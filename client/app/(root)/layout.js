@@ -6,7 +6,7 @@ export const metadata = {
 export default function RootLayout({ children, guest, admin, advertiser, seller, tourGuide, tourismGovernor, tourist }) {
   return (
     <html lang="en">
-      <body>{admin}</body>
+      <body>{seller}</body>
     </html>
   )
 }

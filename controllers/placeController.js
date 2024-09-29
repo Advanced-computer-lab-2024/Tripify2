@@ -20,23 +20,9 @@ const addPlace = async (req, res) => {
 const getPlacesTourismGovernor = async (req, res) => {
   const tourismGovernorId = req.tourismGovernorId;
   //const tourismGovernorId= "66f6f9e8fc38c76b12147e66"
-  const { myPlaces, specificPlace, Name, Tags } = req.query;
-  const query = {};
+  const { myPlaces } = req.query;
   try {
-    if (specificPlace) {
-      if (Name) query.Name = Name;
-      if (Tags) {
-        const putTagsInArray = Tags.split(",").map((eachTag) => eachTag.trim());
-        query.Tags = { $in: putTagsInArray };
-      }
-
-      const places = await Places.find(query);
-      if (!places || !places.length)
-        return res.status(400).json({
-          message: "No places match the given name/tag(s)",
-        });
-      return res.status(200).json(places);
-    } else if (myPlaces) {
+    if (myPlaces) {
       const tourismGovernor = await TourismGovernor.findById(tourismGovernorId);
 
       const nameOfPlaces = tourismGovernor.AddedPlaces;
@@ -58,57 +44,14 @@ const getPlacesTourismGovernor = async (req, res) => {
 const getPlacesTourist = async (req, res) => {
   const touristId = req.touristId;
   //const touristId = "66f70743960a336771bca977";
-  const { Filter, Upcoming, Name, Tags } = req.query;
-  const query = {};
+
   try {
-    if (Filter) {
-      //Tourist / Guest should be able to filter places by tags
-      if (Tags) {
-        const putTagsInArray = Tags.split(",").map((eachTag) => eachTag.trim());
-        query.Tags = { $in: putTagsInArray };
-      }
-
-      const places = await Places.find(query);
-      if (!places || !places.length)
-        return res.status(400).json({
-          message: "No places match the tag(s)",
-        });
-      return res.status(200).json(places);
-    } else if (Upcoming) {
-      //Tourist / Guest view upcoming places==> what is the middleware to check for a guest? wala mafeesh
-      const tourist = await Tourist.findById(touristId);
-      const upcomingPlacesTourist = { $in: tourist.UpcomingPlaces }; //!!!!!add attribute UpcomingPlaces to tourist schema!!!!!
-      query.Name = upcomingPlacesTourist;
-
-      const places = await Places.find(query);
-      if (!places)
-        return res.status(400).json({ message: "No upcoming places!" });
-      return res.status(200).json(places);
-    } else if (Name || Tags) {
-      //Tourist can search for a SPECIFIC place by (name or tag) (ana amelha yenfa3 tefilter bel etnain aw wahda menhom)
-      if (Name) query.Name = Name; //akhaleeha case-insensitive? regrex
-      if (Tags) {
-        const putTagsInArray = Tags.split(",").map((eachTag) => eachTag.trim());
-        query.Tags = { $in: putTagsInArray };
-      }
-
-      const places = await Places.find(query);
-      if (!places || !places.length)
-        return res.status(400).json({
-          message: "No places match the given name/tag(s)",
-        });
-      return res.status(200).json(places);
-    } else {
-      //all places
-      try {
-        const places = await Places.find({});
-        if (!places)
-          return res.status(400).json({ message: "No places available" });
-        return res.status(200).json(places);
-      } catch (error) {
-        return res.status(500).json({ message: error.message });
-      }
-    }
+    const places = await Places.find({});
+    if (!places)
+      return res.status(400).json({
+        message: "No places match the given name/tag(s)",
+      });
+    return res.status(200).json(places);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

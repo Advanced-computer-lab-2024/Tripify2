@@ -5,10 +5,11 @@ const { getActivity, createActivity, updateActivity, deleteActivity, getActivity
 
 router.route('/')
     .get(getActivity)
-    .get(getActivityById)
     .post(createActivity)
     .put( updateActivity)
     .delete(deleteActivity)
+    router.route('/:id')
+    .get(getActivityById)
 
 module.exports = router
     

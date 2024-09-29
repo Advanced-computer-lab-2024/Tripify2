@@ -44,7 +44,21 @@ const createUser = async (req,res)=>{
 
 const getAllUsers= async (req,res) => {
     try {
-        const users= await userModel.find({})
+        const queryName = req.query.UserName
+        if(queryName){
+            const user= await userModel.find({UserName: queryName})
+            if(!user){
+                return res.status(404).json("No users found")
+            }
+            res.status(200).json(users)
+        }
+        else{
+            const users= await userModel.find({})
+            if(!users){
+                return res.status(404).json("No users found")
+        }
+        res.status(200).json(users)
+        }
         if(!users){
             return res.status(404).json("No users found")
         }

@@ -25,6 +25,7 @@ app.use('/tourguides', require('./routes/tourguideRoutes'))
 app.use('/itineraries', require('./routes/itineraryRoutes'))
 app.use('/categories', require('./routes/categoryRoutes'))
 app.use('/users', require('./routes/userRoutes'))
+app.use('/activities', require('./routes/activityRoutes'))
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB')

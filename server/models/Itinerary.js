@@ -3,12 +3,19 @@ const Schema = mongoose.Schema;
 
 const ItinerarySchema = new Schema(
   {
-    Activities: [{
-      Activity: { type: Schema.Types.ObjectId, ref: 'Activity' },
-      duration: Number
-    }],
+    Activities: [
+      {
+        Activity: {
+          type: Schema.Types.ObjectId,
+          /*type: String,*/
+          ref: "Activity",
+        },
+        duration: Number,
+      },
+    ],
     TourGuide: {
       type: Schema.Types.ObjectId,
+      // type: String,
       ref: "TourGuide",
       required: true,
     },
@@ -53,13 +60,13 @@ const ItinerarySchema = new Schema(
       required: true,
     },
     Category: {
-        type: String,
-        required:true,
+      type: String,
+      required: true,
     },
     Tag: {
-        type:String,
-        required:true,
-    }
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

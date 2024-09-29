@@ -60,7 +60,12 @@ const updateTourist = async (req, res) => {
     DOB,
     Occupation,
     Email,
-    Password /*, Wallet */,
+    Password,
+    UpcomingPlaces,
+    UpcomingActivities,
+    UpcomingItineraries,
+    Wishlist,
+    /* Wallet, */
   } = req.body;
 
   try {
@@ -107,9 +112,22 @@ const updateTourist = async (req, res) => {
     if (Occupation) {
       tourist.Occupation = Occupation;
     }
-    // if (Wallet) {
-    //   tourist.Wallet = Wallet;
-    // }
+
+    if (UpcomingPlaces) {
+      tourist.UpcomingPlaces = UpcomingPlaces;
+    }
+
+    if (UpcomingActivities) {
+      tourist.UpcomingActivities = UpcomingActivities;
+    }
+
+    if (UpcomingItineraries) {
+      tourist.UpcomingItineraries = UpcomingItineraries;
+    }
+
+    if (Wishlist) {
+      tourist.Wishlist = Wishlist;
+    }
 
     await tourist.save();
 

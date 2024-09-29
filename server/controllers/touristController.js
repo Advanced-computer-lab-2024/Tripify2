@@ -1,12 +1,30 @@
 const touristModel = require("../models/Tourist.js");
 const userModel = require("../models/User.js");
+const bcrypt = require("bcrypt");
 
 const createTourist = async (req, res) => {
-  const { MobileNumber, Nationality, DOB, Occupation, Wallet, UserId } =
+  const { UserName, Email, Password, MobileNumber, Nationality, DOB, Occupation, Wallet } =
     req.body;
 
   try {
-    const existingTourist = await touristModel.findOne({ UserId });
+    if (!UserName || !Email || !Password)
+      return res.status(400).json({ message: "All Fields Must Be Given!" });
+  
+    const duplicateUser = await userModel.findOne({ Email });
+  
+    if (duplicateUser)
+      return res.status(400).json({ message: "Email Already Exists!" });
+  
+    const hashedPwd = await bcrypt.hash(Password, 10);
+  
+    const user = await userModel.create({
+      UserName,
+      Email,
+      Password: hashedPwd,
+      Role: "Tourist",
+    });
+
+    const existingTourist = await touristModel.findOne({ UserId: user._id });
 
     if (existingTourist) {
       return res.status(409).json({
@@ -14,13 +32,13 @@ const createTourist = async (req, res) => {
       });
     }
 
-    const newTourist = await new touristModel({
+    const newTourist = new touristModel({
       MobileNumber,
       Nationality,
       DOB,
       Occupation,
       Wallet,
-      UserId,
+      UserId: user._id
     });
     await newTourist.save();
     res.status(201).json({

@@ -7,6 +7,11 @@ const ItinerarySchema = new Schema(
       Activity: { type: Schema.Types.ObjectId, ref: 'Activity' },
       duration: Number
     }],
+    TourGuide: {
+      type: Schema.Types.ObjectId,
+      ref: "TourGuide",
+      required: true,
+    },
     Locations: [
       {
         type: String,

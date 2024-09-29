@@ -1,5 +1,19 @@
 const Product = require('../models/Product')
 
+async function getMyProducts(req, res) 
+{
+    const { userId } = req.params
+    try 
+    {
+        const products = await Product.find({ Seller: userId })
+        return res.json(products)
+    } 
+    catch (e) 
+    {
+        return res.status(500).json({ message: 'Error fetching products', error: e.message })
+    }
+}
+
 async function getProducts(req, res) {
     try 
     {
@@ -106,4 +120,4 @@ async function deleteProduct(req, res) {
     }
 }
 
-module.exports = { getProducts, getProductById, createProduct, updateProduct, deleteProduct }
+module.exports = { getProducts, getProductById, getMyProducts, createProduct, updateProduct, deleteProduct }

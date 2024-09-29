@@ -7,18 +7,6 @@ const advertiserSchema = new Schema({
     ref: 'User',
     required: true,
   },
-    Username: {
-    type: String,
-    required: true,
-  },
-  Email: {
-    type: String,
-    required: true
-  },
-  Password: {
-    type: String,
-    required: true,
-  },
   Website: {
     type: String,
     required: true,
@@ -33,7 +21,6 @@ const advertiserSchema = new Schema({
   },
   Accepted: {
     type: Boolean,
-    required: true,
     default: null
   }
 }, { timestamps: true });

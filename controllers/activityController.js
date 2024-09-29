@@ -26,7 +26,7 @@ const getActivityById = async (req, res) => {
     //const { Username, Email, Password, Website, Hotline, Profile, Accepted } = req.body;
 
     try {
-        const findActivity = await activityfModel.findById(id);
+        const findActivity = await activityModel.findById(id);
         
         if (!findActivity) {
             return res.json({ message: 'Activity not found' });

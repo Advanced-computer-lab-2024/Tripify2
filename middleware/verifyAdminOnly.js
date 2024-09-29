@@ -9,17 +9,26 @@ const verifyAdmin = (req, res, next) => {
 
     const token = authHeader.split(' ')[1]
 
-    jwt.verify(
-        token,
-        process.env.ACCESS_TOKEN_SECRET,
-        (err, decoded) => {
-            if (err) return res.status(403).json({ message: 'Forbidden' })
-            req.username = decoded.user.username
-            req.role = decoded.user.role
-            if(decoded.user.role === 'Admin' || decoded.user.role === 'Admin') next()
-            else return res.status(403).json({ message: 'Forbidden' })
-        }
-    )
+    if(process.env.ACCESS_TOKEN_SECRET)
+    {
+        jwt.verify(
+            token,
+            process.env.ACCESS_TOKEN_SECRET,
+            (err, decoded) => {
+                if (err) return res.status(403).json({ message: 'Forbidden' })
+                if (typeof decoded === 'object' && decoded !== null) {
+                    const user = decoded.user;
+                    if (user && typeof user === 'object' && 'username' in user && 'role' in user)
+                    {
+                        req.username = decoded?.user?.username
+                        req.role = decoded?.user?.role
+                        if(decoded?.user?.role === 'Admin') next()
+                        else return res.status(403).json({ message: 'Forbidden' })
+                    }   
+                }
+            }
+        )
+    }
 }
 
 module.exports = verifyAdmin

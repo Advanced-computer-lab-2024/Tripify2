@@ -1,10 +1,10 @@
 const advertiserModel = require('../models/Advertiser.js'); 
 
 const createAdvertiser = async (req, res) => {
-    const { UserId, Username, Email, Password, Website, Hotline, Profile, Accepted } = req.body;
+    const { UserId, Website, Hotline, Profile, Accepted } = req.body;
 
     try {
-        const newAdvertiser = await new advertiserModel({ UserId, Username, Email, Password, Website, Hotline, Profile, Accepted });
+        const newAdvertiser = await new advertiserModel({ UserId, Website, Hotline, Profile, Accepted });
         await newAdvertiser.save();
         res.status(201).json({ message: 'Advertiser created successfully', advertiser: newAdvertiser });
     } catch (error) {

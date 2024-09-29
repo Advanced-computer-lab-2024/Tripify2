@@ -5,10 +5,12 @@ const verifyAdvertiser = require('../middleware/verifyAdvertiser')
 
 router.route('/')
     .get(getAdvertisers)
-    .get(getAdvertiserById)
     .post(createAdvertiser)
     .put(verifyAdvertiser, updateAdvertiser)
     .delete(verifyAdvertiser, deleteAdvertiser)
 
-module.exports = router
+router.route('/:id')    
+    .get(getAdvertiserById)
+
+    module.exports = router
     

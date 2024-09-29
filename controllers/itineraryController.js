@@ -28,6 +28,7 @@ const createItinerary = async(req,res) => {
 
     }
    }
+
    const getItinerary = async (req, res) => {
     const {id}= req.params
     try {

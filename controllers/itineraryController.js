@@ -5,10 +5,10 @@ const createItinerary = async(req,res) => {
     //add a new itinerary to the database with 
     //ctivities, Locations, Timeline, DurationOfActivity, Language, Price, DatesAndTimes, Accesibility, Pickup, and Dropoff 
     const { Activities, Locations, StartDate, EndDate, Language, Price, DatesAndTimes, Accesibility, 
-        Pickup, Dropoff }=req.body;
+        Pickup, Dropoff, Category, Tag } = req.body;
     try {
        const itinerary = await ItineraryModel.create({Activities, Locations, StartDate, EndDate, Language, Price, DatesAndTimes, Accesibility, 
-        Pickup, Dropoff});
+        Pickup, Dropoff, Category, Tag });
        res.status(200).json({msg:"Itinerary created Successfully\n", itinerary});
     }
     catch(e) {

@@ -11,7 +11,7 @@ const SellerSchema = new Schema({
     required: true
   },
   UserId: {
-    type: Number,
+    type: String,
     //ref: 'User',
     required: true,
   },

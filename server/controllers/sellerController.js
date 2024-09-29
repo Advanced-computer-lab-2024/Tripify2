@@ -35,6 +35,31 @@ const createSeller = async(req,res) => {
         return res.status(500).json({ message: 'Error fetching seller', error: e.message })
     }
    }
+   const getSellers = async (req, res) => {
+    try {
+        const { UserName } = req.body;
+        if (UserName) {
+          const user = await SellerModel.findOne({ UserName });
+          if (!user) {
+            return res.status(404).json("No sellers found");
+          }
+          res.status(200).json(user);
+        } else {
+          const users = await SellerModel.find({});
+          if (!users) {
+            return res.status(404).json("No sellers found");
+          }
+          res.status(200).json(users);
+        }
+        if (!users) {
+          return res.status(404).json("No sellers found");
+        }
+        res.status(200).json(users);
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ message: error.message });
+      }
+   }
 
    const updateSeller = async (req, res) => {
     try{
@@ -56,4 +81,4 @@ const createSeller = async(req,res) => {
 
    }
 
- module.exports = {createSeller, getSeller, updateSeller}
+ module.exports = {createSeller, getSeller, getSellers, updateSeller}

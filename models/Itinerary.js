@@ -47,6 +47,14 @@ const ItinerarySchema = new Schema(
       type: String,
       required: true,
     },
+    Category: {
+        type: String,
+        required:true,
+    },
+    Tag: {
+        type:String,
+        required:true,
+    }
   },
   { timestamps: true }
 );

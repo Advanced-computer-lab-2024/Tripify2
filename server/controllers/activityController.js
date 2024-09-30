@@ -15,7 +15,7 @@ const createActivity = async (req, res) => {
   } = req.body;
 
   try {
-    const newActivity = await new activityModel({
+    const newActivity = new activityModel({
       Name,
       Date,
       Time,

@@ -39,7 +39,7 @@ const createAdvertiser = async (req, res) => {
       Password: hashedPwd,
       Role: "Advertiser",
     });
-    const newadvertiser = advertiserModel.create({
+    const newadvertiser = await advertiserModel.create({
       UserId: user._id,
       Website,
       Hotline,

@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const ActivitySchema = new Schema(
   {
+    Name: {
+      type: String,
+      require: true,
+    },
     Date: {
       type: Date,
       required: true,
@@ -14,13 +18,13 @@ const ActivitySchema = new Schema(
     Location: {
       type: {
         type: String, // Don't do `{ location: { type: String } }`
-        enum: ['Point'], // 'location.type' must be 'Point'
-        required: true
+        enum: ["Point"], // 'location.type' must be 'Point'
+        required: true,
       },
       coordinates: {
         type: [Number],
-        required: true
-      }
+        required: true,
+      },
     },
     Price: {
       type: Number,
@@ -28,17 +32,19 @@ const ActivitySchema = new Schema(
     },
     CategoryId: {
       type: Schema.Types.ObjectId,
-      ref: 'Category',
+      ref: "Category",
     },
-    Tags: [{
-      type: String,
-    }],
+    Tags: [
+      {
+        type: String,
+      },
+    ],
     SpecialDiscounts: {
       type: Number,
     },
     AdvertiserId: {
       type: Schema.Types.ObjectId,
-      ref: 'Advertiser',
+      ref: "Advertiser",
       required: true,
     },
     Duration: {
@@ -46,8 +52,9 @@ const ActivitySchema = new Schema(
       required: true,
     },
     Inappropriate: {
-      type:Boolean
-    }
+      type: Boolean,
+      default: null,
+    },
   },
   { timestamps: true }
 );

@@ -3,7 +3,7 @@ const tourguideModel = require("../models/Tourguide.js");
 const { default: mongoose } = require("mongoose");
 
 const createTourguideProfile = async (req, res) => {
-  const { MobileNumber, YearsOfExperience, PreviousWork, UserId, Accepted } =
+  const { MobileNumber, YearsOfExperience, PreviousWork, UserId, Accepted, Documents } =
     req.body;
   try {
     const tourguide = await userModel.create({
@@ -12,6 +12,7 @@ const createTourguideProfile = async (req, res) => {
       PreviousWork,
       UserId,
       Accepted,
+      Documents,
     });
     res.status(200).json(tourguide);
   } catch (error) {
@@ -49,7 +50,7 @@ const getTourguideProfile = async (req, res) => {
 };
 
 const updateTourguideProfile = async (req, res) => {
-  const { MobileNumber, YearsOfExperience, PreviousWork, UserId, Accepted } =
+  const { MobileNumber, YearsOfExperience, PreviousWork, UserId, Accepted, Documents } =
     req.body;
   try {
     if (Accepted) {

@@ -1,4 +1,4 @@
-import Dashboard from "@/components/ui/Allproducts";
+import Dashboard from "@/components/ui/dashboard";
 
 export const metadata = {
   title: "Next.js",
@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header>
-        <Dashboard params={{ role: "Seller" }} />
+          <Dashboard params={{ role: "Seller" }} />
         </header>
         {seller}
       </body>

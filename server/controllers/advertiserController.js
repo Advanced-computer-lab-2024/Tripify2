@@ -1,10 +1,10 @@
 const advertiserModel = require('../models/Advertiser.js'); 
 
 const createAdvertiser = async (req, res) => {
-    const { UserId, Website, Hotline, Profile, Accepted } = req.body;
+    const { UserId, Website, Hotline, Profile, Accepted, Documents } = req.body;
 
     try {
-        const newAdvertiser = await new advertiserModel({ UserId, Website, Hotline, Profile, Accepted });
+        const newAdvertiser = await new advertiserModel({ UserId, Website, Hotline, Profile, Accepted, Documents });
         await newAdvertiser.save();
         res.status(201).json({ message: 'Advertiser created successfully', advertiser: newAdvertiser });
     } catch (error) {
@@ -40,10 +40,10 @@ const getAdvertiserById = async (req, res) => {
 
 const updateAdvertiser = async (req, res) => {
     const { id } = req.body;
-    const { Username, Email, Password, Website, Hotline, Profile, Accepted } = req.body;
+    const { Username, Email, Password, Website, Hotline, Profile, Accepted, Documents } = req.body;
 
     try {
-        const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(id, { Username, Email, Password, Website, Hotline, Profile, Accepted }, { new: true });
+        const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(id, { Username, Email, Password, Website, Hotline, Profile, Accepted, Documents }, { new: true });
         
         if (!updatedAdvertiser) {
             return res.json({ message: 'Advertiser not found' });

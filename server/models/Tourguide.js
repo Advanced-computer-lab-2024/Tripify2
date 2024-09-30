@@ -24,6 +24,10 @@ const TourGuideSchema = new Schema(
       type: Boolean,
       default: null
     },
+    Documents: {
+      type: [String], 
+      required: true, 
+    }
   },
   { timestamps: true }
 );

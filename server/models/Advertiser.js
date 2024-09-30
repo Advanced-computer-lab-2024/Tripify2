@@ -22,6 +22,10 @@ const advertiserSchema = new Schema({
   Accepted: {
     type: Boolean,
     default: null
+  },
+  Documents: {
+    type: [String], 
+    required: true, 
   }
 }, { timestamps: true });
 

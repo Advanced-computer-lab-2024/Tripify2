@@ -1,35 +1,69 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard({ params }) {
   const { role } = params;
+  const router = useRouter();
+
   let dashboardElements;
   switch (role) {
     case "Tourist":
-      dashboardElements = ["Account", "Bought Products", "Upcoming"];
+      dashboardElements = [
+        { name: "Account", link: "/account" },
+        { name: "Bought Products", link: "/boughtProducts" },
+        { name: "Upcoming", link: "/upcoming" },
+      ];
       break;
     case "Tour Guide":
-      dashboardElements = ["Account", "My Tours", "Schedule", "Earnings"];
+      dashboardElements = [
+        { name: "Account", link: "/account" },
+        { name: "My Tours", link: "/myTours" },
+        { name: "Schedule", link: "/schedule" },
+        { name: "Earnings", link: "/earnings" },
+      ];
       break;
     case "Advertiser":
-      dashboardElements = ["Account", "Ad Campaigns", "Statistics", "Billing"];
+      dashboardElements = [
+        { name: "Account", link: "/account" },
+        { name: "Ad Campaigns", link: "adCampagins" },
+        { name: "Statistics", link: "/statistics" },
+        { name: "Billing", link: "/billing" },
+      ];
       break;
     case "Seller":
-      dashboardElements = ["Account", "My Products", "Orders", "Sales Stats"];
+      dashboardElements = [
+        { name: "Account", link: "/account" },
+        { name: "My Products", link: "/myProducts" },
+        { name: "Orders", link: "/orders" },
+        { name: "Sales Stats", link: "/salesStats" },
+      ];
       break;
     case "Tourism Governor":
-      dashboardElements = ["Account", "Regulations", "Reports", "Approvals"];
+      dashboardElements = [
+        { name: "Account", link: "/account" },
+        { name: "Regulations", link: "/regulations" },
+        { name: "Reports", link: "/reports" },
+        { name: "Approvals", link: "/approvals" },
+      ];
       break;
     case "Admin":
       dashboardElements = [
-        "Account",
-        "User Management",
-        "System Settings",
-        "Reports",
+        { name: "Account", link: "/account" },
+        { name: "User Management", link: "/userManagment" },
+        { name: "System Settings", link: "/systemSettings" },
+        { name: "Reports", link: "/reports" },
       ];
       break;
     default:
-      dashboardElements = ["Sign in", "Sign up"];
+      dashboardElements = [
+        { name: "Sign in", link: "/signin" },
+        { name: "Sign up", link: "/signup" },
+      ];
   }
+
+  const handleReroute = (route) => {
+    router.push(route);
+  };
 
   return (
     //ghayar classNames ==> tailwind
@@ -39,9 +73,13 @@ export default function Dashboard({ params }) {
       </div>
       <div className="dashboard--right">
         {dashboardElements.map((element, index) => {
-          return <h3 key={index}>{element}</h3>;
+          return (
+            <button onClick={() => handleReroute(element.link)} key={index}>
+              {element.name}
+            </button>
+          );
         })}
-        <h3>Sign Out</h3>
+        <button onClick={() => handleReroute("/signout")}>Sign Out</button>
       </div>
     </div>
   );

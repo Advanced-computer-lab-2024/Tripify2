@@ -28,10 +28,6 @@ const advertiserSchema = new Schema(
       type: [String],
       required: true,
     },
-    inappropriate: {
-      type: Boolean,
-      default: null,
-    },
   },
   { timestamps: true }
 );

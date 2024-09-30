@@ -28,12 +28,10 @@ const createActivity = async (req, res) => {
       Duration,
     });
     await newActivity.save();
-    res
-      .status(201)
-      .json({
-        message: "Advertiser created successfully",
-        activity: newActivity,
-      });
+    res.status(201).json({
+      message: "Advertiser created successfully",
+      activity: newActivity,
+    });
   } catch (error) {
     res.status(400).json({ message: "Error creating advertiser", error });
   }
@@ -78,6 +76,7 @@ const updateActivity = async (req, res) => {
     SpecialDiscounts,
     AdvertiserId,
     Duration,
+    Inappropriate,
   } = req.body;
 
   try {
@@ -94,6 +93,7 @@ const updateActivity = async (req, res) => {
         SpecialDiscounts,
         AdvertiserId,
         Duration,
+        Inappropriate,
       },
       { new: true }
     );
@@ -102,12 +102,10 @@ const updateActivity = async (req, res) => {
       return res.json({ message: "Activity not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Activity updated successfully",
-        activity: updatedActivity,
-      });
+    res.status(200).json({
+      message: "Activity updated successfully",
+      activity: updatedActivity,
+    });
   } catch (error) {
     res.status(400).json({ message: "Error updating activity", error });
   }

@@ -2,10 +2,10 @@ const { default: mongoose } = require('mongoose');
 const SellerModel = require('../models/Seller.js');
 
 const createSeller = async(req,res) => {
-    const {Name, Description, UserId, Accepted}=req.body;
+    const {Name, Description, UserId, Accepted, Documents}=req.body;
     try {
         if (Accepted){
-            const Seller = await SellerModel.create({Name, Description, UserId, Accepted});
+            const Seller = await SellerModel.create({Name, Description, UserId, Accepted, Documents});
             res.status(200).json({msg:"Seller created Successfully"});
         }
         else{

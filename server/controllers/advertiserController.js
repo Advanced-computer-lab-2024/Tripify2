@@ -56,7 +56,6 @@ const createAdvertiser = async (req, res) => {
     res.status(400).json({ message: "Error creating Adcertiser", error });
   }
 };
-
 const getAdvertisers = async (req, res) => {
   try {
     const advertisers = await advertiserModel.find();
@@ -92,7 +91,7 @@ const updateAdvertiser = async (req, res) => {
   try {
     const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(
       id,
-      { Password, Website, Hotline, Profile, Accepted },
+      { Password, Website, Hotline, Profile, Accepted, Document },
       { new: true }
     );
 

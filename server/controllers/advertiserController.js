@@ -47,7 +47,7 @@ const createAdvertiser = async (req, res) => {
       Accepted,
       Document,
     });
-    await Newadvertiser.save();
+    await newadvertiser.save();
     res.status(201).json({
       message: "Advertiser created successfully",
       tourist: newadvertiser,

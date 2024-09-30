@@ -10,7 +10,7 @@ const Dashboard = () => {
 
   // Function to handle products button click
   const handleProductsClick = () => {
-    router.push('/Seller/products'); // Redirect to the products page (update the path if necessary)
+    router.push('/products'); // Redirect to the products page (update the path if necessary)
   };
 
   return (

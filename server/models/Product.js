@@ -35,6 +35,9 @@ const ProductSchema = new Schema(
             type: Number,
             default: 0,
         },
+        Archived: {
+            type:Boolean
+        }
     },
     {
         timestamps: true,

@@ -75,7 +75,7 @@ export default function Dashboard({ params }) {
         {dashboardElements.map((element, index) => {
           return (
             <button onClick={() => handleReroute(element.link)} key={index}>
-              {element}
+              {element.name}
             </button>
           );
         })}

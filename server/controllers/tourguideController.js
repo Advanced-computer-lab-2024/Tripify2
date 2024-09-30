@@ -96,7 +96,7 @@ const updateTourguideProfile = async (req, res) => {
   }
 };
 
-const deleteTourGuide = async (req, res) => {
+const deleteTourguide = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -117,5 +117,5 @@ module.exports = {
   getTourguideProfile,
   updateTourguideProfile,
   allTourguides,
-  deleteTourGuide
+  deleteTourguide
 };

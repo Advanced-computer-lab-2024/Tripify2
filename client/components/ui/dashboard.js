@@ -1,8 +1,8 @@
 "use client";
-
 export default function Dashboard({ params }) {
   const { role } = params;
   let dashboardElements;
+  //zawed reroutes
   switch (role) {
     case "Tourist":
       dashboardElements = ["Account", "Bought Products", "Upcoming"];

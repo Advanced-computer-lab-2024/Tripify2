@@ -1,9 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useState } from "react"; // Import useState
 
 export default function Dashboard({ params }) {
   const { role } = params;
   const router = useRouter();
+  const [activeSublinks, setActiveSublinks] = useState([]);
 
   let dashboardElements;
   switch (role) {
@@ -11,7 +13,23 @@ export default function Dashboard({ params }) {
       dashboardElements = [
         { name: "Account", link: "/account" },
         { name: "Bought Products", link: "/boughtProducts" },
-        { name: "Upcoming", link: "/upcoming" },
+        {
+          name: "Upcoming",
+          link: "/upcoming",
+          sublinks: [
+            { name: "All Upcoming", link: "/upcoming" },
+            { name: "My Upcoming", link: "/myUpcoming" },
+          ],
+        },
+        {
+          name: "Itineraries",
+          link: "/itineraries",
+          sublinks: [
+            { name: "All Itineraries", link: "/itineraries" },
+            { name: "My Itineraries", link: "/myItineraries" },
+            { name: "Upcoming Itineraries", link: "/upcomingItineraries" },
+          ],
+        },
       ];
       break;
     case "Tour Guide":
@@ -25,7 +43,7 @@ export default function Dashboard({ params }) {
     case "Advertiser":
       dashboardElements = [
         { name: "Account", link: "/account" },
-        { name: "Ad Campaigns", link: "adCampagins" },
+        { name: "Ad Campaigns", link: "/adCampagins" },
         { name: "Statistics", link: "/statistics" },
         { name: "Billing", link: "/billing" },
       ];
@@ -65,6 +83,14 @@ export default function Dashboard({ params }) {
     router.push(route);
   };
 
+  const toggleSublinks = (index) => {
+    setActiveSublinks((prev) => {
+      if (prev.includes(index))
+        return prev.filter((element) => element !== index);
+      else return [...prev, index];
+    });
+  };
+
   return (
     //ghayar classNames ==> tailwind
     <div className="dashboard-container">
@@ -74,9 +100,28 @@ export default function Dashboard({ params }) {
       <div className="dashboard--right">
         {dashboardElements.map((element, index) => {
           return (
-            <button onClick={() => handleReroute(element.link)} key={index}>
-              {element.name}
-            </button>
+            <div key={index}>
+              <button
+                onClick={() => {
+                  if (element.sublinks) toggleSublinks(index);
+                  else handleReroute(element.link);
+                }}
+              >
+                {element.name}
+              </button>
+              {activeSublinks.includes(index) && (
+                <div className="sublinks-container">
+                  {element.sublinks.map((sublink, sublinkIndex) => (
+                    <button
+                      key={sublinkIndex}
+                      onClick={() => handleReroute(sublink.link)}
+                    >
+                      {sublink.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           );
         })}
         <button onClick={() => handleReroute("/signout")}>Sign Out</button>

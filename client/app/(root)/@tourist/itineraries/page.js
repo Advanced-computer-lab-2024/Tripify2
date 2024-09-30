@@ -5,6 +5,7 @@ export default async function Itineraries() {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
     },
   });
   if (!response.ok) {

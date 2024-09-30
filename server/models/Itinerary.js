@@ -67,6 +67,9 @@ const ItinerarySchema = new Schema(
       type: String,
       required: true,
     },
+    Inappropriate: {
+      type:Boolean,
+    }
   },
   { timestamps: true }
 );

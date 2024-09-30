@@ -19,7 +19,7 @@ export default function Dashboard({ params }) {
         { name: "Account", link: "/account" },
         { name: "My Tours", link: "/myTours" },
         { name: "Schedule", link: "/schedule" },
-        "Earnings",
+        { name: "Earnings", link: "/earnings" },
       ];
       break;
     case "Advertiser":

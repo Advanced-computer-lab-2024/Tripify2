@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 
 export default function Dashboard({ params }) {
   const { role } = params;
@@ -92,29 +92,30 @@ export default function Dashboard({ params }) {
   };
 
   return (
-    //ghayar classNames ==> tailwind
-    <div className="dashboard-container">
+    <div className="flex flex-col sm:flex-row justify-between items-center bg-gray-800 text-white p-4">
       <div className="dashboard--left">
-        <h3>Logo</h3>
+        <h3 className="text-lg font-bold">Logo</h3>
       </div>
-      <div className="dashboard--right">
+      <div className="dashboard--right flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
         {dashboardElements.map((element, index) => {
           return (
-            <div key={index}>
+            <div key={index} className="relative">
               <button
                 onClick={() => {
                   if (element.sublinks) toggleSublinks(index);
                   else handleReroute(element.link);
                 }}
+                className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out"
               >
                 {element.name}
               </button>
               {activeSublinks.includes(index) && (
-                <div className="sublinks-container">
+                <div className="absolute left-0 mt-2 w-48 bg-gray-700 rounded shadow-lg">
                   {element.sublinks.map((sublink, sublinkIndex) => (
                     <button
                       key={sublinkIndex}
                       onClick={() => handleReroute(sublink.link)}
+                      className="block text-left w-full py-2 px-4 hover:bg-gray-600 transition duration-300 ease-in-out"
                     >
                       {sublink.name}
                     </button>
@@ -124,7 +125,12 @@ export default function Dashboard({ params }) {
             </div>
           );
         })}
-        <button onClick={() => handleReroute("/signout")}>Sign Out</button>
+        <button
+          onClick={() => handleReroute("/signout")}
+          className="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out"
+        >
+          Sign Out
+        </button>
       </div>
     </div>
   );

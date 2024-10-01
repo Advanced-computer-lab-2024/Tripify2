@@ -1,28 +1,31 @@
 'use client';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 
-export default function Allproducts({ products }) {
-  const router = useRouter(); // Initialize router
+export default function Allproducts({ products, searchQuery }) {
+  const router = useRouter();
 
-  console.log(products); // Log to inspect the products array
+  const filteredProducts = products.filter((product) =>
+    product.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.Price.toString().includes(searchQuery)
+  );
 
-  if (!products || products.length === 0) {
-    return <h2>No products available.</h2>;
+  if (!filteredProducts || filteredProducts.length === 0) {
+    return <h2>No products found.</h2>;
   }
 
   const handleViewDetails = (id) => {
-    router.push(`/products/${id}`); // Navigate to the dynamic product page
+    router.push(`/products/${id}`);
   };
 
   return (
     <div style={styles.productGrid}>
-      {products.map((eachproduct) => (
+      {filteredProducts.map((eachproduct) => (
         <div key={eachproduct._id} style={styles.productCard}>
           <h2 style={styles.productName}>{eachproduct.Name}</h2>
           <p style={styles.productPrice}>Price: ${eachproduct.Price}</p>
           <button 
             style={styles.detailsButton}
-            onClick={() => handleViewDetails(eachproduct._id)} // Use the defined function
+            onClick={() => handleViewDetails(eachproduct._id)}
           >
             View Details
           </button>
@@ -32,7 +35,6 @@ export default function Allproducts({ products }) {
   );
 }
 
-// Styles using inline CSS
 const styles = {
   productGrid: {
     display: 'grid',

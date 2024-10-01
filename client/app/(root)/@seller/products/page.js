@@ -6,9 +6,9 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [minPrice] = useState(0); // Fixed min price
-  const [maxPrice, setMaxPrice] = useState(100); // Default max price for the slider
-  const [currentMaxPrice, setCurrentMaxPrice] = useState(100); // Slider-controlled price
+  const [minPrice] = useState(0); 
+  const [maxPrice, setMaxPrice] = useState(100); 
+  const [currentMaxPrice, setCurrentMaxPrice] = useState(100); 
 
   // Function to fetch products
   const fetchProducts = async () => {
@@ -32,13 +32,12 @@ export default function Products() {
       const maxPrice = Math.max(...prices);
 
       setMaxPrice(maxPrice);
-      setCurrentMaxPrice(maxPrice); // Set slider default to max price
+      setCurrentMaxPrice(maxPrice);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
   };
 
-  // Filter products based on the selected price range
   const filterByPrice = () => {
     const filtered = products.filter(
       (product) => product.Price >= minPrice && product.Price <= currentMaxPrice
@@ -56,14 +55,12 @@ export default function Products() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Reapply price filter when max price changes
   useEffect(() => {
     filterByPrice();
   }, [currentMaxPrice]);
 
   return (
     <div>
-      {/* Search input */}
       <input
         type="text"
         placeholder="Search products..."
@@ -75,12 +72,12 @@ export default function Products() {
       {/* Single Price Slider */}
       <div style={styles.filterContainer}>
         <div>
-          <label>Max Price: ${currentMaxPrice.toFixed(2)}</label> {/* Display float with 2 decimals */}
+          <label>Max Price: ${currentMaxPrice.toFixed(2)}</label> 
           <input
             type="range"
             min={minPrice}
             max={maxPrice}
-            step="0.01" // Allow increments by 0.01 for floating-point numbers
+            step="0.01" 
             value={currentMaxPrice}
             onChange={(e) => setCurrentMaxPrice(parseFloat(e.target.value))} // Parse as float
             style={styles.slider}
@@ -94,7 +91,6 @@ export default function Products() {
   );
 }
 
-// Add styles for the sliders and other elements
 const styles = {
   searchInput: {
     padding: "8px",

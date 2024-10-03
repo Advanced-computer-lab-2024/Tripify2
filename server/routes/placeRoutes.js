@@ -7,6 +7,7 @@ const {
   getPlacesTourist,
   updatePlace,
   deletePlace,
+  getPlace,
 } = require("../controllers/placeController");
 
 //Valid Tourism Governor check
@@ -47,6 +48,7 @@ router
   .patch(updatePlace)
   .delete(deletePlace)
   .post(addPlace);
+router.route("/:id").get(getPlace);
 router.get("/touristGovernor", getPlacesTourismGovernor);
 // router.post("/add" /*, tourismGovernorCheck*/, addPlace);
 // router.delete("/remove" /*, tourismGovernorCheck*/, deletePlace);

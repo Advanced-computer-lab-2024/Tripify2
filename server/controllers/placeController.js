@@ -67,6 +67,19 @@ const getPlacesTourismGovernor = async (req, res) => {
   }
 };
 
+const getPlace = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const place = await Places.findById(id)
+      .populate("Tags", "Tag")
+      .populate("Categories", "Category");
+    if (!place) return res.status(404).json({ msg: "Place not found" });
+    return res.status(200).json(place);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving tourist", error });
+  }
+};
+
 const getPlacesTourist = async (req, res) => {
   const touristId = req.touristId;
   //const touristId = "66f70743960a336771bca977";
@@ -127,4 +140,5 @@ module.exports = {
   deletePlace,
   getPlacesTourismGovernor,
   getPlacesTourist,
+  getPlace,
 };

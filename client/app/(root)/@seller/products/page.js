@@ -6,9 +6,10 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [minPrice] = useState(0); 
-  const [maxPrice, setMaxPrice] = useState(100); 
-  const [currentMaxPrice, setCurrentMaxPrice] = useState(100); 
+  const [minPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(100);
+  const [currentMaxPrice, setCurrentMaxPrice] = useState(100);
+  const [sortOption, setSortOption] = useState("none"); // State for sorting
 
   // Function to fetch products
   const fetchProducts = async () => {
@@ -30,7 +31,6 @@ export default function Products() {
       // Extract max price from products
       const prices = data.map((product) => product.Price);
       const maxPrice = Math.max(...prices);
-
       setMaxPrice(maxPrice);
       setCurrentMaxPrice(maxPrice);
     } catch (error) {
@@ -42,12 +42,26 @@ export default function Products() {
     const filtered = products.filter(
       (product) => product.Price >= minPrice && product.Price <= currentMaxPrice
     );
-    setFilteredProducts(filtered);
+    sortProducts(filtered); // Apply sorting after filtering
+  };
+
+  const handleSortChange = (event) => {
+    setSortOption(event.target.value);
+    sortProducts(filteredProducts, event.target.value);
+  };
+
+  const sortProducts = (productsToSort, sortOrder = sortOption) => {
+    let sortedProducts = [...productsToSort];
+    if (sortOrder === "lowToHigh") {
+      sortedProducts.sort((a, b) => a.Rating - b.Rating);
+    } else if (sortOrder === "highToLow") {
+      sortedProducts.sort((a, b) => b.Rating - a.Rating);
+    }
+    setFilteredProducts(sortedProducts);
   };
 
   useEffect(() => {
     fetchProducts();
-
     const intervalId = setInterval(() => {
       fetchProducts();
     }, 60000); // Fetch every minute
@@ -56,7 +70,7 @@ export default function Products() {
   }, []);
 
   useEffect(() => {
-    filterByPrice();
+    filterByPrice(); // Filter and sort when the price changes
   }, [currentMaxPrice]);
 
   return (
@@ -72,16 +86,26 @@ export default function Products() {
       {/* Single Price Slider */}
       <div style={styles.filterContainer}>
         <div>
-          <label>Max Price: ${currentMaxPrice.toFixed(2)}</label> 
+          <label>Max Price: ${currentMaxPrice.toFixed(2)}</label>
           <input
             type="range"
             min={minPrice}
             max={maxPrice}
-            step="0.01" 
+            step="0.01"
             value={currentMaxPrice}
             onChange={(e) => setCurrentMaxPrice(parseFloat(e.target.value))} // Parse as float
             style={styles.slider}
           />
+        </div>
+
+        {/* Sort Dropdown */}
+        <div>
+          <label>Sort by Rating: </label>
+          <select value={sortOption} onChange={handleSortChange} style={styles.dropdown}>
+            <option value="none">None</option>
+            <option value="lowToHigh">Lowest to Highest</option>
+            <option value="highToLow">Highest to Lowest</option>
+          </select>
         </div>
       </div>
 
@@ -109,5 +133,9 @@ const styles = {
   slider: {
     width: "300px",
     margin: "10px",
+  },
+  dropdown: {
+    padding: "8px",
+    fontSize: "14px",
   },
 };

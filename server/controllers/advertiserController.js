@@ -53,7 +53,7 @@ const createAdvertiser = async (req, res) => {
       tourist: newadvertiser,
     });
   } catch (error) {
-    res.status(400).json({ message: "Error creating Adcertiser", error });
+    res.status(400).json({ message: "Error creating Advertiser", error });
   }
 };
 const getAdvertisers = async (req, res) => {

@@ -36,7 +36,7 @@ const PlacesPage = () => {
   const [places, setPlaces] = useState([]);
   const [tags, setTags] = useState([]);
   const [categories, setCategories] = useState([]); // State for categories
-  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]); // Array to hold selected tags
   const [searchTerm, setSearchTerm] = useState(""); // State for the search input
 
   useEffect(() => {
@@ -63,19 +63,25 @@ const PlacesPage = () => {
     return tag ? tag.Tag : ""; // Return the Tag name or empty string if not found
   };
 
-  // Filter places by the selected tag and search term
-  const filteredPlaces = places.filter((place) => {
-    const matchesTag = selectedTag ? place.Tags.includes(selectedTag) : true;
+  // Handle tag selection
+  const handleTagChange = (tagId) => {
+    setSelectedTags(
+      (prev) =>
+        prev.includes(tagId)
+          ? prev.filter((id) => id !== tagId) // Deselect tag if already selected
+          : [...prev, tagId] // Select tag if not selected
+    );
+  };
 
-    // Check if the search term matches the place name, any category name, or any tag name
+  // Filter places by the selected tags and search term
+  const filteredPlaces = places.filter((place) => {
+    const matchesTag = selectedTags.length
+      ? selectedTags.some((tagId) => place.Tags.includes(tagId))
+      : true;
+
+    // Check if the search term matches the place name or any tag name
     const matchesSearch =
       place.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // Check if any category name matches the search term
-      categories.some(
-        (category) =>
-          place.Categories.includes(category._id) &&
-          category.Category.toLowerCase().includes(searchTerm.toLowerCase())
-      ) ||
       place.Tags.some((tagId) =>
         getTagNameById(tagId).toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -84,72 +90,67 @@ const PlacesPage = () => {
   });
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-bold my-6 text-center">Places</h1>
-
-      {/* Search input */}
-      <div className="mb-4 text-center">
-        <label htmlFor="search" className="mr-2 font-semibold">
-          Search:
-        </label>
-        <input
-          type="text"
-          id="search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by name, category, or tag"
-          className="border rounded-md p-2 text-black"
-        />
-      </div>
-
-      {/* Dropdown to select a tag */}
-      <div className="mb-4 text-center">
-        <label htmlFor="tagFilter" className="mr-2 font-semibold">
-          Filter by Tag:
-        </label>
-        <select
-          id="tagFilter"
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-          className="border rounded-md p-2 text-black" // Ensure text color is visible
-        >
-          <option value="">All Tags</option>
-          {Array.isArray(tags) && tags.length > 0 ? (
-            tags.map((tag) => (
-              <option key={tag._id} value={tag._id}>
-                {tag.Tag}{" "}
-                {/* Make sure to use the correct property name here */}
-              </option>
-            ))
-          ) : (
-            <option disabled>No tags available</option>
-          )}
-        </select>
-      </div>
-
-      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPlaces.map((place) => (
-          <li
-            key={place._id}
-            className="border rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow"
-          >
-            <h2 className="text-xl font-semibold mb-2">{place.Name}</h2>
-            {place.Pictures && place.Pictures.length > 0 && (
-              <img
-                src={place.Pictures[0]}
-                alt={place.Name}
-                className="w-full h-40 object-cover rounded-md mb-2"
+    <div className="flex container mx-auto px-4">
+      {/* Filter Section */}
+      <div className="w-1/4 p-6 bg-white shadow-md rounded-lg border border-gray-200">
+        <h2 className="text-2xl font-semibold mb-4 text-center">
+          Filter by Tags
+        </h2>
+        {tags.map((tag) => (
+          <div key={tag._id} className="mb-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={selectedTags.includes(tag._id)}
+                onChange={() => handleTagChange(tag._id)}
+                className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring focus:ring-blue-500"
               />
-            )}
-            <button
-              onClick={() => (window.location.href = `/places/${place._id}`)}
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-            >
-              View Details
-            </button>
-          </li>
+              <span className="ml-2 text-gray-700">{tag.Tag}</span>
+            </label>
+          </div>
         ))}
-      </ul>
+      </div>
+
+      {/* Main Section */}
+      <div className="w-3/4 p-6">
+        {/* Search input */}
+        <div className="mb-4 text-right">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name or tag"
+            className="border rounded-md p-3 text-black w-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+          />
+        </div>
+
+        {/* Places Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPlaces.map((place) => (
+            <div
+              key={place._id}
+              className="border rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow bg-white"
+            >
+              <h2 className="text-xl font-semibold mb-2 text-gray-800">
+                {place.Name}
+              </h2>
+              {place.Pictures && place.Pictures.length > 0 && (
+                <img
+                  src={place.Pictures[0]}
+                  alt={place.Name}
+                  className="w-full h-40 object-cover rounded-md mb-2"
+                />
+              )}
+              <button
+                onClick={() => (window.location.href = `/places/${place._id}`)}
+                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-200"
+              >
+                View Details
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

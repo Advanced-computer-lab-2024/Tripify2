@@ -7,6 +7,7 @@ const {
   getPlacesTourist,
   updatePlace,
   deletePlace,
+  getPlace,
 } = require("../controllers/placeController");
 
 //Valid Tourism Governor check
@@ -43,12 +44,12 @@ const touristCheck = async (req, res, next) => {
 
 router
   .route("/")
-  .get(getPlacesTourismGovernor)
   .get(getPlacesTourist)
   .patch(updatePlace)
   .delete(deletePlace)
   .post(addPlace);
-
+router.route("/:id").get(getPlace);
+router.get("/touristGovernor", getPlacesTourismGovernor);
 // router.post("/add" /*, tourismGovernorCheck*/, addPlace);
 // router.delete("/remove" /*, tourismGovernorCheck*/, deletePlace);
 // router.patch("/update" /*, tourismGovernorCheck*/, updatePlace);

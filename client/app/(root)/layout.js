@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header>
-          <Dashboard params={{ role: "seller" }} />
+          <Dashboard params={{ role: "Seller" }} />
         </header>
         {seller}
       </body>

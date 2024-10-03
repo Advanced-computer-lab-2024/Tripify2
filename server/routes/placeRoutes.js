@@ -43,12 +43,11 @@ const touristCheck = async (req, res, next) => {
 
 router
   .route("/")
-  .get(getPlacesTourismGovernor)
   .get(getPlacesTourist)
   .patch(updatePlace)
   .delete(deletePlace)
   .post(addPlace);
-
+router.get("/touristGovernor", getPlacesTourismGovernor);
 // router.post("/add" /*, tourismGovernorCheck*/, addPlace);
 // router.delete("/remove" /*, tourismGovernorCheck*/, deletePlace);
 // router.patch("/update" /*, tourismGovernorCheck*/, updatePlace);

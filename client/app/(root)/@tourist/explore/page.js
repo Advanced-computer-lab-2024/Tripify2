@@ -7,22 +7,22 @@ export default async function ExplorePage() {
   const resActivity = await fetch(`http://localhost:3001/activities`, {
     cache: "no-store",
   });
-  //   const resPlace = await fetch(`http://localhost:3001/places`, {
-  //     cache: "no-store",
-  //   });
+  const resPlace = await fetch(`http://localhost:3001/places`, {
+    cache: "no-store",
+  });
 
-  if (!resItinerary.ok || !resActivity.ok /*|| !resPlace.ok*/) {
+  if (!resItinerary.ok || !resActivity.ok || !resPlace.ok) {
     throw new Error("Network response was not ok");
   }
 
   const itineraries = await resItinerary.json();
   const activities = await resActivity.json();
-  //const places = await resPlace.json();
+  const places = await resPlace.json();
 
   const params = {
     itineraries,
     activities,
-    /*places,*/
+    places,
   };
 
   return <Explore params={params} />;

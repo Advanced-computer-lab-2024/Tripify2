@@ -1,10 +1,11 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Import usePathname for current path
 import { useState } from "react";
 
 export default function Dashboard({ params }) {
   const { role } = params;
   const router = useRouter();
+  const pathname = usePathname(); // Get current path
   const [activeSublinks, setActiveSublinks] = useState([]);
 
   let dashboardElements;
@@ -30,6 +31,7 @@ export default function Dashboard({ params }) {
             { name: "Upcoming Itineraries", link: "/upcomingItineraries" },
           ],
         },
+        { name: "Explore", link: "/explore" },
       ];
       break;
     case "Tour Guide":
@@ -85,19 +87,22 @@ export default function Dashboard({ params }) {
 
   const toggleSublinks = (index) => {
     setActiveSublinks((prev) => {
-      if (prev.includes(index))
+      if (prev.includes(index)) {
         return prev.filter((element) => element !== index);
-      else return [...prev, index];
+      } else {
+        return [...prev, index];
+      }
     });
   };
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center bg-gray-800 text-white p-4">
+    <div className="flex flex-col sm:flex-row justify-between items-center bg-white text-black p-4 border-b border-gray-300">
       <div className="dashboard--left">
         <h3 className="text-lg font-bold">Logo</h3>
       </div>
       <div className="dashboard--right flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
         {dashboardElements.map((element, index) => {
+          const isActive = pathname === element.link; // Check if the current path matches the link
           return (
             <div key={index} className="relative">
               <button
@@ -105,17 +110,21 @@ export default function Dashboard({ params }) {
                   if (element.sublinks) toggleSublinks(index);
                   else handleReroute(element.link);
                 }}
-                className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out"
+                className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${
+                  isActive ? "underline" : ""
+                }`}
               >
                 {element.name}
               </button>
               {activeSublinks.includes(index) && (
-                <div className="absolute left-0 mt-2 w-48 bg-gray-700 rounded shadow-lg">
+                <div className="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg">
                   {element.sublinks.map((sublink, sublinkIndex) => (
                     <button
                       key={sublinkIndex}
                       onClick={() => handleReroute(sublink.link)}
-                      className="block text-left w-full py-2 px-4 hover:bg-gray-600 transition duration-300 ease-in-out"
+                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
+                        pathname === sublink.link ? "underline" : ""
+                      }`}
                     >
                       {sublink.name}
                     </button>
@@ -127,7 +136,7 @@ export default function Dashboard({ params }) {
         })}
         <button
           onClick={() => handleReroute("/signout")}
-          className="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out"
+          className="bg-red-600 hover:bg-red-500 text-white font-normal py-2 px-4 rounded transition duration-300 ease-in-out"
         >
           Sign Out
         </button>

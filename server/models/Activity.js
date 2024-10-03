@@ -30,13 +30,16 @@ const ActivitySchema = new Schema(
       type: Number,
       required: true,
     },
-    CategoryId: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-    },
+    CategoryId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
     Tags: [
       {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Tag",
       },
     ],
     SpecialDiscounts: {

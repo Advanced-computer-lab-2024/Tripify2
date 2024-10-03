@@ -10,8 +10,8 @@ const {
   getPlace,
 } = require("../controllers/placeController");
 
-router.route("/").get(getPlacesTourist).delete(deletePlace).post(addPlace);
-router.route("/:id").get(getPlace).patch(updatePlace);
+router.route("/").get(getPlacesTourist).post(addPlace);
+router.route("/:id").get(getPlace).patch(updatePlace).delete(deletePlace);
 router.get("/touristGovernor", getPlacesTourismGovernor);
 
 module.exports = router;

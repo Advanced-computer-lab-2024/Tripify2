@@ -117,19 +117,18 @@ const updatePlace = async (req, res) => {
 };
 
 const deletePlace = async (req, res) => {
-  const { Name } = req.body;
+  const { id } = req.params;
   try {
-    //findOneAndDelete takes objects
-    const placeToDelete = await Places.findOneAndDelete({ Name: Name });
+    const placeToDelete = await Places.findByIdAndDelete(id);
     if (!placeToDelete)
       return res
         .status(400)
-        .json({ message: `The place with name ${Name} was not found!` });
+        .json({ message: `The place with id ${id} was not found!` });
 
     //remove Name from tourismgovernor table in AddedPlaces attribute
     return res
       .status(200)
-      .json({ message: `The place with name ${Name} was deleted!` });
+      .json({ message: `The place with id ${id} was deleted!` });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

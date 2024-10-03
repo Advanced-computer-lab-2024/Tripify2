@@ -97,11 +97,12 @@ const getPlacesTourist = async (req, res) => {
 };
 
 const updatePlace = async (req, res) => {
+  const { id } = req.params;
   const { Name, ...rest } = req.body;
   try {
     //findOneAndUpdate takes objects
-    const placeToUpdate = await Places.findOneAndUpdate(
-      { Name: Name },
+    const placeToUpdate = await Places.findByIdAndUpdate(
+      id,
       { $set: rest },
       { new: true, runValidators: true } //runValidators runs all the schema validations that need to be met
     );

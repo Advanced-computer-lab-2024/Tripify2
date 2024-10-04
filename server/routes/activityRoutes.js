@@ -6,6 +6,7 @@ const {
   updateActivity,
   deleteActivity,
   getActivityById,
+  getActivityByAdvertiserId,
 } = require("../controllers/activityController");
 //const verifyAdvertiser = require("../middleware/verifyAdvertiser");
 
@@ -17,4 +18,5 @@ router
   .delete(deleteActivity)
   .patch(updateActivity);
 
+router.route("/MyActivities/:id").get(getActivityByAdvertiserId);
 module.exports = router;

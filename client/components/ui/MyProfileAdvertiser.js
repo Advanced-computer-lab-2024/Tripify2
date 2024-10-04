@@ -33,8 +33,8 @@ export default function AdvertiserProfile({ advertiser }) {
     e.preventDefault();
 
     // Submit the updated data to the backend
-    console.log("Test");
-    console.log(formData);
+    // console.log("Test");
+    // console.log(formData);
     try {
       const response = await fetch(
         "http://localhost:3001/advertisers/66fd00e5af33328b032193cf",

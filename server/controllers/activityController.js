@@ -15,7 +15,25 @@ const createActivity = async (req, res) => {
   } = req.body;
 
   try {
-    const newActivity = new activityModel({
+    if (
+      !Name ||
+      !Date ||
+      !Time ||
+      !Location.type ||
+      !Location.coordinates ||
+      !Price ||
+      !CategoryId ||
+      !Tags ||
+      !SpecialDiscounts ||
+      !AdvertiserId ||
+      !Duration
+    ) {
+      res
+        .status(400)
+        .json({ message: "please enter all field correctly", error });
+    }
+
+    const newActivity = await activityModel.create({
       Name,
       Date,
       Time,
@@ -27,9 +45,9 @@ const createActivity = async (req, res) => {
       AdvertiserId,
       Duration,
     });
-    await newActivity.save();
+    //await newActivity.save();
     res.status(201).json({
-      message: "Advertiser created successfully",
+      message: "Activity created successfully",
       activity: newActivity,
     });
   } catch (error) {
@@ -39,10 +57,10 @@ const createActivity = async (req, res) => {
 
 const getActivity = async (req, res) => {
   try {
-    const activity = await activityModel.find();
+    const activity = await activityModel.find().populate();
     res.status(200).json(activity);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving advertisers", error });
+    res.status(500).json({ message: "Error retrieving Activity", error });
   }
 };
 

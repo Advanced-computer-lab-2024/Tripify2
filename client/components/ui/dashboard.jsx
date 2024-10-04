@@ -42,10 +42,10 @@ export default function Dashboard({ params }) {
       break;
     case "Advertiser":
       dashboardElements = [
-        { name: "Account", link: "/account" },
-        { name: "Ad Campaigns", link: "/adCampagins" },
-        { name: "Statistics", link: "/statistics" },
-        { name: "Billing", link: "/billing" },
+        { name: "My Profile", link: "/MyProfile" },
+        { name: "My Activities", link: "/MyActivities" },
+        // { name: "Statistics", link: "/statistics" },
+        // { name: "Billing", link: "/billing" },
       ];
       break;
     case "Seller":

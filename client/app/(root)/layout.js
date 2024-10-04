@@ -20,10 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header>
-          <Dashboard params={{ role: "Tourist" }} />
-        </header>
-        {tourist}
+        {/* <header>
+          <Dashboard params={{ role: "Advertiser" }} />
+        </header> */}
+        {advertiser}
       </body>
     </html>
   );

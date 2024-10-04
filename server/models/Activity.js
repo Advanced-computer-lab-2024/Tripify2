@@ -36,7 +36,8 @@ const ActivitySchema = new Schema(
     },
     Tags: [
       {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Tags",
       },
     ],
     SpecialDiscounts: {

@@ -16,9 +16,9 @@ const advertiserSchema = new Schema(
       type: String,
       required: true,
     },
-    // need to reference profile schema 
-    Profile: {
-      type: String,
+    CompanyProfile: {
+      type: Schema.Types.ObjectId,
+      ref: "CompanyProfile",
       required: true,
     },
     Accepted: {

@@ -12,10 +12,11 @@ const TourismGovernorSchema = new Schema(
       type: String,
       required: [true, "Please enter a password"],
     },
-    AddedPlaces: {
-      //names of all created places (Names of created places MUST be unqiue)
-      type: [String],
-    },
+    AddedPlaces: [{
+        type: Schema.Types.ObjectId,
+        ref: "Place",
+        required: true,
+    }],
   },
   {
     timestamps: true,

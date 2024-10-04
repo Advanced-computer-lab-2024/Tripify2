@@ -7,15 +7,14 @@ const {
   deleteActivity,
   getActivityById,
 } = require("../controllers/activityController");
-// const verifyAdvertiser = require('../middleware/verifyAdvertiser')
+//const verifyAdvertiser = require("../middleware/verifyAdvertiser");
+
+router.route("/").get(getActivity).post(/*verifyAdvertiser,*/ createActivity);
 
 router
-  .route("/")
-  .get(getActivity)
-  .post(/*verifyAdvertiser,*/ createActivity)
-  .patch(/*verifyAdvertiser, */ updateActivity)
-  .delete(/*verifyAdvertiser, */ deleteActivity);
-
-router.route("/:id").get(getActivityById);
+  .route("/:id")
+  .get(getActivityById)
+  .delete(deleteActivity)
+  .patch(updateActivity);
 
 module.exports = router;

@@ -1,4 +1,6 @@
 const activityModel = require("../models/Activity.js");
+const TagModel = require("../models/Tag");
+const CategoryModel = require("../models/Category");
 
 const createActivity = async (req, res) => {
   const {
@@ -12,28 +14,33 @@ const createActivity = async (req, res) => {
     SpecialDiscounts,
     AdvertiserId,
     Duration,
+    Image,
   } = req.body;
 
   try {
-    if (
-      !Name ||
-      !Date ||
-      !Time ||
-      !Location.type ||
-      !Location.coordinates ||
-      !Price ||
-      !CategoryId ||
-      !Tags ||
-      !SpecialDiscounts ||
-      !AdvertiserId ||
-      !Duration
-    ) {
-      res
+    if (!Tags || Tags.length === 0) {
+      return res.status(400).json({ message: "Please provide valid tags" });
+    }
+    if (!CategoryId || CategoryId.length === 0) {
+      return res
         .status(400)
-        .json({ message: "please enter all field correctly", error });
+        .json({ message: "Please provide valid categories" });
+    }
+    const foundTags = await TagModel.find({ _id: { $in: Tags } });
+    const foundCategories = await CategoryModel.find({
+      _id: { $in: CategoryId },
+    });
+
+    if (foundTags.length !== Tags.length) {
+      return res.status(400).json({ message: "One or more Tags are invalid" });
+    }
+    if (foundCategories.length !== CategoryId.length) {
+      return res
+        .status(400)
+        .json({ message: "One or more Categories are invalid" });
     }
 
-    const newActivity = await activityModel.create({
+    const newActivity = new activityModel({
       Name,
       Date,
       Time,
@@ -44,6 +51,7 @@ const createActivity = async (req, res) => {
       SpecialDiscounts,
       AdvertiserId,
       Duration,
+      Image,
     });
     //await newActivity.save();
     res.status(201).json({
@@ -82,38 +90,15 @@ const getActivityById = async (req, res) => {
 };
 
 const updateActivity = async (req, res) => {
-  const { id } = req.body;
-  const {
-    Name,
-    Date,
-    Time,
-    Location,
-    Price,
-    CategoryId,
-    Tags,
-    SpecialDiscounts,
-    AdvertiserId,
-    Duration,
-    Inappropriate,
-  } = req.body;
-
+  const { id } = req.params;
+  const { Name, ...rest } = req.body;
   try {
     const updatedActivity = await activityModel.findByIdAndUpdate(
       id,
       {
-        Name,
-        Date,
-        Time,
-        Location,
-        Price,
-        CategoryId,
-        Tags,
-        SpecialDiscounts,
-        AdvertiserId,
-        Duration,
-        Inappropriate,
+        $set: rest,
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updatedActivity) {
@@ -130,7 +115,7 @@ const updateActivity = async (req, res) => {
 };
 
 const deleteActivity = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
 
   try {
     const deletedActivity = await activityModel.findByIdAndDelete(id);

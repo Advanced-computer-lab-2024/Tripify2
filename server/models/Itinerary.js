@@ -5,26 +5,19 @@ const ItinerarySchema = new Schema(
   {
     Activities: [
       {
-        Activity: {
-          type: Schema.Types.ObjectId,
-          /*type: String,*/
-          ref: "Activity",
-        },
-        duration: Number,
+        type: { type: String, required: true },
+        duration: { type: Number, required: true },
       },
     ],
     TourGuide: {
       type: Schema.Types.ObjectId,
-      // type: String,
       ref: "TourGuide",
       required: true,
     },
-    Locations: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
+    Locations: {
+      type: String,
+      required: true,
+    },
     StartDate: {
       type: Date,
       required: true,
@@ -59,17 +52,24 @@ const ItinerarySchema = new Schema(
       type: String,
       required: true,
     },
-    Category: {
-      type: String,
-      required: true,
-    },
-    Tag: {
-      type: String,
-      required: true,
-    },
+    Category: [
+      { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    ],
+    Tag: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Tag",
+        required: true,
+      },
+    ],
     Inappropriate: {
-      type:Boolean,
-    }
+      type: Boolean,
+      default: false,
+    },
+    Image: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

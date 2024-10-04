@@ -16,28 +16,23 @@ const ActivitySchema = new Schema(
       required: true,
     },
     Location: {
-      type: {
-        type: String, // Don't do `{ location: { type: String } }`
-        enum: ["Point"], // 'location.type' must be 'Point'
-        required: true,
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-      },
+      type: String,
+      required: true,
     },
     Price: {
       type: Number,
       required: true,
     },
-    CategoryId: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-    },
+    CategoryId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
     Tags: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Tags",
+        ref: "Tag",
       },
     ],
     SpecialDiscounts: {
@@ -55,6 +50,10 @@ const ActivitySchema = new Schema(
     Inappropriate: {
       type: Boolean,
       default: null,
+    },
+    Image: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

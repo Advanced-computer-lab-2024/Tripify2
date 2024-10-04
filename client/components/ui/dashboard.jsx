@@ -1,7 +1,6 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { FiMenu } from "react-icons/fi";
 
 export default function Dashboard({ params }) {
   const { role } = params;

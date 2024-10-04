@@ -1,7 +1,7 @@
 "use client"; // Marking this component as a Client Component
 
 import { useEffect, useState } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 
 export default function MyPlaces() {

@@ -138,7 +138,7 @@ module.exports = {
   addPlace,
   updatePlace,
   deletePlace,
-  getPlacesTourismGovernor,
+  /*getPlacesTourismGovernor,*/
   getPlacesTourist,
   getPlace,
 };

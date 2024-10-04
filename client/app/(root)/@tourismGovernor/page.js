@@ -19,7 +19,7 @@ export default function MyPlaces() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await fetch('http://localhost:3001/places/tourismGovernor/:id');
+        const response = await fetch('http://localhost:3001/tourismGovernor/my-places');
 
         const data = await response.json();
         setPlaces(data);
@@ -38,12 +38,10 @@ export default function MyPlaces() {
       const response = await fetch('http://localhost:3001/places', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+          'Content-Type': 'application/json'},
         body: JSON.stringify(newPlace),
       });
-
+    
       const data = await response.json();
       setPlaces([...places, data]); // Update the places list with the new place
       setNewPlace({ Name: '', Description: '', Categories: [], Tags: [] }); // Reset the newPlace state
@@ -80,8 +78,7 @@ export default function MyPlaces() {
         await fetch(`http://localhost:3001/places/${id}`, {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+            'Content-Type': 'application/json'},
         });
         setPlaces(places.filter(place => place._id !== id)); // Remove deleted place from the list
       } catch (err) {
@@ -92,53 +89,11 @@ export default function MyPlaces() {
     }
   };
   
-  /*const updatePlace = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:3001/places/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(newPlace),
-      });
-
-      const data = await response.json();
-      setPlaces(places.map(place => (place._id === id ? data : place))); // Update the place in the list
-      setNewPlace({ Name: '', Description: '', Categories: [], Tags: [] }); // Reset the newPlace state
-    } catch (err) {
-      setError(err.message);
-    }
-  };*/
   const startEdit = (place) => {
     // Redirect to the update page and pass the place data as query params
-    // make sure of the route
     router.push({
-      pathname: `/place/tourismGovernor/:id`,
-      query: {
-        Name: place.Name,
-        Description: place.Description,
-        Type: place.Type,
-        Location: place.Location,
-        OpeningHours: place.OpeningHours,
-        Pictures: place.Pictures.join(', '), // Join array for input
-        TicketPrices: JSON.stringify(place.TicketPrices), // Stringify for input
-        Tags: place.Tags.join(', '), // Join array for input
-        Categories: place.Categories.join(', '), // Join array for input
-      }
+      pathname: `/${place._id}`,
     });
-    
-    /*setNewPlace({
-      Name: place.Name,
-      Description: place.Description,
-      Type: place.Type,
-      Location: place.Location,
-      OpeningHours: place.OpeningHours,
-      Pictures: place.Pictures.join(', '), // Convert array to string for input
-      TicketPrices: JSON.stringify(place.TicketPrices), // Convert object to string for input
-      Tags: place.Tags.join(', '), // Convert array to string for input
-      Categories: place.Categories.join(', '), // Convert array to string for input
-    });*/
   };
 
   if (loading) {

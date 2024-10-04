@@ -42,9 +42,14 @@ const PlaceSchema = new Schema(
       required: [true, "Please state the ticket prices of the place"],
     },
     Tags: {
-      type: [String], //law ando kaza tag
-      enum: ["monument", "museum", "religious-site", "palace-castle"], //dol el fel comments beta3et el requirements
+      type: [Schema.Types.ObjectId],
+      ref: "Tag",
       required: [true, "Please set tags for the place"],
+    },
+    Categories: {
+      type: [Schema.Types.ObjectId],
+      ref: "Category",
+      required: [true, "Please set categories for the place"],
     },
     TourismGovernor: {
       type: Schema.Types.ObjectId,

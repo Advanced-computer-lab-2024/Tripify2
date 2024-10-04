@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const advertiserModel = require("../models/Advertiser.js");
 const userModel = require("../models/User.js");
 const createAdvertiser = async (req, res) => {
@@ -11,6 +13,7 @@ const createAdvertiser = async (req, res) => {
     Accepted,
     Document,
   } = req.body;
+  // console.log(req.body);
   try {
     if (
       !UserName ||
@@ -33,6 +36,7 @@ const createAdvertiser = async (req, res) => {
       return res.status(400).json({ message: "UserName Already Exists!" });
     }
     const hashedPwd = await bcrypt.hash(Password, 10);
+    console.log(hashedPwd);
     const user = await userModel.create({
       UserName,
       Email,
@@ -47,13 +51,13 @@ const createAdvertiser = async (req, res) => {
       Accepted,
       Document,
     });
-    await newadvertiser.save();
+    // await newadvertiser.save();
     res.status(201).json({
       message: "Advertiser created successfully",
       tourist: newadvertiser,
     });
   } catch (error) {
-    res.status(400).json({ message: "Error creating Adcertiser", error });
+    res.status(400).json({ message: "Error creating Advertiser", error });
   }
 };
 const getAdvertisers = async (req, res) => {
@@ -70,8 +74,13 @@ const getAdvertiserById = async (req, res) => {
   //const { Username, Email, Password, Website, Hotline, Profile, Accepted } = req.body;
 
   try {
-    const findAdvertiser = await advertiserModel.findById(id);
+    const findAdvertiser = await advertiserModel
+      .findById(id)
+      .populate("UserId");
 
+    // console.log(findAdvertiser);
+
+    // console.log(findAdvertiser.UserId.UserName)
     if (!findAdvertiser) {
       return res.json({ message: "Advertiser not found" });
     }
@@ -85,22 +94,44 @@ const getAdvertiserById = async (req, res) => {
 };
 
 const updateAdvertiser = async (req, res) => {
-  const { id } = req.body;
-  const { Password, Website, Hotline, Profile, Accepted, Document } = req.body;
+  const { id } = req.params;
+  const { UserName, Email, Website, Hotline, Profile, Document } = req.body;
 
   try {
-    const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(
-      id,
-      { Password, Website, Hotline, Profile, Accepted, Document },
+    const advertiser = await advertiserModel.findById(id).populate("UserId");
+
+    const duplicatedUserEmail = await userModel.findOne({ Email });
+    const duplicatedUserName = await userModel.findOne({ UserName });
+    if (
+      duplicatedUserEmail &&
+      duplicatedUserEmail._id.toString() !== advertiser.UserId._id.toString()
+    ) {
+      return res.status(500).json({ message: "Email already in use" });
+    }
+
+    if (
+      duplicatedUserName &&
+      duplicatedUserName._id.toString() !== advertiser.UserId._id.toString()
+    ) {
+      return res.status(500).json({ message: "Username already taken" });
+    }
+    const userId = advertiser.UserId._id;
+    // console.log(userId);
+
+    await userModel.findByIdAndUpdate(
+      userId,
+      { UserName, Email }, // Update UserName and Email
       { new: true }
     );
 
-    if (!updatedAdvertiser) {
-      return res.json({ message: "Advertiser not found" });
-    }
+    const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(
+      id,
+      { Website, Hotline, Profile, Document },
+      { new: true }
+    );
 
     res.status(200).json({
-      message: "Advertiser updated successfully",
+      message: "Advertiser and user updated successfully",
       advertiser: updatedAdvertiser,
     });
   } catch (error) {

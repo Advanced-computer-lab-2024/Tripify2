@@ -1,6 +1,8 @@
 const { default: mongoose } = require("mongoose");
 const ItineraryModel = require("../models/Itinerary.js");
 const tourGuideModel = require("../models/Tourguide.js");
+const TagModel = require("../models/Tag");
+const CategoryModel = require("../models/Category");
 
 const createItinerary = async (req, res) => {
   //add a new itinerary to the database with
@@ -9,6 +11,7 @@ const createItinerary = async (req, res) => {
     Activities,
     Locations,
     StartDate,
+    TourGuide,
     EndDate,
     Language,
     Price,
@@ -18,16 +21,37 @@ const createItinerary = async (req, res) => {
     Dropoff,
     Category,
     Tag,
-    TourGuide
+    Image,
   } = req.body;
 
   const tourGuide = await tourGuideModel.findById(TourGuide, "UserId")
   if(!tourGuide || (tourGuide.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
 
   try {
+    if (!Tag || Tag.length === 0) {
+      return res.status(400).json({ message: "Please provide valid tags" });
+    }
+    if (!Category || Category.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide valid categories" });
+    }
+    const foundTags = await TagModel.find({ _id: { $in: Tag } });
+    const foundCategories = await CategoryModel.find({
+      _id: { $in: Category },
+    });
+    if (foundTags.length !== Tag.length) {
+      return res.status(400).json({ message: "One or more Tags are invalid!" });
+    }
+    if (foundCategories.length !== Category.length) {
+      return res
+        .status(400)
+        .json({ message: "One or more Categories are invalid!" });
+    }
     const itinerary = await ItineraryModel.create({
       Activities,
       Locations,
+      TourGuide,
       StartDate,
       EndDate,
       Language,
@@ -38,13 +62,12 @@ const createItinerary = async (req, res) => {
       Dropoff,
       Category,
       Tag,
-      TourGuide
+      Image,
     });
     res
       .status(200)
       .json({ msg: "Itinerary created Successfully\n", itinerary });
   } catch (e) {
-    console.log(e);
     res.status(400).json({ msg: e.message });
   }
 };

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const verifyTourismGovernor = require("../middleware/verifyTourismGovernor");
 
 const {
   addPlace,
@@ -7,6 +8,7 @@ const {
   getPlacesTourist,
   updatePlace,
   deletePlace,
+  getPlace,
 } = require("../controllers/placeController");
 
 const verifyTourismGovernor = require('../middleware/verifyTourismGovernor')

@@ -16,8 +16,9 @@ const advertiserSchema = new Schema(
       type: String,
       required: true,
     },
-    Profile: {
-      type: String,
+    CompanyProfile: {
+      type: Schema.Types.ObjectId,
+      ref: "CompanyProfile",
       required: true,
     },
     Accepted: {

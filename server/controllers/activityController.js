@@ -1,5 +1,7 @@
 const activityModel = require("../models/Activity.js");
 const advertiserModel = require("../models/Advertiser.js");
+const TagModel = require("../models/Tag");
+const CategoryModel = require("../models/Category");
 
 const createActivity = async (req, res) => {
   const {
@@ -13,12 +15,35 @@ const createActivity = async (req, res) => {
     SpecialDiscounts,
     AdvertiserId,
     Duration,
+    Image,
   } = req.body;
 
   const advertiser = await advertiserModel.findById(AdvertiserId, "UserId")
   if(!advertiser || (advertiser.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
 
   try {
+    if (!Tags || Tags.length === 0) {
+      return res.status(400).json({ message: "Please provide valid tags" });
+    }
+    if (!CategoryId || CategoryId.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide valid categories" });
+    }
+    const foundTags = await TagModel.find({ _id: { $in: Tags } });
+    const foundCategories = await CategoryModel.find({
+      _id: { $in: CategoryId },
+    });
+
+    if (foundTags.length !== Tags.length) {
+      return res.status(400).json({ message: "One or more Tags are invalid" });
+    }
+    if (foundCategories.length !== CategoryId.length) {
+      return res
+        .status(400)
+        .json({ message: "One or more Categories are invalid" });
+    }
+
     const newActivity = new activityModel({
       Name,
       Date,
@@ -30,10 +55,12 @@ const createActivity = async (req, res) => {
       SpecialDiscounts,
       AdvertiserId,
       Duration,
+      Image,
     });
     await newActivity.save();
+
     res.status(201).json({
-      message: "Advertiser created successfully",
+      message: "Activity created successfully",
       activity: newActivity,
     });
   } catch (error) {
@@ -43,10 +70,10 @@ const createActivity = async (req, res) => {
 
 const getActivity = async (req, res) => {
   try {
-    const activity = await activityModel.find();
+    const activity = await activityModel.find({}).populate();
     res.status(200).json(activity);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving advertisers", error });
+    res.status(500).json({ message: "Error retrieving Activity", error });
   }
 };
 
@@ -68,38 +95,15 @@ const getActivityById = async (req, res) => {
 };
 
 const updateActivity = async (req, res) => {
-  const { id } = req.body;
-  const {
-    Name,
-    Date,
-    Time,
-    Location,
-    Price,
-    CategoryId,
-    Tags,
-    SpecialDiscounts,
-    AdvertiserId,
-    Duration,
-    Inappropriate,
-  } = req.body;
-
+  const { id } = req.params;
+  const { Name, ...rest } = req.body;
   try {
     const updatedActivity = await activityModel.findByIdAndUpdate(
       id,
       {
-        Name,
-        Date,
-        Time,
-        Location,
-        Price,
-        CategoryId,
-        Tags,
-        SpecialDiscounts,
-        AdvertiserId,
-        Duration,
-        Inappropriate,
+        $set: rest,
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updatedActivity) {
@@ -116,7 +120,7 @@ const updateActivity = async (req, res) => {
 };
 
 const deleteActivity = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
 
   try {
     const deletedActivity = await activityModel.findByIdAndDelete(id);

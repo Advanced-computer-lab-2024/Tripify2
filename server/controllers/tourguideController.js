@@ -1,4 +1,4 @@
-const userModel = require("../models/Tourguide.js");
+const userModel = require("../models/User.js");
 const tourguideModel = require("../models/Tourguide.js");
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
@@ -24,7 +24,7 @@ const createTourguideProfile = async (req, res) => {
       Email,
       Password: hashedPwd,
       UserName,
-      Role: "TourismGovernor",
+      Role: "TourGuide",
     });
 
     await newUser.save();
@@ -32,10 +32,9 @@ const createTourguideProfile = async (req, res) => {
       MobileNumber,
       YearsOfExperience,
       PreviousWork,
-      UserId: newUser._id,
+      UserId,
       Accepted,
       Documents,
-      Itineraries: []
     });
     res.status(200).json(tourguide);
   } catch (error) {
@@ -63,7 +62,7 @@ const allTourguides = async (req, res) => {
     const tourguideIds = await tourguideModel.find({}).select("_id");
     const arrayIds = tourguideIds.map((tourguide) => tourguide._id);
 
-    const tourguides = await userModel.find({ _id: { $in: arrayIds } });
+    const tourguides = await tourguideModel.find({ _id: { $in: arrayIds } });
     if (!tourguides)
       return res.status(400).json({ message: "No tour guides found!" });
     return res.status(200).json(tourguides);
@@ -72,12 +71,11 @@ const allTourguides = async (req, res) => {
   }
 };
 const getTourguideProfile = async (req, res) => {
-  const { MobileNumber, YearsOfExperience, PreviousWork, UserId, Accepted } =
-    req.body;
+  const {id} = req.params
   try {
     const tourguide = await userModel.find({ Accepted: true });
-    // res.status(200).json({ message: "Tourguides read successfully" });
-    if (tourguide.length === 0) {
+    res.status(200).json({ message: "Tourguides read successfully" });
+    if (acceptedTourGuides.length === 0) {
       return res.status(404).json({
         message: "No tour guides found",
       });
@@ -89,24 +87,44 @@ const getTourguideProfile = async (req, res) => {
 };
 
 const updateTourguideProfile = async (req, res) => {
-  const { MobileNumber, YearsOfExperience, PreviousWork, UserId, Accepted, Documents } =
-    req.body;
+  const { MobileNumber, YearsOfExperience, PreviousWork, Accepted } = req.body;
+  const {id} = req.params
   try {
-    if (Accepted) {
-      const updatedUser = await userModel.findOne({ UserId: req.body.UserId });
-      updatedUser.MobileNumber = req.body.MobileNumber;
-      updatedUser.YearsOfExperience = req.body.YearsOfExperience;
-      updatedUser.PreviousWork = req.body.PreviousWork;
-      await updatedUser.save();
-
-      res.status(200).json(" Update is successful");
+    
+      const updatedUser = await tourguideModel.findById(id);
+    if (updatedUser.Accepted) { 
+      if (updatedUser){
+        updatedUser.MobileNumber = MobileNumber;
+        updatedUser.YearsOfExperience = YearsOfExperience;
+        updatedUser.PreviousWork = PreviousWork;
+        updatedUser.Accepted = Accepted;
+        await updatedUser.save();
+        res.status(200).json({message:"Update is successful",tourGuide: updatedUser});
+      }
+      
     } else {
       res
         .status(400)
-        .json({ message: "Tourguide is not accepted yet by Admin" });
+        .json({ message: "Cannot update: Tourguide is not accepted yet by Admin" });
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+const deleteTourguide = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedTourGuide = await tourguideModel.findByIdAndDelete(id);
+
+    if (!deletedTourGuide) {
+      return res.json({ message: "Tour guide not found" });
+    }
+
+    res.status(200).json({ message: "Tour guide deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting tour guide", error });
   }
 };
 
@@ -115,5 +133,5 @@ module.exports = {
   getTourguideProfile,
   updateTourguideProfile,
   allTourguides,
-  getTourguideItineraries,
+  getTourguideItineraries
 };

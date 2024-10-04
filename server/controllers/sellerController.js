@@ -1,7 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const SellerModel = require('../models/Seller.js');
 
-const createSeller = async(req,res) => {
+const   createSeller = async(req,res) => {
     const {Name, Description, UserId, Accepted, Documents}=req.body;
     try {
         if (Accepted){
@@ -22,13 +22,13 @@ const createSeller = async(req,res) => {
         const { id } = req.params
         const Seller = await SellerModel.findById(id)
         if(Seller && Seller.Accepted){
-            return res.status(404).json({msg:"Seller found successfully with id "+id})
+            return res.status(200).json({msg:"Seller found successfully with id "+id})
         }
         else if(Seller){
-            return res.status(200).json("Seller is not accepted");
+            return res.status(404).json("Seller is not accepted");
         }
         else{
-            return res.status(200).json({msg:"Cannot find any seller with id "+id});
+            return res.status(404).json({msg:"Cannot find any seller with id "+id});
         }
     }
     catch(error){

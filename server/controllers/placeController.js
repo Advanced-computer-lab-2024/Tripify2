@@ -2,6 +2,8 @@ const Places = require("../models/Place");
 /////
 const TourismGovernorModel = require("../models/TourismGovernor");
 const Tourist = require("../models/Tourist");
+const TagModel = require("../models/Tag");
+const CategoryModel = require("../models/Category");
 /////
 
 const addPlace = async (req, res) => {
@@ -21,6 +23,30 @@ const addPlace = async (req, res) => {
   if(!tourismGovernor || (tourismGovernor.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
   
   try {
+    const { Tags, Categories } = req.body;
+    if (!Tags || Tags.length === 0) {
+      return res.status(400).json({ message: "Please provide valid tags" });
+    }
+    if (!Categories || Categories.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide valid categories" });
+    }
+
+    const foundTags = await TagModel.find({ _id: { $in: Tags } });
+    const foundCategories = await CategoryModel.find({
+      _id: { $in: Categories },
+    });
+
+    if (foundTags.length !== Tags.length) {
+      return res.status(400).json({ message: "One or more Tags are invalid" });
+    }
+    if (foundCategories.length !== Categories.length) {
+      return res
+        .status(400)
+        .json({ message: "One or more Categories are invalid" });
+    }
+
     const thePlaceToAdd = await Places.create(req.body);
     const updatedTourismGovernor = await TourismGovernorModel.findByIdAndUpdate(TourismGovernor, {$push: {AddedPlaces: thePlaceToAdd._id}});
     if (!thePlaceToAdd || !updatedTourismGovernor)
@@ -32,7 +58,7 @@ const addPlace = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
+/*
 const getPlacesTourismGovernor = async (req, res) => {
   const tourismGovernorId = req.tourismGovernorId;
   //const tourismGovernorId= "66f6f9e8fc38c76b12147e66"
@@ -56,6 +82,19 @@ const getPlacesTourismGovernor = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+*/
+const getPlace = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const place = await Places.findById(id)
+      .populate("Tags", "Tag")
+      .populate("Categories", "Category");
+    if (!place) return res.status(404).json({ msg: "Place not found" });
+    return res.status(200).json(place);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving tourist", error });
+  }
+};
 
 const getPlacesTourist = async (req, res) => {
   const touristId = req.touristId;
@@ -74,11 +113,12 @@ const getPlacesTourist = async (req, res) => {
 };
 
 const updatePlace = async (req, res) => {
+  const { id } = req.params;
   const { Name, ...rest } = req.body;
   try {
     //findOneAndUpdate takes objects
-    const placeToUpdate = await Places.findOneAndUpdate(
-      { Name: Name },
+    const placeToUpdate = await Places.findByIdAndUpdate(
+      id,
       { $set: rest },
       { new: true, runValidators: true } //runValidators runs all the schema validations that need to be met
     );
@@ -93,19 +133,18 @@ const updatePlace = async (req, res) => {
 };
 
 const deletePlace = async (req, res) => {
-  const { Name } = req.body;
+  const { id } = req.params;
   try {
-    //findOneAndDelete takes objects
-    const placeToDelete = await Places.findOneAndDelete({ Name: Name });
+    const placeToDelete = await Places.findByIdAndDelete(id);
     if (!placeToDelete)
       return res
         .status(400)
-        .json({ message: `The place with name ${Name} was not found!` });
+        .json({ message: `The place with id ${id} was not found!` });
 
     //remove Name from tourismgovernor table in AddedPlaces attribute
     return res
       .status(200)
-      .json({ message: `The place with name ${Name} was deleted!` });
+      .json({ message: `The place with id ${id} was deleted!` });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -115,6 +154,7 @@ module.exports = {
   addPlace,
   updatePlace,
   deletePlace,
-  getPlacesTourismGovernor,
+  /*getPlacesTourismGovernor,*/
   getPlacesTourist,
+  getPlace,
 };

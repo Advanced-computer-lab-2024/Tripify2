@@ -7,15 +7,18 @@ const {
   deleteAdvertiser,
   getAdvertiserById,
 } = require("../controllers/advertiserController");
-const verifyAdvertiser = require("../middleware/verifyAdvertiser");
+// const verifyAdvertiser = require("../middleware/verifyAdvertiser");
 
 router
   .route("/")
   .get(getAdvertisers)
   .post(createAdvertiser)
-  .put(verifyAdvertiser, updateAdvertiser)
-  .delete(verifyAdvertiser, deleteAdvertiser);
 
-router.route("/:id").get(getAdvertiserById);
+  .delete(/*verifyAdvertiser,*/ deleteAdvertiser);
+
+router
+  .route("/:id")
+  .get(getAdvertiserById)
+  .patch(/*verifyAdvertiser,*/ updateAdvertiser);
 
 module.exports = router;

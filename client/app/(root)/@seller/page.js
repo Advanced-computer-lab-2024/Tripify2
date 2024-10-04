@@ -1,4 +1,4 @@
-// Import the Next.js useRouter hook for navigation
+
 'use client'
 import { useRouter } from 'next/navigation';
 

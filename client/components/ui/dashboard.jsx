@@ -1,12 +1,16 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation"; // Import usePathname for current path
-import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { FiMenu } from "react-icons/fi";
 
 export default function Dashboard({ params }) {
   const { role } = params;
   const router = useRouter();
-  const pathname = usePathname(); // Get current path
+  const pathname = usePathname();
   const [activeSublinks, setActiveSublinks] = useState([]);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [showHamburger, setShowHamburger] = useState(false);
+  const [hamburgerThreshold, setHamburgerThreshold] = useState(0);
 
   let dashboardElements;
   switch (role) {
@@ -83,63 +87,146 @@ export default function Dashboard({ params }) {
 
   const handleReroute = (route) => {
     router.push(route);
+    setSidebarVisible(false);
   };
 
   const toggleSublinks = (index) => {
-    setActiveSublinks((prev) => {
-      if (prev.includes(index)) {
-        return prev.filter((element) => element !== index);
-      } else {
-        return [...prev, index];
-      }
-    });
+    setActiveSublinks((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
   };
 
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
+
+  const checkMenuVisibility = () => {
+    const navbar = document.querySelector(".navbar-links");
+    if (navbar) {
+      const availableWidth = window.innerWidth - 70;
+      const elementWidth = navbar.scrollWidth;
+      const isOverflowing = elementWidth > availableWidth;
+
+      if (isOverflowing && !showHamburger) {
+        setHamburgerThreshold(availableWidth);
+        setShowHamburger(true);
+      } else if (!isOverflowing && showHamburger) {
+        setShowHamburger(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkMenuVisibility();
+    window.addEventListener("resize", checkMenuVisibility);
+
+    return () => {
+      window.removeEventListener("resize", checkMenuVisibility);
+    };
+  }, [sidebarVisible]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > hamburgerThreshold) {
+        setShowHamburger(false);
+        if (sidebarVisible) {
+          setSidebarVisible(false);
+        }
+      } else if (window.innerWidth <= hamburgerThreshold) {
+        checkMenuVisibility();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [hamburgerThreshold, sidebarVisible]);
+
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center bg-white text-black p-4 border-b border-gray-300">
-      <div className="dashboard--left">
+    <div className="flex justify-between items-center bg-white text-black p-4 border-b border-gray-300">
+      <div className="flex-shrink-0">
         <h3 className="text-lg font-bold">Logo</h3>
       </div>
-      <div className="dashboard--right flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-        {dashboardElements.map((element, index) => {
-          const isActive = pathname === element.link; // Check if the current path matches the link
-          return (
-            <div key={index} className="relative">
-              <button
-                onClick={() => {
-                  if (element.sublinks) toggleSublinks(index);
-                  else handleReroute(element.link);
-                }}
-                className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${
-                  isActive ? "underline" : ""
-                }`}
-              >
-                {element.name}
-              </button>
-              {activeSublinks.includes(index) && (
-                <div className="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg">
-                  {element.sublinks.map((sublink, sublinkIndex) => (
+
+      <div className="flex items-center space-x-4">
+        {showHamburger ? (
+          <button
+            onClick={toggleSidebar}
+            className="text-black text-2xl p-2 focus:outline-none"
+          >
+            <FiMenu />
+          </button>
+        ) : (
+          <div className={`navbar-links flex-grow overflow-auto`}>
+            <nav className="flex space-x-4 p-4">
+              {dashboardElements.map((element, index) => {
+                const isActive = pathname === element.link;
+                return (
+                  <div key={index} className="relative">
                     <button
-                      key={sublinkIndex}
-                      onClick={() => handleReroute(sublink.link)}
-                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
-                        pathname === sublink.link ? "underline" : ""
+                      onClick={() => {
+                        if (element.sublinks) toggleSublinks(index);
+                        else handleReroute(element.link);
+                      }}
+                      className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${
+                        isActive ? "underline" : ""
                       }`}
                     >
-                      {sublink.name}
+                      {element.name}
                     </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+                    {activeSublinks.includes(index) && element.sublinks && (
+                      <div className="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg z-10">
+                        {element.sublinks.map((sublink, sublinkIndex) => (
+                          <button
+                            key={sublinkIndex}
+                            onClick={() => handleReroute(sublink.link)}
+                            className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
+                              pathname === sublink.link ? "underline" : ""
+                            }`}
+                          >
+                            {sublink.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+      </div>
+      {sidebarVisible && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10"
+          onClick={toggleSidebar}
+        />
+      )}
+
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-gray-100 z-20 transform ${
+          sidebarVisible ? "translate-x-0" : "translate-x-full"
+        } transition-transform duration-300 ease-in-out`}
+      >
         <button
-          onClick={() => handleReroute("/signout")}
-          className="bg-red-600 hover:bg-red-500 text-white font-normal py-2 px-4 rounded transition duration-300 ease-in-out"
+          onClick={toggleSidebar}
+          className="text-xl p-4 absolute right-2 top-2"
         >
-          Sign Out
+          ✕
         </button>
+        <nav className="flex flex-col p-4">
+          {dashboardElements.map((element, index) => (
+            <button
+              key={index}
+              onClick={() => handleReroute(element.link)}
+              className="text-black font-normal py-2 px-4 rounded hover:bg-gray-200 transition duration-300 ease-in-out"
+            >
+              {element.name}
+            </button>
+          ))}
+        </nav>
       </div>
     </div>
   );

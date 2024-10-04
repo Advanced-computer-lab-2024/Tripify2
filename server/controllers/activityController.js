@@ -53,7 +53,8 @@ const createActivity = async (req, res) => {
       Duration,
       Image,
     });
-    //await newActivity.save();
+    await newActivity.save();
+
     res.status(201).json({
       message: "Activity created successfully",
       activity: newActivity,
@@ -65,7 +66,7 @@ const createActivity = async (req, res) => {
 
 const getActivity = async (req, res) => {
   try {
-    const activity = await activityModel.find().populate();
+    const activity = await activityModel.find({}).populate();
     res.status(200).json(activity);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving Activity", error });

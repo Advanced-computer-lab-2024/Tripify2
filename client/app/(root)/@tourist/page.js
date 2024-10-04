@@ -1,4 +1,4 @@
 //gift-shop!
 export default function Page() {
-  return <div>helooooo</div>;
+  return <div>hellooooo</div>;
 }

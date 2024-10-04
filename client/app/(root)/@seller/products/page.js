@@ -1,6 +1,6 @@
-import Allproducts from "@/components/ui/Allproducts";
+import Allproducts from "@/components/shared/Allproducts";
 
-export default async function products() {
+export default async function Products() {
   const response = await fetch("http://localhost:3001/products", {
     method: "GET",
     headers: {
@@ -15,7 +15,6 @@ export default async function products() {
   return (
     <div>
       <Allproducts products={products} />
-      
     </div>
   );
 }

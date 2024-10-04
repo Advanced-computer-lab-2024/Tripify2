@@ -1,7 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const SellerModel = require('../models/Seller.js');
 
-const createSeller = async(req,res) => {
+const   createSeller = async(req,res) => {
     const {Name, Description, UserId, Accepted, Documents}=req.body;
     try {
         if (Accepted){

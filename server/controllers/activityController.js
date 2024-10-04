@@ -1,4 +1,5 @@
 const activityModel = require("../models/Activity.js");
+const advertiserModel = require("../models/Advertiser.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
 
@@ -16,6 +17,9 @@ const createActivity = async (req, res) => {
     Duration,
     Image,
   } = req.body;
+
+  const advertiser = await advertiserModel.findById(AdvertiserId, "UserId")
+  if(!advertiser || (advertiser.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
 
   try {
     if (!Tags || Tags.length === 0) {

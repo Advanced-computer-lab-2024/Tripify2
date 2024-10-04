@@ -1,48 +1,61 @@
 const userModel = require("../models/User.js");
 const tourguideModel = require("../models/Tourguide.js");
+const bcrypt = require("bcrypt");
+const User = require("../models/User");
 const { default: mongoose } = require("mongoose");
 
 const createTourguideProfile = async (req, res) => {
-  const { UserName, Email, Password, MobileNumber, YearsOfExperience, PreviousWork, Accepted } =
+  const { UserName, Email, Password, MobileNumber, YearsOfExperience, PreviousWork, Accepted, Documents } =
     req.body;
-  try {
-    if (
-      !UserName ||
-      !Email ||
-      !Password ||
-      !MobileNumber ||
-      !YearsOfExperience ||
-      !Accepted
-    ) {
-      return res.status(400).json({ message: "All Fields Must Be Given!" });
-    }
-    const duplicateUserEmail = await userModel.findOne({ Email });
-    const duplicateUserName = await userModel.findOne({ UserName });
-    if (duplicateUserEmail) {
-      return res.status(400).json({ message: "Email Already Exists!" });
-    }
-    if (duplicateUserName) {
-      return res.status(400).json({ message: "UserName Already Exists!" });
-    }
-    //const hashedPwd = await bcrypt.hash(Password, 10);
-    const user = await userModel.create({
-      UserName,
+    
+  if(!Email || !Password || !UserName) return res.status(400).json({'message': 'All Fields Must Be Given!'})
+
+    try {
+    const duplicateEmail = await User.findOne({ Email }, "_id").lean().exec();
+
+    if(duplicateEmail) return res.status(400).json({'message': 'Email Already Exists!'})
+
+    const duplicateUserName = await User.findOne({ UserName }, "_id").lean().exec();
+    if(duplicateUserName) return res.status(400).json({'message': 'UserName Already Exists!'})
+
+    const hashedPwd = await bcrypt.hash(Password, 10);
+
+    const newUser = new User({
       Email,
-      Password,
+      Password: hashedPwd,
+      UserName,
       Role: "TourGuide",
     });
-    const tourguide = await tourguideModel.create({
+
+    await newUser.save();
+    const tourguide = await userModel.create({
       MobileNumber,
       YearsOfExperience,
       PreviousWork,
-      UserId: user._id,
+      UserId,
       Accepted,
+      Documents,
     });
     res.status(200).json(tourguide);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
+const getTourguideItineraries = async (req, res) => {
+  if(!req?._id) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+
+  try 
+  {
+    const itineraries = await tourguideModel.findOne({ UserId: req._id }, "Itineraries").lean().populate("Itineraries");
+    if (!itineraries) return res.status(400).json({ message: "No Itineraries where found!" });
+    return res.status(200).json(itineraries);
+  } 
+  catch (error) 
+  {
+    return res.status(500).json({ message: error.message });
+  }
+}
 
 const allTourguides = async (req, res) => {
   try {
@@ -60,11 +73,14 @@ const allTourguides = async (req, res) => {
 const getTourguideProfile = async (req, res) => {
   const {id} = req.params
   try {
-    const tourguide = await tourguideModel.findById(id);
-    res.status(200).json({ message: "Tourguide found successfully",tourGuide: tourguide});
-    if (!tourguide) {
-      return res.status(404).json({message: "No tour guides found"});
+    const tourguide = await userModel.find({ Accepted: true });
+    res.status(200).json({ message: "Tourguides read successfully" });
+    if (acceptedTourGuides.length === 0) {
+      return res.status(404).json({
+        message: "No tour guides found",
+      });
     }
+    res.status(200).json(tourguide);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -117,5 +133,5 @@ module.exports = {
   getTourguideProfile,
   updateTourguideProfile,
   allTourguides,
-  deleteTourguide
+  getTourguideItineraries
 };

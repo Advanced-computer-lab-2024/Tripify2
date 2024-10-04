@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const ItineraryModel = require("../models/Itinerary.js");
+const tourGuideModel = require("../models/Tourguide.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
 
@@ -23,6 +24,10 @@ const createItinerary = async (req, res) => {
     Tag,
     Image,
   } = req.body;
+
+  const tourGuide = await tourGuideModel.findById(TourGuide, "UserId")
+  if(!tourGuide || (tourGuide.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
+
   try {
     if (!Tag || Tag.length === 0) {
       return res.status(400).json({ message: "Please provide valid tags" });

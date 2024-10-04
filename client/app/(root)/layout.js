@@ -23,7 +23,7 @@ export default function RootLayout({
         {/* <header>
           <Dashboard params={{ role: "Advertiser" }} />
         </header> */}
-        {tourist}
+        {tourismGovernor}
       </body>
     </html>
   );

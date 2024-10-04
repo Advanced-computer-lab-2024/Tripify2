@@ -12,6 +12,8 @@ async function login(req, res) {
     const correctPwd = await bcrypt.compare(Password, user.Password)
     if(!correctPwd) return res.status(400).json({'message': 'Password Is Wrong!'})
 
+    console.log(user)
+
     const accessToken = jwt.sign(
         {
             "user": {

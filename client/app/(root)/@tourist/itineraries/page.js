@@ -1,4 +1,4 @@
-import TouristItineraries from "@/components/ui/touristItineraries";
+import TouristItineraries from "@/components/shared/touristItineraries";
 
 export default async function Itineraries() {
   const response = await fetch("http://localhost:3001/itineraries", {

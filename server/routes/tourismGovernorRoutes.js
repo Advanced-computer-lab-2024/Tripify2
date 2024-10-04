@@ -4,13 +4,14 @@ const router = express.Router();
 const {
   addTourismgovernor,
   getTourismgovernor,
-  getPlacesTourismGoverner,
+  getTourismGovernorPlaces
 } = require("../controllers/tourismgovernorController");
 
+const verifyTourismGovernor = require('../middleware/verifyTourismGovernor')
 
+router.route('/').post(addTourismgovernor).get(getTourismgovernor);
 
-router.route("/").post(addTourismgovernor).get(getTourismgovernor);
-router.route("/myPlaces").get(getPlacesTourismGoverner)
+router.route('/my-places').get(verifyTourismGovernor, getTourismGovernorPlaces);
 
 // router.post("/add", addTourismgovernor);
 // router.get("/", getTourismgovernor);

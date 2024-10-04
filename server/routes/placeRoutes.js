@@ -9,6 +9,8 @@ const {
   deletePlace,
 } = require("../controllers/placeController");
 
+const verifyTourismGovernor = require('../middleware/verifyTourismGovernor')
+
 //Valid Tourism Governor check
 const tourismGovernorCheck = async (req, res, next) => {
   try {
@@ -47,7 +49,7 @@ router
   .get(getPlacesTourist)
   .patch(updatePlace)
   .delete(deletePlace)
-  .post(addPlace);
+  .post(verifyTourismGovernor, addPlace);
 
 // router.post("/add" /*, tourismGovernorCheck*/, addPlace);
 // router.delete("/remove" /*, tourismGovernorCheck*/, deletePlace);

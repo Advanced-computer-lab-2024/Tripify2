@@ -27,7 +27,11 @@ const TourGuideSchema = new Schema(
     Documents: {
       type: [String], 
       required: true, 
-    }
+    },
+    Itineraries: [{
+      type: Schema.Types.ObjectId,
+      ref: "Itinerary",
+    }]
   },
   { timestamps: true }
 );

@@ -20,7 +20,7 @@ const verifyAdvertiser = (req, res, next) => {
                     const user = decoded.user;
                     if (user && typeof user === 'object' && 'username' in user && 'role' in user)
                     {
-                        req.username = decoded?.user?.username
+                        req._id = decoded?.user?.id
                         req.role = decoded?.user?.role
                         if(decoded?.user?.role === 'Advertiser' || decoded?.user?.role === 'Admin') next()
                         else return res.status(403).json({ message: 'Forbidden' })

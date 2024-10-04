@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const ItineraryModel = require("../models/Itinerary.js");
+const tourGuideModel = require("../models/Tourguide.js");
 
 const createItinerary = async (req, res) => {
   //add a new itinerary to the database with
@@ -17,7 +18,12 @@ const createItinerary = async (req, res) => {
     Dropoff,
     Category,
     Tag,
+    TourGuide
   } = req.body;
+
+  const tourGuide = await tourGuideModel.findById(TourGuide, "UserId")
+  if(!tourGuide || (tourGuide.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
+
   try {
     const itinerary = await ItineraryModel.create({
       Activities,
@@ -32,6 +38,7 @@ const createItinerary = async (req, res) => {
       Dropoff,
       Category,
       Tag,
+      TourGuide
     });
     res
       .status(200)

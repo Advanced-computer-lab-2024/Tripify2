@@ -3,18 +3,14 @@ const Schema = mongoose.Schema;
 
 const TourismGovernorSchema = new Schema(
   {
-    Name: {
-      type: String,
-      unique: true,
-      required: [true, "Please enter a username"],
-    },
-    Password: {
-      type: String,
-      required: [true, "Please enter a password"],
-    },
-    AddedPlaces: {
-      //names of all created places (Names of created places MUST be unqiue)
-      type: [String],
+    AddedPlaces: [{
+      type: Schema.Types.ObjectId,
+      ref: "Place",
+    }],
+    UserId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   {

@@ -1,4 +1,4 @@
-import TouristItineraries from "@/components/ui/touristItineraries";
+import TouristItineraries from "@/components/shared/touristItineraries";
 
 export default async function Itineraries() {
   const response = await fetch("http://localhost:3001/itineraries", {
@@ -7,6 +7,7 @@ export default async function Itineraries() {
       "Content-Type": "application/json",
       "Cache-Control": "no-cache",
     },
+    cache: "no-store",
   });
   if (!response.ok) {
     throw new Error("Network response was not ok");

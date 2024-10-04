@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const ItinerarySchema = new Schema(
   {
+    Name: {
+      type: String,
+      required: true,
+    },
     Activities: [
       {
         type: { type: String, required: true },

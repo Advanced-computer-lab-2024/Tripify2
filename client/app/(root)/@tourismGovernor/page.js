@@ -1,8 +1,11 @@
 "use client"; // Marking this component as a Client Component
 
 import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
+
 
 export default function MyPlaces() {
+  const router = useRouter();
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,6 +52,25 @@ export default function MyPlaces() {
     }
   };
 
+  const createTag = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/tags', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Tag: newTag }),
+      });
+
+      const data = await response.json();
+      setTags([...tags, data]); // Update the tags list with the new tag
+      setNewTag(''); // Reset the newTag state
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+
   const [loadingDelete, setLoadingDelete] = useState(false);
 
   const deletePlace = async (id) => {
@@ -70,7 +92,7 @@ export default function MyPlaces() {
     }
   };
   
-  const updatePlace = async (id) => {
+  /*const updatePlace = async (id) => {
     try {
       const response = await fetch(`http://localhost:3001/places/${id}`, {
         method: 'PATCH',
@@ -87,9 +109,26 @@ export default function MyPlaces() {
     } catch (err) {
       setError(err.message);
     }
-  };
+  };*/
   const startEdit = (place) => {
-    setNewPlace({
+    // Redirect to the update page and pass the place data as query params
+    // make sure of the route
+    router.push({
+      pathname: `/place/tourismGovernor/:id`,
+      query: {
+        Name: place.Name,
+        Description: place.Description,
+        Type: place.Type,
+        Location: place.Location,
+        OpeningHours: place.OpeningHours,
+        Pictures: place.Pictures.join(', '), // Join array for input
+        TicketPrices: JSON.stringify(place.TicketPrices), // Stringify for input
+        Tags: place.Tags.join(', '), // Join array for input
+        Categories: place.Categories.join(', '), // Join array for input
+      }
+    });
+    
+    /*setNewPlace({
       Name: place.Name,
       Description: place.Description,
       Type: place.Type,
@@ -99,7 +138,7 @@ export default function MyPlaces() {
       TicketPrices: JSON.stringify(place.TicketPrices), // Convert object to string for input
       Tags: place.Tags.join(', '), // Convert array to string for input
       Categories: place.Categories.join(', '), // Convert array to string for input
-    });
+    });*/
   };
 
   if (loading) {
@@ -175,11 +214,21 @@ export default function MyPlaces() {
       onChange={(e) => setNewPlace({ ...newPlace, Categories: e.target.value.split(',') })}
     />
     <Button onClick={createPlace}>Create Place</Button>
+
+     {/* Tag Creation Section */}
+     <h2>Create a New Tag</h2>
+      <input
+        type="text"
+        placeholder="New Tag (e.g., Monuments, Museums)"
+        value={newTag}
+        onChange={(e) => setNewTag(e.target.value)}
+      />
+      <Button onClick={createTag}>Create Tag</Button>
   
     <ul style={styles.placeList}>
       {places.map((place) => (
         <li key={place._id} style={styles.placeItem}>
-          <h2>{place.Name}</h2>
+          {place.Name}
           {place.Image && (
             <img
               src={place.Image}
@@ -195,7 +244,7 @@ export default function MyPlaces() {
           <p>Ticket Prices: {JSON.stringify(place.TicketPrices)}</p>
           <p>Category: {place.Categories.join(', ')}</p>
           <p>Tags: {place.Tags.join(', ')}</p>
-          <Button onClick={() => startEdit(place)}>Update Place</Button>
+          <Button onClick={() => startEdit(place)}>View Place</Button>
           <Button onClick={() => deletePlace(place._id)}>Delete Place</Button>
         </li>
       ))}

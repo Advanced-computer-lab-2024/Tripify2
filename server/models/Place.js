@@ -18,8 +18,15 @@ const PlaceSchema = new Schema(
       required: [true, "Please enter a discription for the place"],
     },
     Location: {
-      type: String,
-      required: [true, "Please set a location to the place"],
+      type: {
+        type: String, // Don't do `{ location: { type: String } }`
+        enum: ["Point"], // 'location.type' must be 'Point'
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
     Pictures: {
       type: [String],
@@ -43,6 +50,11 @@ const PlaceSchema = new Schema(
       type: [Schema.Types.ObjectId],
       ref: "Category",
       required: [true, "Please set categories for the place"],
+    },
+    TourismGovernor: {
+      type: Schema.Types.ObjectId,
+      ref: "TourismGovernor",
+      required: [true, "Please select a tourism governor for the place"],
     },
   },
   {

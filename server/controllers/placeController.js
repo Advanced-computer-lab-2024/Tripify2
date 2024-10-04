@@ -1,12 +1,27 @@
 const Places = require("../models/Place");
 /////
-const TourismGovernor = require("../models/TourismGovernor");
+const TourismGovernorModel = require("../models/TourismGovernor");
 const Tourist = require("../models/Tourist");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
 /////
 
 const addPlace = async (req, res) => {
+  const { 
+  Name,
+  Type,
+  Description,
+  Location,
+  Pictures,
+  OpeningHours,
+  TicketPrices,
+  TourismGovernor } = req.body
+
+  if(!Name || !Type || !Description || !Location || !Pictures || !OpeningHours || !TicketPrices || !TourismGovernor) return res.status(400).json({'message': 'All Fields Must Be Given!'})
+
+  const tourismGovernor = await TourismGovernorModel.findById(TourismGovernor, "UserId")
+  if(!tourismGovernor || (tourismGovernor.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+  
   try {
     const { Tags, Categories } = req.body;
     if (!Tags || Tags.length === 0) {
@@ -33,7 +48,8 @@ const addPlace = async (req, res) => {
     }
 
     const thePlaceToAdd = await Places.create(req.body);
-    if (!thePlaceToAdd)
+    const updatedTourismGovernor = await TourismGovernorModel.findByIdAndUpdate(TourismGovernor, {$push: {AddedPlaces: thePlaceToAdd._id}});
+    if (!thePlaceToAdd || !updatedTourismGovernor)
       return res.status(400).json({ message: "Please enter a valid place" });
 
     //add Name to tourismgovernor table in AddedPlaces attribute
@@ -49,7 +65,7 @@ const getPlacesTourismGovernor = async (req, res) => {
   const { myPlaces } = req.query;
   try {
     if (myPlaces) {
-      const tourismGovernor = await TourismGovernor.findById(tourismGovernorId);
+      const tourismGovernor = await TourismGovernorModel.findById(tourismGovernorId);
 
       const nameOfPlaces = tourismGovernor.AddedPlaces;
       if (!nameOfPlaces || !nameOfPlaces.length)

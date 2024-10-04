@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const ItineraryModel = require("../models/Itinerary.js");
+const tourGuideModel = require("../models/Tourguide.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
 
@@ -7,6 +8,7 @@ const createItinerary = async (req, res) => {
   //add a new itinerary to the database with
   //ctivities, Locations, Timeline, DurationOfActivity, Language, Price, DatesAndTimes, Accesibility, Pickup, and Dropoff
   const {
+    Name,
     Activities,
     Locations,
     StartDate,
@@ -22,6 +24,10 @@ const createItinerary = async (req, res) => {
     Tag,
     Image,
   } = req.body;
+
+  const tourGuide = await tourGuideModel.findById(TourGuide, "UserId")
+  if(!tourGuide || (tourGuide.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
+
   try {
     if (!Tag || Tag.length === 0) {
       return res.status(400).json({ message: "Please provide valid tags" });
@@ -44,6 +50,7 @@ const createItinerary = async (req, res) => {
         .json({ message: "One or more Categories are invalid!" });
     }
     const itinerary = await ItineraryModel.create({
+      Name,
       Activities,
       Locations,
       TourGuide,
@@ -68,7 +75,10 @@ const createItinerary = async (req, res) => {
 };
 const getItineraries = async (req, res) => {
   try {
-    const itineraries = await ItineraryModel.find({});
+    const itineraries = await ItineraryModel.find({})
+      .populate("Tag")
+      .populate("Category")
+      .populate("TourGuide");
 
     return res.status(200).json(itineraries);
   } catch (e) {
@@ -79,7 +89,10 @@ const getItineraries = async (req, res) => {
 const getItinerary = async (req, res) => {
   const { id } = req.params;
   try {
-    const itinerary = await ItineraryModel.findById(id);
+    const itinerary = await ItineraryModel.findById(id)
+      .populate("Tag")
+      .populate("Category")
+      .populate("TourGuide");
     if (!itinerary)
       return res
         .status(404)
@@ -94,7 +107,14 @@ const getItinerary = async (req, res) => {
 const updateItinerary = async (req, res) => {
   const { id } = req.params;
   try {
-    const itinerary = await ItineraryModel.findByIdAndUpdate(id, req.body);
+    const itinerary = await ItineraryModel.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    })
+      .populate("Tag")
+      .populate("Category")
+      .populate("TourGuide");
+
     if (!itinerary)
       return res
         .status(404)
@@ -119,6 +139,7 @@ const deleteItinerary = async (req, res) => {
     res.status(400).json({ msg: "Operation Failed" });
   }
 };
+
 module.exports = {
   createItinerary,
   getItineraries,

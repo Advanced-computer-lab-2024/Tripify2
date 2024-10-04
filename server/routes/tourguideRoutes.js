@@ -5,9 +5,9 @@ const {
   getTourguideProfile,
   updateTourguideProfile,
   allTourguides,
-  deleteTourguide
+  getTourguideItineraries
 } = require("../controllers/tourguideController");
-//const verifyTourGuide = require('../middleware/verifyTourGuide')
+const verifyTourGuide = require('../middleware/verifyTourGuide')
 
 router.route("/")
   .post(createTourguideProfile)
@@ -18,5 +18,8 @@ router
   .get(getTourguideProfile)
   .patch(/*verifyTourGuide,*/ updateTourguideProfile)
   .delete(deleteTourguide)
+
+router.route('/get/my-itineraries')
+      .get(verifyTourGuide, getTourguideItineraries);
 
 module.exports = router;

@@ -1,12 +1,13 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FiMenu } from "react-icons/fi";
 
 export default function Dashboard({ params }) {
-  const { role } = params;
+  const { role, id } = params;
   const router = useRouter();
   const pathname = usePathname();
+  const sublinkRef = useRef();
   const [activeSublinks, setActiveSublinks] = useState([]);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
@@ -16,7 +17,7 @@ export default function Dashboard({ params }) {
   switch (role) {
     case "Tourist":
       dashboardElements = [
-        { name: "Account", link: "/account" },
+        { name: "Account", link: `/account/${id}` },
         { name: "Bought Products", link: "/boughtProducts" },
         {
           name: "Upcoming",
@@ -40,7 +41,7 @@ export default function Dashboard({ params }) {
       break;
     case "Tour Guide":
       dashboardElements = [
-        { name: "Account", link: "/account" },
+        { name: "Account", link: `/account/${id}` },
         { name: "My Tours", link: "/myTours" },
         { name: "Schedule", link: "/schedule" },
         { name: "Earnings", link: "/earnings" },
@@ -56,7 +57,7 @@ export default function Dashboard({ params }) {
       break;
     case "Seller":
       dashboardElements = [
-        { name: "Account", link: "/account" },
+        { name: "Account", link: `/account/${id}` },
         { name: "My Products", link: "/myProducts" },
         { name: "Orders", link: "/orders" },
         { name: "Sales Stats", link: "/salesStats" },
@@ -64,7 +65,7 @@ export default function Dashboard({ params }) {
       break;
     case "Tourism Governor":
       dashboardElements = [
-        { name: "Account", link: "/account" },
+        { name: "Account", link: `/account/${id}` },
         { name: "Regulations", link: "/regulations" },
         { name: "Reports", link: "/reports" },
         { name: "Approvals", link: "/approvals" },
@@ -72,7 +73,7 @@ export default function Dashboard({ params }) {
       break;
     case "Admin":
       dashboardElements = [
-        { name: "Account", link: "/account" },
+        { name: "Account", link: `/account/${id}` },
         { name: "User Management", link: "/userManagment" },
         { name: "System Settings", link: "/systemSettings" },
         { name: "Reports", link: "/reports" },
@@ -91,13 +92,12 @@ export default function Dashboard({ params }) {
   };
 
   const toggleSublinks = (index) => {
-    setActiveSublinks((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-    );
+    setActiveSublinks((prev) => (prev.includes(index) ? [] : [index]));
   };
 
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
+    setActiveSublinks([]);
   };
 
   const checkMenuVisibility = () => {
@@ -123,7 +123,7 @@ export default function Dashboard({ params }) {
     return () => {
       window.removeEventListener("resize", checkMenuVisibility);
     };
-  }, [sidebarVisible]);
+  }, [showHamburger, sidebarVisible]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -144,6 +144,18 @@ export default function Dashboard({ params }) {
     };
   }, [hamburgerThreshold, sidebarVisible]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sublinkRef.current && !sublinkRef.current.contains(event.target)) {
+        setActiveSublinks([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sublinkRef]);
+
   return (
     <div className="flex justify-between items-center bg-white text-black p-4 border-b border-gray-300">
       <div className="flex-shrink-0">
@@ -159,7 +171,10 @@ export default function Dashboard({ params }) {
             <FiMenu />
           </button>
         ) : (
-          <div className={`navbar-links flex-grow overflow-auto`}>
+          <div
+            className={`navbar-links flex-grow overflow-visible relative`}
+            ref={sublinkRef}
+          >
             <nav className="flex space-x-4 p-4">
               {dashboardElements.map((element, index) => {
                 const isActive = pathname === element.link;
@@ -167,8 +182,11 @@ export default function Dashboard({ params }) {
                   <div key={index} className="relative">
                     <button
                       onClick={() => {
-                        if (element.sublinks) toggleSublinks(index);
-                        else handleReroute(element.link);
+                        if (element.sublinks) {
+                          toggleSublinks(index);
+                        } else {
+                          handleReroute(element.link);
+                        }
                       }}
                       className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${
                         isActive ? "underline" : ""
@@ -198,6 +216,7 @@ export default function Dashboard({ params }) {
           </div>
         )}
       </div>
+
       {sidebarVisible && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-10"
@@ -210,21 +229,34 @@ export default function Dashboard({ params }) {
           sidebarVisible ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out`}
       >
-        <button
-          onClick={toggleSidebar}
-          className="text-xl p-4 absolute right-2 top-2"
-        >
-          ✕
-        </button>
         <nav className="flex flex-col p-4">
           {dashboardElements.map((element, index) => (
-            <button
-              key={index}
-              onClick={() => handleReroute(element.link)}
-              className="text-black font-normal py-2 px-4 rounded hover:bg-gray-200 transition duration-300 ease-in-out"
-            >
-              {element.name}
-            </button>
+            <div key={index} className="relative">
+              <button
+                onClick={() => {
+                  if (element.sublinks) toggleSublinks(index);
+                  else handleReroute(element.link);
+                }}
+                className="text-black font-normal py-2 px-4 rounded hover:bg-gray-200 transition duration-300 ease-in-out"
+              >
+                {element.name}
+              </button>
+              {activeSublinks.includes(index) && element.sublinks && (
+                <div className="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg z-10">
+                  {element.sublinks.map((sublink, sublinkIndex) => (
+                    <button
+                      key={sublinkIndex}
+                      onClick={() => handleReroute(sublink.link)}
+                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
+                        pathname === sublink.link ? "underline" : ""
+                      }`}
+                    >
+                      {sublink.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
       </div>

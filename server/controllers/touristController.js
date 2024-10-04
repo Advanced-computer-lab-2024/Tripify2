@@ -3,20 +3,28 @@ const userModel = require("../models/User.js");
 const bcrypt = require("bcrypt");
 
 const createTourist = async (req, res) => {
-  const { UserName, Email, Password, MobileNumber, Nationality, DOB, Occupation, Wallet } =
-    req.body;
+  const {
+    UserName,
+    Email,
+    Password,
+    MobileNumber,
+    Nationality,
+    DOB,
+    Occupation,
+    Wallet,
+  } = req.body;
 
   try {
     if (!UserName || !Email || !Password)
       return res.status(400).json({ message: "All Fields Must Be Given!" });
-  
+
     const duplicateUser = await userModel.findOne({ Email });
-  
+
     if (duplicateUser)
       return res.status(400).json({ message: "Email Already Exists!" });
-  
+
     const hashedPwd = await bcrypt.hash(Password, 10);
-  
+
     const user = await userModel.create({
       UserName,
       Email,
@@ -33,12 +41,13 @@ const createTourist = async (req, res) => {
     }
 
     const newTourist = new touristModel({
+      UserName,
       MobileNumber,
       Nationality,
       DOB,
       Occupation,
       Wallet,
-      UserId: user._id
+      UserId: user._id,
     });
     await newTourist.save();
     res.status(201).json({
@@ -173,6 +182,15 @@ const deleteTourist = async (req, res) => {
     res.status(500).json({ message: "Error deleting tourist", error });
   }
 };
+
+// const deleteAll = async (req, res) => {
+//   try {
+//     const deleteMany = await touristModel.deleteMany({});
+//     return res.status(200).json({ message: "All tourist records deleted!" });
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
 
 module.exports = {
   createTourist,

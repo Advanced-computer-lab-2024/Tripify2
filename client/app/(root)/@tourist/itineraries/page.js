@@ -7,6 +7,7 @@ export default async function Itineraries() {
       "Content-Type": "application/json",
       "Cache-Control": "no-cache",
     },
+    cache: "no-store",
   });
   if (!response.ok) {
     throw new Error("Network response was not ok");

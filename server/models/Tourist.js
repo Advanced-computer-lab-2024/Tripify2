@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const TouristSchema = new Schema(
   {
+    UserName: {
+      type: String,
+      required: true,
+    },
     MobileNumber: {
       type: String,
       required: true,

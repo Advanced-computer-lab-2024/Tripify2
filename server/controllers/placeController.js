@@ -42,7 +42,7 @@ const addPlace = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
+/*
 const getPlacesTourismGovernor = async (req, res) => {
   const tourismGovernorId = req.tourismGovernorId;
   //const tourismGovernorId= "66f6f9e8fc38c76b12147e66"
@@ -66,7 +66,7 @@ const getPlacesTourismGovernor = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
+*/
 const getPlace = async (req, res) => {
   try {
     const { id } = req.params;

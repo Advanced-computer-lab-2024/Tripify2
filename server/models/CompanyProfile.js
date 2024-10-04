@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const profileSchema = new Schema(
+const companyProfileSchema = new Schema(
   {
     Name: {
       type: String,
@@ -31,5 +31,5 @@ const profileSchema = new Schema(
   { timestamps: true }
 );
 
-const Profile = mongoose.model("Profile", profileSchema);
+const Profile = mongoose.model("CompanyProfile", companyProfileSchema);
 module.exports = Profile;

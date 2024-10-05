@@ -8,7 +8,7 @@ export default function AddProduct() {
   const [image, setImage] = useState("");
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState(0);
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null); 
   const [success, setSuccess] = useState(false); 
@@ -28,7 +28,7 @@ export default function AddProduct() {
           Image: image,
           Price: parseFloat(price),
           Description: description,
-          AvailableQuantity:quantity,
+          AvailableQuantity:parseInt(quantity),
           Seller:session?.data?.user?.userId,
         }),
       });

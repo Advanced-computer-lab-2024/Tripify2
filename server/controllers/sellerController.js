@@ -1,10 +1,12 @@
 const { default: mongoose } = require('mongoose');
 const SellerModel = require('../models/Seller.js');
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
-const  createSeller = async(req,res) => {
-    const {UserName, Email, Password, Description, UserId, Documents}=req.body; 
+const createSeller = async(req,res) => {
+    const {UserName, Email, Password, Description, Documents}=req.body; 
 
-    if(!UserName || !Description || !UserId || !Documents || !Email || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
+    if(!UserName || !Description || !Documents || !Email || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
 
     try {
         const duplicateEmail = await User.findOne({ Email }, "_id").lean().exec();
@@ -27,7 +29,7 @@ const  createSeller = async(req,res) => {
         
         const seller = await SellerModel.create({
             Description,
-            UserId,
+            UserId: newUser._id,
             Accepted: false,
             Documents,
         });
@@ -137,12 +139,15 @@ const  createSeller = async(req,res) => {
   }
 
   const getSellerProducts = async (req, res) => {
+    console.log(req._id)
+
     if(!req._id) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
   
     try 
     {
       const products = await SellerModel.findOne({ UserId: req._id }, "Products").lean().populate("Products");
-      if (!products) return res.status(400).json({ message: "No Products where found!" });
+      console.log(products, req._id)
+      if (!products) return res.status(400).json({ message: "No Products were found!" });
       return res.status(200).json(products);
     } 
     catch (error) 

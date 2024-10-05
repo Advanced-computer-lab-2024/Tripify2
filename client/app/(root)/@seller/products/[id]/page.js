@@ -1,6 +1,7 @@
 "use client"; // Marking this component as a Client Component
 
 import { useEffect, useState } from 'react';
+import { fetcher } from "@/lib/fetch-client";
 
 export default function ProductDetail({ params }) {
   const { id } = params; // Access the dynamic product ID from the URL parameters
@@ -9,18 +10,33 @@ export default function ProductDetail({ params }) {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const response = await fetch(`http://localhost:3001/products/${id}`);
-      const data = await response.json();
-      setProduct(data);
+      try {
+        // Fetch the product details
+        const response = await fetcher(`/products/${id}`);
+        let data = await response.json();
 
-      // Fetch the seller's name using the seller ID
-      if (data.Seller) {
-        const sellerResponse = await fetch(`http://localhost:3001/sellers/${data.Seller}`);
-        const sellerData = await sellerResponse.json();
-        setSellerName(sellerData.Name); // Assuming the seller object has a Name property
+        // Stringify the product data
+        const stringifiedProductData = JSON.stringify(data);
+        console.log("Stringified Product Data: ", stringifiedProductData); // For debugging
+
+        setProduct(data);
+
+        // Fetch the seller's name using the seller ID
+        if (data.Seller) {
+          const sellerResponse = await fetcher(`/sellers/${data.Seller}`);
+          const sellerData = await sellerResponse.json();
+
+          // Stringify the seller data
+          const stringifiedSellerData = JSON.stringify(sellerData);
+          console.log("Stringified Seller Data: ", stringifiedSellerData); // For debugging
+
+          setSellerName(sellerData.Name); // Assuming the seller object has a Name property
+        }
+      } catch (error) {
+        console.error("Error fetching product details: ", error);
       }
     };
-    
+
     fetchProduct();
   }, [id]);
 
@@ -37,7 +53,6 @@ export default function ProductDetail({ params }) {
       {/* <p>Seller Name: {sellerName ? sellerName : 'Loading seller...'}</p> Display seller name */}
       <p>Rating: {product.Rating}</p>
       <p>Available Quantity: {product.AvailableQuantity}</p>
-      {/* If you want to display reviews, you will need another fetch to get the review details */}
     </div>
   );
 }

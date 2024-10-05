@@ -1,7 +1,7 @@
 'use client'; // Marking this as a client component
 import { useRouter } from 'next/navigation';
 
-export default function Allproducts({ products, searchQuery }) {
+export default function Myproducts({ products, searchQuery }) {
   const router = useRouter();
 
   console.log(products)
@@ -19,6 +19,10 @@ export default function Allproducts({ products, searchQuery }) {
     // Navigate to the product details page
     router.push(`/products/${id}`);
   };
+  const handleeditdetails = (id) => {
+    // Navigate to the product details page
+    router.push(`/myproducts/${id}`);
+  };
 
   return (
     <div style={styles.productGrid}>
@@ -31,6 +35,13 @@ export default function Allproducts({ products, searchQuery }) {
             onClick={() => handleViewDetails(eachproduct._id)} // Pass the correct product id
           >
             View Details
+          </button>
+          
+          <button 
+            style={styles.detailsButton}
+            onClick={() => handleeditdetails(eachproduct._id)} // Pass the correct product id
+          >
+            Edit Product
           </button>
         </div>
       ))}
@@ -72,4 +83,5 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.3s',
   },
+  
 };

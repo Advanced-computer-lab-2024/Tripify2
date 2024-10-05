@@ -12,7 +12,12 @@ const Dashboard = () => {
   const handleProductsClick = () => {
     router.push('/products'); // Redirect to the products page (update the path if necessary)
   };
-
+  const handlemyProductsClick = () => {
+    router.push('/myproducts'); // Redirect to the products page (update the path if necessary)
+  };
+  const handlecreateProductClick = () => {
+    router.push('/createproduct'); // Redirect to the products page (update the path if necessary)
+  };
   return (
     <div style={styles.container}>
       <h1>Seller Dashboard</h1>
@@ -20,8 +25,14 @@ const Dashboard = () => {
         <button style={styles.button}>
           My Profile
         </button>
+        <button style={styles.button} onClick={handlemyProductsClick}>
+          View my Products
+        </button>
         <button style={styles.button} onClick={handleProductsClick}>
           View All Products
+        </button>
+        <button style={styles.button} onClick={handlecreateProductClick}>
+          Post a Product for Sale
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const User = require("../models/User");
+const SellerModel = require("../models/Seller");
 
 async function getMyProducts(req, res) {
   const { userId } = req.params;
@@ -59,7 +60,7 @@ async function createProduct(req, res) {
       Seller,
       Rating = 0,
       Reviews = [],
-      AvailableQuantity = 0,
+      AvailableQuantity,
     } = req.body;
 
     const seller = await User.findById(Seller, "_id")
@@ -76,7 +77,14 @@ async function createProduct(req, res) {
       AvailableQuantity,
     });
 
+    
     await product.save();
+    
+    await SellerModel.findOneAndUpdate(
+      { UserId: req._id },
+      { $push: { Products: product._id } },
+      { new: true }
+    ).catch(err => console.log(err))
 
     return res
       .status(201)

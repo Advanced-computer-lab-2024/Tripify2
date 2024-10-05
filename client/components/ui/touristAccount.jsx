@@ -1,9 +1,12 @@
 "use client";
 import { useState } from "react";
 import { FaWallet } from "react-icons/fa"; // Import an icon for the wallet
+import { fetcher } from "@/lib/fetch-client";
+import { useSession } from "next-auth/react";
 
 export default function TouristAccount({ params }) {
   const { touristInfo } = params;
+  const Session = useSession();
   const touristDetails = Object.entries(touristInfo).reduce(
     (acc, [key, value]) => {
       acc[key] = value;
@@ -49,13 +52,13 @@ export default function TouristAccount({ params }) {
       Nationality: nationalityChange,
     };
     try {
-      const response = await fetch(`http://localhost:3001/tourists/${_id}`, {
+      const response = await fetcher(`/tourists/${Session.data.user.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedData),
-      });
+      }).catch((e) => console.log(e));
 
       if (!response.ok) {
         throw new Error("Network response was not ok");

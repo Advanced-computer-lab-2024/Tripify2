@@ -59,7 +59,7 @@ async function createProduct(req, res) {
       Seller,
       Rating = 0,
       Reviews = [],
-      AvailableQuantity = 0,
+      AvailableQuantity,
     } = req.body;
 
     const seller = await User.findById(Seller, "_id")

@@ -13,39 +13,41 @@ export default function Products() {
   const [sortOption, setSortOption] = useState("none"); // State for sorting
 
   // Function to fetch products
-  const fetchProducts = async () => {
-    try {
-      const response = await fetcher("/products", {
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-          "Accept": "application/json",
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-  
-      let data = await response.json();
-  
-      // Stringify the fetched data
-      const stringifiedData = JSON.stringify(data);
-  
-      console.log("Stringified Data: ", stringifiedData); // For debugging
-  
-      setProducts(data);
-      setFilteredProducts(data);
-  
-      // Extract max price from products
-      const prices = data.map((product) => product.Price);
-      const maxPrice = Math.max(...prices);
-      setMaxPrice(maxPrice);
-      setCurrentMaxPrice(maxPrice);
-    } catch (error) {
-      console.error("Error fetching products:", error);
+  // Function to fetch products
+const fetchProducts = async () => {
+  try {
+    const response = await fetcher("/get-all/my-products", {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Accept": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
     }
-  };
+
+    let data = await response.json();
+
+    // Stringify the fetched data
+    const stringifiedData = JSON.stringify(data);
+
+    console.log("Stringified Data: ", stringifiedData); // For debugging
+
+    setProducts(data);
+    setFilteredProducts(data);
+
+    // Extract max price from products
+    const prices = data.map((product) => product.Price);
+    const maxPrice = Math.max(...prices);
+    setMaxPrice(maxPrice);
+    setCurrentMaxPrice(maxPrice);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
+
 
   const filterByPrice = () => {
     const filtered = products.filter(

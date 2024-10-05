@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const User = require("../models/User");
+const SellerModel = require("../models/Seller");
 
 async function getMyProducts(req, res) {
   const { userId } = req.params;
@@ -79,11 +80,11 @@ async function createProduct(req, res) {
     
     await product.save();
     
-    await Seller.findOneAndUpdate(
+    await SellerModel.findOneAndUpdate(
       { UserId: req._id },
-      { $push: { Products: newProduct } },
+      { $push: { Products: product._id } },
       { new: true }
-    );
+    ).catch(err => console.log(err))
 
     return res
       .status(201)

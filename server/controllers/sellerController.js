@@ -139,12 +139,15 @@ const createSeller = async(req,res) => {
   }
 
   const getSellerProducts = async (req, res) => {
+    console.log(req._id)
+
     if(!req._id) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
   
     try 
     {
       const products = await SellerModel.findOne({ UserId: req._id }, "Products").lean().populate("Products");
-      if (!products) return res.status(400).json({ message: "No Products where found!" });
+      console.log(products, req._id)
+      if (!products) return res.status(400).json({ message: "No Products were found!" });
       return res.status(200).json(products);
     } 
     catch (error) 

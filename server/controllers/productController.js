@@ -76,7 +76,14 @@ async function createProduct(req, res) {
       AvailableQuantity,
     });
 
+    
     await product.save();
+    
+    await Seller.findOneAndUpdate(
+      { UserId: req._id },
+      { $push: { Products: newProduct } },
+      { new: true }
+    );
 
     return res
       .status(201)

@@ -4,7 +4,6 @@ const verifyTourismGovernor = require("../middleware/verifyTourismGovernor");
 
 const {
   addPlace,
-  getPlacesTourist,
   updatePlace,
   deletePlace,
   getPlace,
@@ -22,10 +21,6 @@ router
   .patch(verifyTourismGovernor, updatePlace)
   .delete(verifyTourismGovernor, deletePlace)
 
-// router.post("/add" /*, tourismGovernorCheck*/, addPlace);
-// router.delete("/remove" /*, tourismGovernorCheck*/, deletePlace);
-// router.patch("/update" /*, tourismGovernorCheck*/, updatePlace);
-// router.get("/" /*, tourismGovernorCheck*/, getPlacesTourismGovernor);
-// router.get(/*"/touristCheck"*/ "/" /*, touristCheck*/, getPlacesTourist);
+//.get(getPlacesTourismGovernor)
 
 module.exports = router;

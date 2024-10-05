@@ -12,15 +12,13 @@ const {
 const verifyTourGuide = require('../middleware/verifyTourGuide')
 const verifyAdmin = require('../middleware/verifyAdminOnly')
 
-router.route("/")
-  .post(createTourguideProfile)
-  .get(allTourguides);
+router.route("/").post(createTourguideProfile).get(allTourguides);
 
 router
   .route("/:id")
   .get(getTourguideProfile)
-  .patch(/*verifyTourGuide,*/ updateTourguideProfile)
-  .delete(deleteTourguide)
+  .patch(verifyTourGuide, updateTourguideProfile)
+  .delete(verifyAdmin, deleteTourguide)
 
 router.route('/get-all/my-itineraries')
       .get(verifyTourGuide, getTourguideItineraries);

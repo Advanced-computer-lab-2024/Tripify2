@@ -28,7 +28,7 @@ export default function AddProduct() {
           Image: image,
           Price: parseFloat(price),
           Description: description,
-          AvailableQuantity:parseInt(quantity),
+          AvailableQuantity:quantity,
           Seller:session?.data?.user?.userId,
         }),
       });

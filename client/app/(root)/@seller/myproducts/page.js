@@ -10,10 +10,8 @@ export default function Products() {
   const [minPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100);
   const [currentMaxPrice, setCurrentMaxPrice] = useState(100);
-  const [sortOption, setSortOption] = useState("none"); // State for sorting
+  const [sortOption, setSortOption] = useState("none"); 
 
-  // Function to fetch products
-  // Function to fetch products
 const fetchProducts = async () => {
   try {
     const response = await fetcher("/sellers/get-all/my-products", {

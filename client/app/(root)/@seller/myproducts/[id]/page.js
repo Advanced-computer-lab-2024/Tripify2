@@ -1,7 +1,8 @@
-"use client"; // Marking this component as a Client Component
+"use client"; 
 
 import { useEffect, useState } from 'react';
 import { fetcher } from "@/lib/fetch-client";
+import { useRouter } from 'next/navigation';
 
 export default function ProductDetail({ params }) {
   const { id } = params; 
@@ -16,14 +17,13 @@ export default function ProductDetail({ params }) {
     AvailableQuantity: ''
   });
 
+  const router = useRouter(); 
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await fetcher(`/products/${id}`);
         let data = await response.json();
-
-        const stringifiedProductData = JSON.stringify(data);
-        console.log("Stringified Product Data: ", stringifiedProductData); 
 
         setProduct(data);
         setFormData({
@@ -37,11 +37,7 @@ export default function ProductDetail({ params }) {
         if (data.Seller) {
           const sellerResponse = await fetcher(`/sellers/${data.Seller}`);
           const sellerData = await sellerResponse.json();
-
-          const stringifiedSellerData = JSON.stringify(sellerData);
-          console.log("Stringified Seller Data: ", stringifiedSellerData); 
-
-          setSellerName(sellerData.Name); 
+          setSellerName(sellerData.Name);
         }
       } catch (error) {
         console.error("Error fetching product details: ", error);
@@ -59,7 +55,7 @@ export default function ProductDetail({ params }) {
     }));
   };
 
-  const handleEdit = async () => {
+  const handleEdit = () => {
     setIsEditing(true);
   };
 
@@ -72,13 +68,7 @@ export default function ProductDetail({ params }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          Name: formData.Name,
-          Price: formData.Price,
-          Description: formData.Description,
-          Image: formData.Image,
-          AvailableQuantity: formData.AvailableQuantity
-        })
+        body: JSON.stringify(formData)
       });
   
       if (!response.ok) {
@@ -86,15 +76,31 @@ export default function ProductDetail({ params }) {
       }
   
       const updatedProduct = await response.json();
-      console.log("Product updated successfully: ", updatedProduct);
-  
       setProduct(updatedProduct); 
       setIsEditing(false); 
     } catch (error) {
       console.error("Error updating product details: ", error);
     }
   };
-  
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetcher(`/products/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete product");
+      }
+
+      console.log("Product deleted successfully");
+
+      router.push('/myproducts'); 
+    } catch (error) {
+      console.error("Error deleting product: ", error);
+    }
+  };
+
   if (!product) {
     return <div>Couldn't Fetch Details</div>;
   }
@@ -154,6 +160,7 @@ export default function ProductDetail({ params }) {
           <p>Rating: {product.Rating}</p>
           <p>Available Quantity: {product.AvailableQuantity}</p>
           <button onClick={handleEdit} style={styles.editButton}>Edit</button>
+          <button onClick={handleDelete} style={styles.deleteButton}>Delete</button>
         </>
       )}
     </div>
@@ -190,8 +197,17 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
+    marginRight: '10px', 
   },
   saveButton: {
+    padding: '10px 20px',
+    backgroundColor: 'black',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  deleteButton: {
     padding: '10px 20px',
     backgroundColor: 'black',
     color: '#fff',

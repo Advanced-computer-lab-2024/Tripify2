@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Allproducts from "@/components/ui/Allproducts";
+import Allproducts from "@/components/shared/Allproducts";
 
 export default function Products() {
   const [products, setProducts] = useState([]);

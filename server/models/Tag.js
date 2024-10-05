@@ -8,6 +8,11 @@ const TagSchema = new Schema(
       required: true,
       enum: ['Monuments', 'Museums', 'Religious Sites', 'Palaces/Castles'], // Define the allowed values
     },
+    UserId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    }
   },
   { timestamps: true }
 );

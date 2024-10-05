@@ -2,17 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const SellerSchema = new Schema({
-  Name: {
-    type: String,
-    required: true,
-  },
   Description: {
     type: String,
     required: true
   },
   UserId: {
-    type: String,
-    //ref: 'User',
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
   Accepted: {
@@ -22,7 +18,13 @@ const SellerSchema = new Schema({
   Documents: {
     type: [String], 
     required: true, 
-  }
+  },
+  Products: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+  ],
 }, { timestamps: true });
 
 const Seller = mongoose.model('Seller', SellerSchema);

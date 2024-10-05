@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const User = require("../models/User");
 
 async function getMyProducts(req, res) {
   const { userId } = req.params;
@@ -61,6 +62,9 @@ async function createProduct(req, res) {
       AvailableQuantity = 0,
     } = req.body;
 
+    const seller = await User.findById(Seller, "_id")
+    if(!seller || (seller._id.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized Seller!'})  
+
     const product = new Product({
       Name,
       Image,
@@ -88,6 +92,10 @@ async function updateProduct(req, res) {
   try {
     const { id } = req.params;
 
+    const deletedProduct = await Product.findById(id)
+
+    if(!deletedProduct || (deletedProduct.Seller.toString() !== req._id.toString())) return res.status(400).json({'message': 'Unauthorized Seller!'})
+
     const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
@@ -108,6 +116,11 @@ async function updateProduct(req, res) {
 async function deleteProduct(req, res) {
   try {
     const { id } = req.params;
+
+    const deletedProduct = await Product.findById(id)
+
+    if(!deletedProduct || (deletedProduct.Seller.toString() !== req._id.toString())) return res.status(400).json({'message': 'Unauthorized Seller!'})
+
     const product = await Product.findByIdAndDelete(id);
 
     if (!product) {

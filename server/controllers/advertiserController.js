@@ -69,6 +69,21 @@ const getAdvertisers = async (req, res) => {
   }
 };
 
+const getAdvertiserActivities = async (req, res) => {
+  if(!req._id) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
+
+  try 
+  {
+    const activities = await advertiserModel.findOne({ UserId: req._id }, "Activities").lean().populate("Activities");
+    if (!activities) return res.status(400).json({ message: "No Activities where found!" });
+    return res.status(200).json(activities);
+  } 
+  catch (error) 
+  {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 const getAdvertiserById = async (req, res) => {
   const { id } = req.params;
   //const { Username, Email, Password, Website, Hotline, Profile, Accepted } = req.body;
@@ -155,10 +170,29 @@ const deleteAdvertiser = async (req, res) => {
   }
 };
 
+const acceptAdvertiser = async (req, res) => {
+  const { id } = req.params
+
+  try
+  {
+    const advertiser = await advertiserModel.findById(id)
+    if(advertiser.Accepted) return res.status(400).json({'message': 'Advertiser is already accepted!'})
+    advertiser.Accepted = true
+    await advertiser.save()
+    res.status(200).json({message: 'Advertiser accepted successfully!'})
+  }
+  catch(error)
+  {
+    return res.status(500).json({ message: 'Error accepting advertiser', error: e.message })
+  }
+}
+
 module.exports = {
   createAdvertiser,
   getAdvertisers,
   getAdvertiserById,
   updateAdvertiser,
   deleteAdvertiser,
+  getAdvertiserActivities,
+  acceptAdvertiser
 };

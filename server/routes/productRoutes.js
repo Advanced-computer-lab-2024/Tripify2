@@ -19,6 +19,6 @@ router
   .patch(verifySeller, updateProduct)
   .delete(verifySeller, deleteProduct);
 
-router.route("/my-products/:userId").get(getMyProducts);
+// router.route("/get-all/my-products").get(getMyProducts);
 
 module.exports = router;

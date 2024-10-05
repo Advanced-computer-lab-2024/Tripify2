@@ -29,6 +29,7 @@ app.use("/activities", require("./routes/activityRoutes"));
 app.use("/sellers", require("./routes/sellerRoutes"));
 app.use("/places", require("./routes/placeRoutes"));
 app.use("/tourists", require("./routes/touristRoutes"));
+app.use("/tourism-governors", require("./routes/tourismGovernorRoutes"));
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");

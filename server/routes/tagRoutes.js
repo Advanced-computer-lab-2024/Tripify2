@@ -7,14 +7,14 @@ const {
   updateTag,
   deleteTag,
 } = require("../controllers/tagController");
-// const verifyAdmin = require('../middleware/verifyAdminOnly')
+const verifyTourismGovernor = require('../middleware/verifyTourismGovernor')
 
-router.route("/").get(getTags).post(/*verifyAdmin,*/ createTag);
+router.route("/").get(getTags).post(verifyTourismGovernor,createTag);
 
 router
   .route("/:id")
   .get(getTagById)
-  .patch(/*verifyAdmin,*/ updateTag)
-  .delete(/*verifyAdmin, */ deleteTag);
+  .patch(verifyTourismGovernor, updateTag)
+  .delete(verifyTourismGovernor, deleteTag);
 
 module.exports = router;

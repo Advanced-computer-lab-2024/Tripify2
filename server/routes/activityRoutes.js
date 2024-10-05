@@ -8,15 +8,14 @@ const {
   getActivityById,
   getActivityByAdvertiserId,
 } = require("../controllers/activityController");
-//const verifyAdvertiser = require("../middleware/verifyAdvertiser");
+const verifyAdvertiser = require("../middleware/verifyAdvertiser");
 
-router.route("/").get(getActivity).post(/*verifyAdvertiser,*/ createActivity);
+router.route("/").get(getActivity).post(verifyAdvertiser, createActivity);
 
 router
   .route("/:id")
   .get(getActivityById)
-  .delete(deleteActivity)
-  .patch(updateActivity);
+  .delete(verifyAdvertiser, deleteActivity)
+  .patch(verifyAdvertiser, updateActivity);
 
-router.route("/MyActivities/:id").get(getActivityByAdvertiserId);
 module.exports = router;

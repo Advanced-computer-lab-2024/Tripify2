@@ -20,7 +20,7 @@ const verifyTourismGovernor = (req, res, next) => {
                     const user = decoded.user;
                     if (user && typeof user === 'object' && 'username' in user && 'role' in user)
                     {
-                        req._id = decoded?.user?.id
+                        req._id = decoded?.user?.userId
                         req.role = decoded?.user?.role
                         if(decoded?.user?.role === 'TourismGovernor' || decoded?.user?.role === 'Admin') next()
                         else return res.status(403).json({ message: 'Forbidden' })

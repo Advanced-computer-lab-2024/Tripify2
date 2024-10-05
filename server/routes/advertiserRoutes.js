@@ -6,19 +6,29 @@ const {
   updateAdvertiser,
   deleteAdvertiser,
   getAdvertiserById,
+  getAdvertiserActivities,
+  acceptAdvertiser
 } = require("../controllers/advertiserController");
-// const verifyAdvertiser = require("../middleware/verifyAdvertiser");
+const verifyAdvertiser = require("../middleware/verifyAdvertiser");
+const verifyAdmin = require("../middleware/verifyAdminOnly");
 
 router
   .route("/")
   .get(getAdvertisers)
   .post(createAdvertiser)
 
-  .delete(/*verifyAdvertiser,*/ deleteAdvertiser);
-
 router
   .route("/:id")
   .get(getAdvertiserById)
-  .patch(/*verifyAdvertiser,*/ updateAdvertiser);
+  .patch(verifyAdvertiser, updateAdvertiser)
+  .delete(verifyAdmin, deleteAdvertiser);
+
+router
+  .route("/get-all/my-activities")
+  .get(getAdvertiserActivities);
+
+router
+  .route('/accept/:id')
+  .post(verifyAdmin, acceptAdvertiser);
 
 module.exports = router;

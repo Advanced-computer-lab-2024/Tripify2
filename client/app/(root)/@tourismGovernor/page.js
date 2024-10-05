@@ -2,27 +2,84 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
-
+import { fetcher } from "@/lib/fetch-client";
+import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
+import { Input } from "@/components/ui/input"
+import { Trash2 } from "lucide-react";
+import LocationPicker from "@/components/shared/LocationPicker";
+import LocationViewer from "@/components/shared/LoactionViewer";
 
 export default function MyPlaces() {
   const router = useRouter();
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [newTag, setNewTag] = useState('');
   const [error, setError] = useState(null);
   const [newPlace, setNewPlace] = useState({
     Name: '',
     Description: '',
     Categories: [],
     Tags: [],
+    TicketPrices: {},
+    location: null
   });
+  const [tags, setTags] = useState([]);
+  const session = useSession()
+  const [key, setKey] = useState('');
+  const [value, setValue] = useState('');
+
+  const handleAddPair = () => {
+    if (key.trim() !== '') {
+      setNewPlace(prevPlace => ({
+        ...prevPlace,
+        TicketPrices: {
+          ...prevPlace.TicketPrices,
+          [key]: value
+        }
+      }));
+      setKey('');
+      setValue('');
+    }
+  };
+
+  const handleEditValue = (key, newValue) => {
+    setNewPlace(prevPlace => ({
+      ...prevPlace,
+      TicketPrices: {
+        ...prevPlace.TicketPrices,
+        [key]: newValue
+      }
+    }));
+  };
+
+  const handleDeletePair = (keyToDelete) => {
+    setNewPlace(prevPlace => {
+      const { [keyToDelete]: _, ...rest } = prevPlace.TicketPrices;
+      return {
+        ...prevPlace,
+        TicketPrices: rest
+      };
+    });
+  };
+
+  const handleLocationSelect = (location) => {
+    setNewPlace(prevPlace => ({
+      ...prevPlace,
+      location
+    }));
+  };
 
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await fetch('http://localhost:3001/tourismGovernor/my-places');
+        const response = await fetcher(`/tourism-governors/my-places`);
+
+        console.log(response)
 
         const data = await response.json();
-        setPlaces(data);
+        console.log(data)
+        setPlaces(data.AddedPlaces);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -35,11 +92,12 @@ export default function MyPlaces() {
 
   const createPlace = async () => {
     try {
-      const response = await fetch('http://localhost:3001/places', {
+      const response = await fetcher('/places', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'},
-        body: JSON.stringify(newPlace),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({...newPlace, TourismGovernor: session?.data?.user?.id, Location: newPlace.location}),
       });
     
       const data = await response.json();
@@ -52,12 +110,12 @@ export default function MyPlaces() {
 
   const createTag = async () => {
     try {
-      const response = await fetch('http://localhost:3001/tags', {
+      const response = await fetcher('/tags', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Tag: newTag }),
+        body: JSON.stringify({ Tag: newTag, TourismGovernor: session?.data?.user?.id }),
       });
 
       const data = await response.json();
@@ -75,7 +133,7 @@ export default function MyPlaces() {
     if (window.confirm('Are you sure you want to delete this place?')) {
       setLoadingDelete(true);
       try {
-        await fetch(`http://localhost:3001/places/${id}`, {
+        await fetcher(`/places/${id}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'},
@@ -88,12 +146,12 @@ export default function MyPlaces() {
       }
     }
   };
+
+  console.log(newPlace.location)
   
   const startEdit = (place) => {
     // Redirect to the update page and pass the place data as query params
-    router.push({
-      pathname: `/${place._id}`,
-    });
+    router.push(`/${place._id}`);
   };
 
   if (loading) {
@@ -104,9 +162,9 @@ export default function MyPlaces() {
     return <div>Error: {error}</div>;
   }
 
-  if (!places.length) {
-    return <div>No places found!</div>;
-  }
+  // if (!places.length) {
+  //   return <div>No places found!</div>;
+  // }
 
   return (
     <div style={styles.container}>
@@ -150,12 +208,59 @@ export default function MyPlaces() {
       value={newPlace.Pictures}
       onChange={(e) => setNewPlace({ ...newPlace, Pictures: e.target.value.split(',') })}
     />
-    <input
+    {/* <input
       type="text"
       placeholder="Ticket Prices (JSON format)"
       value={newPlace.TicketPrices}
       onChange={(e) => setNewPlace({ ...newPlace, TicketPrices: JSON.parse(e.target.value) })}
-    />
+    /> */}
+    <div className="p-4 space-y-4">
+      <h2 className="text-xl font-bold mb-4">Ticket Prices</h2>
+      <div className="flex space-x-2">
+        <Input
+          type="text"
+          value={key}
+          onChange={(e) => setKey(e.target.value)}
+          placeholder="Enter ticket type"
+          className="flex-1"
+        />
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Enter price"
+          className="flex-1"
+        />
+        <Button onClick={handleAddPair}>Add</Button>
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Current Ticket Prices:</h3>
+        <div className="space-y-2">
+          {Object.entries(newPlace.TicketPrices || {}).map(([k, v]) => (
+            <div key={k} className="flex items-center space-x-2">
+              <span className="font-medium w-1/3">{k}:</span>
+              <Input
+                type="number"
+                value={v}
+                onChange={(e) => handleEditValue(k, e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                onClick={() => handleDeletePair(k)}
+                variant="destructive"
+                size="icon"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <div className="space-y-4">
+      <h3 className="text-xl font-bold">Location</h3>
+      <LocationPicker onLocationSelect={handleLocationSelect} />
+    </div>
     <input
       type="text"
       placeholder="Tags (comma-separated IDs)"
@@ -181,7 +286,7 @@ export default function MyPlaces() {
       <Button onClick={createTag}>Create Tag</Button>
   
     <ul style={styles.placeList}>
-      {places.map((place) => (
+      {places?.map((place) => (
         <li key={place._id} style={styles.placeItem}>
           {place.Name}
           {place.Image && (
@@ -193,12 +298,17 @@ export default function MyPlaces() {
           )}
           <p>Description: {place.Description}</p>
           <p>Type: {place.Type}</p>
-          <p>Location: {place.Location}</p>
+          {place.Location && (
+            <div className="mt-4">
+              <h4 className="text-lg font-semibold mb-2">Selected Location:</h4>
+              <LocationViewer location={place.Location} />
+            </div>
+          )}
           <p>Opening Hours: {place.OpeningHours}</p>
-          <p>Pictures: {place.Pictures.join(', ')}</p>
+          <p>Pictures: {place?.Pictures?.join(', ')}</p>
           <p>Ticket Prices: {JSON.stringify(place.TicketPrices)}</p>
-          <p>Category: {place.Categories.join(', ')}</p>
-          <p>Tags: {place.Tags.join(', ')}</p>
+          <p>Category: {place?.Categories?.join(', ')}</p>
+          <p>Tags: {place?.Tags?.join(', ')}</p>
           <Button onClick={() => startEdit(place)}>View Place</Button>
           <Button onClick={() => deletePlace(place._id)}>Delete Place</Button>
         </li>

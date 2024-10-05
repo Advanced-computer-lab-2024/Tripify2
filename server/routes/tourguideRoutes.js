@@ -5,9 +5,12 @@ const {
   getTourguideProfile,
   updateTourguideProfile,
   allTourguides,
-  getTourguideItineraries
+  getTourguideItineraries,
+  deleteTourguide,
+  acceptTourGuide
 } = require("../controllers/tourguideController");
 const verifyTourGuide = require('../middleware/verifyTourGuide')
+const verifyAdmin = require('../middleware/verifyAdminOnly')
 
 router.route("/")
   .post(createTourguideProfile)
@@ -19,7 +22,10 @@ router
   .patch(/*verifyTourGuide,*/ updateTourguideProfile)
   .delete(deleteTourguide)
 
-router.route('/get/my-itineraries')
+router.route('/get-all/my-itineraries')
       .get(verifyTourGuide, getTourguideItineraries);
+
+router.route('/accept/:id')
+      .post(verifyAdmin, acceptTourGuide)
 
 module.exports = router;

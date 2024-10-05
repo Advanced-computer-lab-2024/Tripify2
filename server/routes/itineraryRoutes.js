@@ -18,7 +18,7 @@ router
 router
   .route("/:id")
   .get(getItinerary)
-  .patch(/*verifyTourGuide,*/ updateItinerary)
-  .delete(/*verifyTourGuide,*/ deleteItinerary);
+  .patch(verifyTourGuide, updateItinerary)
+  .delete(verifyTourGuide, deleteItinerary);
 
 module.exports = router;

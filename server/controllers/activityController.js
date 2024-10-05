@@ -2,7 +2,7 @@ const activityModel = require("../models/Activity.js");
 const advertiserModel = require("../models/Advertiser.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
-const advertiserModel = require("../models/Advertiser.js");
+
 const createActivity = async (req, res) => {
   const {
     Name,
@@ -115,6 +115,13 @@ const getActivityById = async (req, res) => {
 
 const updateActivity = async (req, res) => {
   const { id } = req.params;
+
+  const advertiser = await advertiserModel.findOne({ UserId: req._id }, "UserId")
+
+  const updatedActivity = await activityModel.findById(id)
+
+  if(!updatedActivity || (updatedActivity.AdvertiserId.toString() !== advertiser._id.toString())) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
+
   const {
     Name,
     Date: dateString,
@@ -169,6 +176,13 @@ const updateActivity = async (req, res) => {
 const deleteActivity = async (req, res) => {
   const { id } = req.params;
 
+  const advertiser = await advertiserModel.findOne({ UserId: req._id }, "UserId")
+
+  const deletedActivity = await activityModel.findById(id)
+
+  if(!deletedActivity || (deletedActivity.AdvertiserId.toString() !== advertiser._id.toString())) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
+
+
   try {
     const deletedActivity = await activityModel.findByIdAndDelete(id);
 
@@ -181,24 +195,25 @@ const deleteActivity = async (req, res) => {
     res.status(500).json({ message: "Error deleting activity", error });
   }
 };
-const getActivityByAdvertiserId = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const activities = await activityModel.find({ AdvertiserId: id });
 
-    if (!activities || activities.length == 0) {
-      return res.status(400).json("No activity found for this advertiser");
-    }
-    res
-      .status(200)
-      .json({ message: "Activities found", activities: activities });
-  } catch (error) {
-    res.status(400).json({ Error: error.message });
-  }
-};
+// const getActivityByAdvertiserId = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     const activities = await activityModel.find({ AdvertiserId: id });
+
+//     if (!activities || activities.length == 0) {
+//       return res.status(400).json("No activity found for this advertiser");
+//     }
+//     res
+//       .status(200)
+//       .json({ message: "Activities found", activities: activities });
+//   } catch (error) {
+//     res.status(400).json({ Error: error.message });
+//   }
+// };
 
 module.exports = {
-  getActivityByAdvertiserId,
+  // getActivityByAdvertiserId,
   createActivity,
   getActivity,
   getActivityById,

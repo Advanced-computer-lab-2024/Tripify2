@@ -12,6 +12,11 @@ const TourismGovernorSchema = new Schema(
       ref: "User",
       required: true,
     },
+    AddedTags: [{
+      type: Schema.Types.ObjectId,
+      ref: "Tag",
+      default: [],
+    }],
   },
   {
     timestamps: true,

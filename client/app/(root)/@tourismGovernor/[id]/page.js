@@ -1,6 +1,8 @@
 "use client";
+import { fetcher } from "@/lib/fetch-client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function ViewPlace() {
   const params = useParams();
@@ -52,7 +54,7 @@ export default function ViewPlace() {
   const handleUpdate = async () => {
     // check route
     try {
-      const response = await fetch(`http://localhost:3001/places/${params.id}`, {
+      const response = await fetcher(`/places/${params.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +72,7 @@ export default function ViewPlace() {
         const data = await response.json();
         setPlace(data);
         alert("Place updated successfully!");
-        router.push("/places"); // Redirect after update
+        router.push("/"); // Redirect after update
       } else {
         setError("Failed to update place.");
       }

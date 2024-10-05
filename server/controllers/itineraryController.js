@@ -6,7 +6,7 @@ const CategoryModel = require("../models/Category");
 
 const createItinerary = async (req, res) => {
   //add a new itinerary to the database with
-  //ctivities, Locations, Timeline, DurationOfActivity, Language, Price, DatesAndTimes, Accesibility, Pickup, and Dropoff
+  //ctivities, Locations, Timeline, DurationOfItinerary, Language, Price, DatesAndTimes, Accesibility, Pickup, and Dropoff
   const {
     Name,
     Activities,
@@ -25,9 +25,9 @@ const createItinerary = async (req, res) => {
     Image,
   } = req.body;
 
-  const tourGuide = await tourGuideModel.findById(TourGuide, "UserId")
-  if(!tourGuide || (tourGuide.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
-
+  const tourGuide = await tourGuideModel.findOne({ UserId: req._id }, "UserId")
+  if(!tourGuide || (tourGuide?.User?.toString() !== TourGuide)) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
+  
   try {
     if (!Tag || Tag.length === 0) {
       return res.status(400).json({ message: "Please provide valid tags" });
@@ -106,6 +106,13 @@ const getItinerary = async (req, res) => {
 
 const updateItinerary = async (req, res) => {
   const { id } = req.params;
+
+  const tourGuide = await tourGuideModel.findOne({ UserId: req._id }, "UserId")
+
+  const updatedItinerary = await ItineraryModel.findById(id)
+
+  if(!updatedItinerary || (updatedItinerary.TourGuide.toString() !== tourGuide._id.toString())) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
+
   try {
     const itinerary = await ItineraryModel.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -127,6 +134,13 @@ const updateItinerary = async (req, res) => {
 };
 const deleteItinerary = async (req, res) => {
   const { id } = req.params;
+
+  const tourGuide = await tourGuideModel.findOne({ UserId: req._id }, "UserId")
+
+  const deletedItinerary = await ItineraryModel.findById(id)
+
+  if(!deletedItinerary || (deletedItinerary.TourGuide.toString() !== tourGuide._id.toString())) return res.status(400).json({'message': 'Unauthorized TourGuide!'})
+
   try {
     const itinerary = await ItineraryModel.findByIdAndDelete(id);
     if (!itinerary)

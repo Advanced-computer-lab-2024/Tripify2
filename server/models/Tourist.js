@@ -32,22 +32,26 @@ const TouristSchema = new Schema(
       ref: "User",
       required: true,
     },
-    UpcomingPlaces: {
-      type: [String],
+    UpcomingPlaces: [{
+      type: Schema.Types.ObjectId,
+      ref: "Place",
       default: [],
-    },
-    UpcomingActivities: {
-      type: [String],
+    }],
+    UpcomingActivities: [{
+      type: Schema.Types.ObjectId,
+      ref: "Activity",
       default: [],
-    },
-    UpcomingItineraries: {
-      type: [String],
+    }],
+    UpcomingItineraries: [{
+      type: Schema.Types.ObjectId,
+      ref: "Itinerary",
       default: [],
-    },
-    Wishlist: {
-      type: [String],
+    }],
+    Wishlist: [{
+      type: Schema.Types.ObjectId,
+      ref: "Product",
       default: [],
-    },
+    }],
   },
   { timestamps: true }
 );

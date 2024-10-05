@@ -1,16 +1,38 @@
 const { default: mongoose } = require('mongoose');
 const SellerModel = require('../models/Seller.js');
 
-const   createSeller = async(req,res) => {
-    const {Name, Description, UserId, Accepted, Documents}=req.body;
+const  createSeller = async(req,res) => {
+    const {UserName, Email, Password, Description, UserId, Documents}=req.body; 
+
+    if(!UserName || !Description || !UserId || !Documents || !Email || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
+
     try {
-        if (Accepted){
-            const Seller = await SellerModel.create({Name, Description, UserId, Accepted, Documents});
-            res.status(200).json({msg:"Seller created Successfully"});
-        }
-        else{
-            res.status(200).json({msg:"Seller is not accepted on the system"});
-        }
+        const duplicateEmail = await User.findOne({ Email }, "_id").lean().exec();
+
+        if(duplicateEmail) return res.status(400).json({'message': 'Email Already Exists!'})
+
+        const duplicateUserName = await User.findOne({ UserName }, "_id").lean().exec();
+        if(duplicateUserName) return res.status(400).json({'message': 'UserName Already Exists!'})
+
+        const hashedPwd = await bcrypt.hash(Password, 10);
+
+        const newUser = new User({
+            Email,
+            Password: hashedPwd,
+            UserName,
+            Role: "Seller",
+        });
+
+        await newUser.save();
+        
+        const seller = await SellerModel.create({
+            Description,
+            UserId,
+            Accepted: false,
+            Documents,
+        });
+
+        res.status(200).json(seller);
     }
     catch(error) {
         return res.status(500).json({ message: 'Error fetching seller', error: e.message })
@@ -81,4 +103,53 @@ const   createSeller = async(req,res) => {
 
    }
 
- module.exports = {createSeller, getSeller, getSellers, updateSeller}
+   const deleteSeller = async (req, res) => {
+    const { id } = req.body;
+  
+    try {
+      const deletedSeller = await SellerModel.findByIdAndDelete(id);
+  
+      if (!deletedSeller) {
+        return res.json({ message: "Seller not found" });
+      }
+  
+      res.status(200).json({ message: "Seller deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting seller", error });
+    }
+  };
+
+  const acceptSeller = async (req, res) => {
+    const { id } = req.params
+  
+    try
+    {
+      const seller = await SellerModel.findById(id)
+      if(seller.Accepted) return res.status(400).json({'message': 'Seller is already accepted!'})
+      seller.Accepted = true
+      await seller.save()
+      res.status(200).json({message: 'Seller accepted successfully!'})
+    }
+    catch(error)
+    {
+      return res.status(500).json({ message: 'Error accepting seller', error: e.message })
+    }
+  }
+
+  const getSellerProducts = async (req, res) => {
+    if(!req._id) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
+  
+    try 
+    {
+      const products = await SellerModel.findOne({ UserId: req._id }, "Products").lean().populate("Products");
+      if (!products) return res.status(400).json({ message: "No Products where found!" });
+      return res.status(200).json(products);
+    } 
+    catch (error) 
+    {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+
+ module.exports = {createSeller, getSeller, getSellers, updateSeller, deleteSeller, acceptSeller, getSellerProducts}

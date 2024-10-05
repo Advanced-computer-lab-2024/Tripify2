@@ -8,11 +8,13 @@ export default async function Itineraries() {
       "Cache-Control": "no-cache",
     },
     cache: "no-store",
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  }).catch(e => {});
+  if (!response?.ok) {
+    return <>No Itineraries</>
   }
   const itineraries = await response.json();
+
+  console.log(itineraries)
 
   return <TouristItineraries itineraries={itineraries} />;
 }

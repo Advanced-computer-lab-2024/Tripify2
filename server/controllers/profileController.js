@@ -1,7 +1,11 @@
-const profileModel = require("../models/Profile.js");
+const profileModel = require("../models/CompanyProfile.js");
+const advertiserModel = require("../models/Advertiser.js");
 
 const createCompanyProfile = async (req, res) => {
-  const { Name, Industry, FoundedDate, Headquarters, Description, Website, Email } = req.body;
+  const { Name, Industry, FoundedDate, Headquarters, Description, Website, Email, AdvertiserId } = req.body;
+
+  const advertiser = await advertiserModel.findById(AdvertiserId, "UserId")
+  if(!advertiser || (advertiser.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
 
   try {
     // required
@@ -29,6 +33,7 @@ const createCompanyProfile = async (req, res) => {
       Description,
       Website,
       Email,
+      AdvertiserId,
     });
 
     await newCompanyProfile.save();
@@ -72,6 +77,13 @@ const getCompanyProfileById = async (req, res) => {
 
 const updateCompanyProfile = async (req, res) => {
   const { id } = req.body;
+
+  const advertiser = await advertiserModel.findOne({ UserId: req._id }, "UserId")
+
+  const updatedCompanyProfile = await profileModel.findById(id)
+
+  if(!updatedCompanyProfile || (updatedCompanyProfile.AdvertiserId.toString() !== advertiser._id.toString())) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
+
   const { Name, Industry, FoundedDate, Headquarters, Description, Website, Email } = req.body;
 
   try {
@@ -96,6 +108,12 @@ const updateCompanyProfile = async (req, res) => {
 
 const deleteCompanyProfile = async (req, res) => {
   const { id } = req.body;
+
+  const advertiser = await advertiserModel.findOne({ UserId: req._id }, "UserId")
+
+  const deletedCompanyProfile = await profileModel.findById(id)
+
+  if(!deletedCompanyProfile || (deletedCompanyProfile.AdvertiserId.toString() !== advertiser._id.toString())) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
 
   try {
     const deletedCompanyProfile = await profileModel.findByIdAndDelete(id);

@@ -7,14 +7,14 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../controllers/categoryController");
-// const verifyAdmin = require('../middleware/verifyAdminOnly')
+const verifyAdmin = require('../middleware/verifyAdminOnly')
 
-router.route("/").get(getCategories).post(/*verifyAdmin,*/ createCategory);
+router.route("/").get(getCategories).post(verifyAdmin, createCategory);
 
 router
   .route("/:id")
   .get(getCategoryById)
-  .patch(/*verifyAdmin, */ updateCategory)
-  .delete(/*verifyAdmin,*/ deleteCategory);
+  .patch(verifyAdmin,  updateCategory)
+  .delete(verifyAdmin, deleteCategory);
 
 module.exports = router;

@@ -1,9 +1,9 @@
 const Places = require("../models/Place");
 /////
 const TourismGovernorModel = require("../models/TourismGovernor");
-const Tourist = require("../models/Tourist");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
+const TourismGovernor = require("../models/TourismGovernor");
 /////
 
 const addPlace = async (req, res) => {
@@ -19,11 +19,14 @@ const addPlace = async (req, res) => {
 
   if(!Name || !Type || !Description || !Location || !Pictures || !OpeningHours || !TicketPrices || !TourismGovernor) return res.status(400).json({'message': 'All Fields Must Be Given!'})
 
+  console.log(req.body)
+
   const tourismGovernor = await TourismGovernorModel.findById(TourismGovernor, "UserId")
-  if(!tourismGovernor || (tourismGovernor.UserId.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+  if(!tourismGovernor || (tourismGovernor?.UserId?.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
   
   try {
     const { Tags, Categories } = req.body;
+    console.log(req.body)
     if (!Tags || Tags.length === 0) {
       return res.status(400).json({ message: "Please provide valid tags" });
     }
@@ -38,6 +41,9 @@ const addPlace = async (req, res) => {
       _id: { $in: Categories },
     });
 
+    console.log(foundTags)
+    console.log(foundCategories)
+
     if (foundTags.length !== Tags.length) {
       return res.status(400).json({ message: "One or more Tags are invalid" });
     }
@@ -47,8 +53,8 @@ const addPlace = async (req, res) => {
         .json({ message: "One or more Categories are invalid" });
     }
 
-    const thePlaceToAdd = await Places.create(req.body);
-    const updatedTourismGovernor = await TourismGovernorModel.findByIdAndUpdate(TourismGovernor, {$push: {AddedPlaces: thePlaceToAdd._id}});
+    const thePlaceToAdd = await Places.create(req.body).catch(err => console.log(err));
+    const updatedTourismGovernor = await TourismGovernorModel.findByIdAndUpdate(TourismGovernor, {$push: {AddedPlaces: thePlaceToAdd._id}}).catch(err => console.log(err));
     if (!thePlaceToAdd || !updatedTourismGovernor)
       return res.status(400).json({ message: "Please enter a valid place" });
 
@@ -86,6 +92,7 @@ const getPlacesTourismGovernor = async (req, res) => {
 const getPlace = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(id)
     const place = await Places.findById(id)
       .populate("Tags", "Tag")
       .populate("Categories", "Category");
@@ -96,12 +103,9 @@ const getPlace = async (req, res) => {
   }
 };
 
-const getPlacesTourist = async (req, res) => {
-  const touristId = req.touristId;
-  //const touristId = "66f70743960a336771bca977";
-
+const getPlaces = async (req, res) => {
   try {
-    const places = await Places.find({});
+    const places = await Places.find().lean().exec();
     if (!places)
       return res.status(400).json({
         message: "No places match the given name/tag(s)",
@@ -112,16 +116,43 @@ const getPlacesTourist = async (req, res) => {
   }
 };
 
+// const getPlacesTourist = async (req, res) => {
+//   const touristId = req.touristId;
+//   //const touristId = "66f70743960a336771bca977";
+
+//   try {
+//     const places = await Places.find({});
+//     if (!places)
+//       return res.status(400).json({
+//         message: "No places match the given name/tag(s)",
+//       });
+//     return res.status(200).json(places);
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
+
 const updatePlace = async (req, res) => {
   const { id } = req.params;
   const { Name, ...rest } = req.body;
+
+  const toursimGovernor = await TourismGovernor.findOne({ UserId: req._id }, "UserId")
+
+  const updatedPlace = await Places.findById(id)
+
+  if(!updatedPlace || (updatedPlace?.TourismGovernor?.toString() !== toursimGovernor?._id?.toString())) return res.status(400).json({'message': 'Unauthorized ToursimGovernor!'})
+
   try {
     //findOneAndUpdate takes objects
+    rest.Categories = rest.Categories.map(category => category._id)
+    rest.Tags = rest.Tags.map(tag => tag._id)
+
     const placeToUpdate = await Places.findByIdAndUpdate(
       id,
-      { $set: rest },
-      { new: true, runValidators: true } //runValidators runs all the schema validations that need to be met
-    );
+      {...rest},
+      { new: true } //runValidators runs all the schema validations that need to be met
+    ).catch(err => console.log(err));
+    console.log("placeToUpdate: ", placeToUpdate)
     if (!placeToUpdate)
       return res
         .status(400)
@@ -134,6 +165,13 @@ const updatePlace = async (req, res) => {
 
 const deletePlace = async (req, res) => {
   const { id } = req.params;
+
+  const tourismGovernor = await TourismGovernor.findOne({ UserId: req._id }, "UserId")
+
+  const deletedPlace = await Places.findById(id)
+
+  if(!deletedPlace || (deletedPlace.TourismGovernor.toString() !== tourismGovernor._id.toString())) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+
   try {
     const placeToDelete = await Places.findByIdAndDelete(id);
     if (!placeToDelete)
@@ -155,6 +193,7 @@ module.exports = {
   updatePlace,
   deletePlace,
   /*getPlacesTourismGovernor,*/
-  getPlacesTourist,
+  // getPlacesTourist,
   getPlace,
+  getPlaces
 };

@@ -1,26 +1,42 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
+const Tourist = require('../models/Tourist')
+const Admin = require('../models/Admin')
+const Advertiser = require('../models/Advertiser')
+const Seller = require('../models/Seller')
+const TourGuide = require('../models/Tourguide')    
+const TourismGovernor = require('../models/TourismGovernor')
 
 async function login(req, res) {
     const { Email, Password } = req.body
+    console.log(Email, Password)
     if(!Email || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
 
-    const user = await User.findOne({ Email }).lean().exec()
-    if(!user) return res.status(400).json({'message': 'User Not Found!'})
+    const foundUser = await User.findOne({ Email }).lean().exec()
+    if(!foundUser) return res.status(400).json({'message': 'User Not Found!'})
 
-    const correctPwd = await bcrypt.compare(Password, user.Password)
+    const correctPwd = await bcrypt.compare(Password, foundUser.Password)
     if(!correctPwd) return res.status(400).json({'message': 'Password Is Wrong!'})
 
-    console.log(user)
+
+    let user
+    if(foundUser.Role === 'Tourist') user = await Tourist.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    else if(foundUser.Role === 'Admin') user = await Admin.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    else if(foundUser.Role === 'Advertiser') user = await Advertiser.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    else if(foundUser.Role === 'Seller') user = await Seller.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    else if(foundUser.Role === 'TourGuide') user = await TourGuide.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    else if(foundUser.Role === 'TourismGovernor') user = await TourismGovernor.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+
 
     const accessToken = jwt.sign(
         {
             "user": {
+                "userId": foundUser._id,
                 "id": user._id,
-                "email": user.Email,
-                "username": user.UserName,
-                "role": user.Role
+                "email": foundUser.Email,
+                "username": foundUser.UserName,
+                "role": foundUser.Role
             }
         }, 
         process.env.ACCESS_TOKEN_SECRET,
@@ -29,29 +45,32 @@ async function login(req, res) {
 
     const refreshToken = jwt.sign(
         {
-            "email": user.Email
+            "email": foundUser.Email
         }, 
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '30d' }
     )
-    res.cookie('jwt', 
-    refreshToken, 
-    { 
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        maxAge: 30 * 24 * 60 * 60 * 1000
-    })
+    // res.cookie('jwt', 
+    // refreshToken, 
+    // { 
+    //     httpOnly: true,
+    //     secure: true,
+    //     sameSite: 'None',
+    //     maxAge: 30 * 24 * 60 * 60 * 1000
+    // })
 
-    res.status(200).json({ accessToken })
+    res.status(200).json({ accessToken, refreshToken, user: {...foundUser, userId: foundUser._id, _id: user._id } })
 }
 
 async function refresh(req, res)
 {
-    const cookies = req.cookies
-    if(!cookies?.jwt) return res.status(401).json({'message': 'Unauthorized By Server!'})
+    const authHeader = req.headers.authorization || req.headers.Authorization
 
-    const refreshToken = cookies.jwt
+    if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Unauthorized' })
+    }
+
+    const refreshToken = authHeader.split(' ')[1]
 
     jwt.verify(
         refreshToken,
@@ -59,16 +78,23 @@ async function refresh(req, res)
         async (err, decoded) => {
             if (err) return res.status(403).json({ message: 'Forbidden' })
 
-            const foundUser = await User.findOne({ Email: decoded.email }).exec()
+            const foundUser = await User.findOne({ Email: decoded.email }).lean().exec()
 
-            console.log(decoded)
+            let user
+            if(foundUser?.Role === 'Tourist') user = await Tourist.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            else if(foundUser?.Role === 'Admin') user = await Admin.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            else if(foundUser?.Role === 'Advertiser') user = await Advertiser.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            else if(foundUser?.Role === 'Seller') user = await Seller.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            else if(foundUser?.Role === 'TourGuide') user = await TourGuide.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            else if(foundUser?.Role === 'TourismGovernor') user = await TourismGovernor.findOne({ UserId: foundUser._id }, "_id").lean().exec()
 
             if (!foundUser) return res.status(401).json({ message: 'Unauthorized' })
 
             const accessToken = jwt.sign(
                 {
                     "user": {
-                        "id": foundUser._id,
+                        "userId": foundUser._id,
+                        "id": user._id,
                         "email": foundUser.Email,
                         "username": foundUser.UserName,
                         "role": foundUser.Role
@@ -78,7 +104,7 @@ async function refresh(req, res)
                 { expiresIn: '1m' }
             )
 
-            res.json({ accessToken })
+            res.json({ accessToken, refreshToken, user: {...foundUser, userId: foundUser._id, _id: user._id } })
         }
     )
 }

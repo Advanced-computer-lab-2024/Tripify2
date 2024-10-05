@@ -128,10 +128,29 @@ const deleteTourguide = async (req, res) => {
   }
 };
 
+const acceptTourGuide = async (req, res) => {
+  const { id } = req.params
+
+  try
+  {
+    const tourGuide = await tourguideModel.findById(id)
+    if(tourGuide.Accepted) return res.status(400).json({'message': 'TourGuide is already accepted!'})
+    tourGuide.Accepted = true
+    await tourGuide.save()
+    res.status(200).json({message: 'TourGuide accepted successfully!'})
+  }
+  catch(error)
+  {
+    return res.status(500).json({ message: 'Error accepting tourGuide', error: e.message })
+  }
+}
+
 module.exports = {
   createTourguideProfile,
   getTourguideProfile,
   updateTourguideProfile,
   allTourguides,
-  getTourguideItineraries
+  getTourguideItineraries,
+  deleteTourguide,
+  acceptTourGuide
 };

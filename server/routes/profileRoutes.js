@@ -7,12 +7,14 @@ const {
   deleteCompanyProfile,
   getCompanyProfileById,
 } = require("../controllers/profileController");
+const verifyAdvertiser = require("../middleware/verifyAdvertiser");
+
 router
   .route("/")
   .get(getCompanyProfiles)
-  .post(createCompanyProfile)
-  .put(updateCompanyProfile)
-  .delete(deleteCompanyProfile);
+  .post(verifyAdvertiser, createCompanyProfile)
+  .patch(verifyAdvertiser, updateCompanyProfile)
+  .delete(verifyAdvertiser, deleteCompanyProfile);
 
 router.route("/:id").get(getCompanyProfileById);
 

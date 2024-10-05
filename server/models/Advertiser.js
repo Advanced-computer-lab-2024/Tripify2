@@ -29,6 +29,12 @@ const advertiserSchema = new Schema(
       type: [String],
       required: true,
     },
+    Activities: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Activity",
+      },
+    ],
   },
   { timestamps: true }
 );

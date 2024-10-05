@@ -27,9 +27,14 @@ const companyProfileSchema = new Schema(
     Email: {
       type: String,
     },
+    AdvertiserId: {
+      type: Schema.Types.ObjectId,
+      ref: "Advertiser",
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-const Profile = mongoose.model("CompanyProfile", companyProfileSchema);
-module.exports = Profile;
+const CompanyProfile = mongoose.model("CompanyProfile", companyProfileSchema);
+module.exports = CompanyProfile;

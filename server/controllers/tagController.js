@@ -25,7 +25,10 @@ async function getTagById(req, res) {
 
 async function createTag(req, res) {
   try {
-    const { Tag } = req.body;
+    const { Tag, UserId } = req.body;
+
+    const user = await User.findById(UserId, "_id")
+    if(!user || (user._id.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized User!'})
 
     const tag = new TagModel({
       Tag,
@@ -45,16 +48,20 @@ async function updateTag(req, res) {
   try {
     const { id } = req.params;
 
-    const updatedTag = await TagModel.findByIdAndUpdate(id, req.body, {
+    const updatedTag = await TagModel.findById(id)
+
+    if(!updatedTag || (updatedTag.UserId.toString() !== req._id.toString())) return res.status(400).json({'message': 'Unauthorized Seller!'})
+
+    const updateTag = await TagModel.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
     });
 
-    if (!updatedTag) {
+    if (!updateTag) {
       return res.status(404).json({ message: "Tag not found" });
     }
 
-    return res.json(updatedTag);
+    return res.json(updateTag);
   } catch (e) {
     return res
       .status(500)
@@ -65,6 +72,11 @@ async function updateTag(req, res) {
 async function deleteTag(req, res) {
   try {
     const { id } = req.params;
+
+    const deletedTag = await TagModel.findById(id)
+
+    if(!deletedTag || (deletedTag.UserId.toString() !== req._id.toString())) return res.status(400).json({'message': 'Unauthorized Seller!'})
+
     const tag = await TagModel.findByIdAndDelete(id);
 
     if (!tag) {

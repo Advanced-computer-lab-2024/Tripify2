@@ -53,7 +53,6 @@ const getTourismgovernor = async (req, res) => {
 };
 
 const getTourismGovernorPlaces = async (req, res) => {
-  
   if(!req._id) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
 
   try 
@@ -68,4 +67,19 @@ const getTourismGovernorPlaces = async (req, res) => {
   }
 }
 
-module.exports = { addTourismgovernor, getTourismgovernor, getTourismGovernorPlaces };
+const getTourismGovernorTags = async (req, res) => {
+  if(!req._id) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+
+  try 
+  {
+    const tags = await TourismGovernor.findOne({ UserId: req._id }, "AddedTags").lean().populate("AddedTags");
+    if (!tags) return res.status(400).json({ message: "No Tags where found!" });
+    return res.status(200).json(tags);
+  } 
+  catch (error) 
+  {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+module.exports = { addTourismgovernor, getTourismgovernor, getTourismGovernorPlaces, getTourismGovernorTags };

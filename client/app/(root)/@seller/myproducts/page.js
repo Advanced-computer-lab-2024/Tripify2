@@ -16,7 +16,7 @@ export default function Products() {
   // Function to fetch products
 const fetchProducts = async () => {
   try {
-    const response = await fetcher("/get-all/my-products", {
+    const response = await fetcher("/sellers/get-all/my-products", {
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": "no-cache",
@@ -35,11 +35,13 @@ const fetchProducts = async () => {
 
     console.log("Stringified Data: ", stringifiedData); // For debugging
 
-    setProducts(data);
-    setFilteredProducts(data);
+    console.log(data)
+
+    setProducts(data.Products);
+    setFilteredProducts(data.Products);
 
     // Extract max price from products
-    const prices = data.map((product) => product.Price);
+    const prices = data.Products.map((product) => product.Price);
     const maxPrice = Math.max(...prices);
     setMaxPrice(maxPrice);
     setCurrentMaxPrice(maxPrice);
@@ -50,7 +52,7 @@ const fetchProducts = async () => {
 
 
   const filterByPrice = () => {
-    const filtered = products.filter(
+    const filtered = products?.filter(
       (product) => product.Price >= minPrice && product.Price <= currentMaxPrice
     );
     sortProducts(filtered); // Apply sorting after filtering
@@ -62,6 +64,7 @@ const fetchProducts = async () => {
   };
 
   const sortProducts = (productsToSort, sortOrder = sortOption) => {
+    console.log("productsToSort: ", productsToSort)
     let sortedProducts = [...productsToSort];
     if (sortOrder === "lowToHigh") {
       sortedProducts.sort((a, b) => a.Rating - b.Rating);

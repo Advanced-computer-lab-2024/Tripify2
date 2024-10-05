@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation';
 export default function Allproducts({ products, searchQuery }) {
   const router = useRouter();
 
-  const filteredProducts = products.filter((product) =>
+  console.log(products)
+
+  const filteredProducts = products?.filter((product) =>
     product.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     product.Price.toString().includes(searchQuery)
   );

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Allproducts from "@/components/shared/Allproducts";
+import Myproducts from "@/components/shared/Myproducts";
 import {fetcher} from "@/lib/fetch-client"
 
 export default function Products() {
@@ -124,7 +124,7 @@ const fetchProducts = async () => {
       </div>
 
       {/* Pass filtered products and search query */}
-      <Allproducts products={filteredProducts} searchQuery={searchQuery} />
+      <Myproducts products={filteredProducts} searchQuery={searchQuery} />
     </div>
   );
 }

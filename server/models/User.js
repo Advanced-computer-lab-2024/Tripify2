@@ -17,9 +17,16 @@ const UserSchema = new Schema(
     },
     Role: {
       type: String,
-      enum: ['Tourist', 'TourGuide', 'Advertiser', 'Seller', 'TourismGovernor', 'Admin'], 
-      required: true
-    }
+      enum: [
+        "Tourist",
+        "TourGuide",
+        "Advertiser",
+        "Seller",
+        "TourismGovernor",
+        "Admin",
+      ],
+      required: true,
+    },
   },
   { timestamps: true }
 );

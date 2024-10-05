@@ -2,60 +2,82 @@ const userModel = require("../models/User.js");
 const tourguideModel = require("../models/Tourguide.js");
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+
 const { default: mongoose } = require("mongoose");
 
 const createTourguideProfile = async (req, res) => {
-  const { UserName, Email, Password, MobileNumber, YearsOfExperience, PreviousWork, Accepted, Documents } =
-    req.body;
-    
-  if(!Email || !Password || !UserName) return res.status(400).json({'message': 'All Fields Must Be Given!'})
-
-    try {
-    const duplicateEmail = await User.findOne({ Email }, "_id").lean().exec();
-
-    if(duplicateEmail) return res.status(400).json({'message': 'Email Already Exists!'})
-
-    const duplicateUserName = await User.findOne({ UserName }, "_id").lean().exec();
-    if(duplicateUserName) return res.status(400).json({'message': 'UserName Already Exists!'})
-
+  const {
+    UserName,
+    Email,
+    Password,
+    MobileNumber,
+    YearsOfExperience,
+    PreviousWork,
+    Accepted,
+    Documents,
+  } = req.body;
+  try {
+    if (
+      !UserName ||
+      !Email ||
+      !Password ||
+      !MobileNumber ||
+      !YearsOfExperience ||
+      !PreviousWork ||
+      !Accepted ||
+      !Documents
+    ) {
+      return res.status(400).json({ message: "All Fields Must Be Given!" });
+    }
+    const duplicateUserEmail = await userModel.findOne({ Email });
+    const duplicateUserName = await userModel.findOne({ UserName });
+    if (duplicateUserEmail) {
+      return res.status(400).json({ message: "Email Already Exists!" });
+    }
+    if (duplicateUserName) {
+      return res.status(400).json({ message: "UserName Already Exists!" });
+    }
     const hashedPwd = await bcrypt.hash(Password, 10);
-
-    const newUser = new User({
+    console.log(hashedPwd);
+    const user = await userModel.create({
+      UserName,
       Email,
       Password: hashedPwd,
-      UserName,
       Role: "TourGuide",
     });
-
-    await newUser.save();
-    const tourguide = await userModel.create({
+    const tourGuide = await tourguideModel.create({
       MobileNumber,
       YearsOfExperience,
       PreviousWork,
-      UserId,
       Accepted,
       Documents,
+      UserId: user._id,
     });
-    res.status(200).json(tourguide);
+    res.status(201).json({
+      message: "TourGuide created successfully",
+      TourGuide: tourGuide,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ message: "Error creating TourGuide", error });
   }
 };
 
 const getTourguideItineraries = async (req, res) => {
-  if(!req?._id) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+  if (!req?._id)
+    return res.status(400).json({ message: "Unauthorized TourismGovernor!" });
 
-  try 
-  {
-    const itineraries = await tourguideModel.findOne({ UserId: req._id }, "Itineraries").lean().populate("Itineraries");
-    if (!itineraries) return res.status(400).json({ message: "No Itineraries where found!" });
+  try {
+    const itineraries = await tourguideModel
+      .findOne({ UserId: req._id }, "Itineraries")
+      .lean()
+      .populate("Itineraries");
+    if (!itineraries)
+      return res.status(400).json({ message: "No Itineraries where found!" });
     return res.status(200).json(itineraries);
-  } 
-  catch (error) 
-  {
+  } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-}
+};
 
 const allTourguides = async (req, res) => {
   try {
@@ -71,7 +93,7 @@ const allTourguides = async (req, res) => {
   }
 };
 const getTourguideProfile = async (req, res) => {
-  const {id} = req.params
+  const { id } = req.params;
   try {
     const tourguide = await userModel.find({ Accepted: true });
     res.status(200).json({ message: "Tourguides read successfully" });
@@ -88,24 +110,24 @@ const getTourguideProfile = async (req, res) => {
 
 const updateTourguideProfile = async (req, res) => {
   const { MobileNumber, YearsOfExperience, PreviousWork, Accepted } = req.body;
-  const {id} = req.params
+  const { id } = req.params;
   try {
-    
-      const updatedUser = await tourguideModel.findById(id);
-    if (updatedUser.Accepted) { 
-      if (updatedUser){
+    const updatedUser = await tourguideModel.findById(id);
+    if (updatedUser.Accepted) {
+      if (updatedUser) {
         updatedUser.MobileNumber = MobileNumber;
         updatedUser.YearsOfExperience = YearsOfExperience;
         updatedUser.PreviousWork = PreviousWork;
         updatedUser.Accepted = Accepted;
         await updatedUser.save();
-        res.status(200).json({message:"Update is successful",tourGuide: updatedUser});
+        res
+          .status(200)
+          .json({ message: "Update is successful", tourGuide: updatedUser });
       }
-      
     } else {
-      res
-        .status(400)
-        .json({ message: "Cannot update: Tourguide is not accepted yet by Admin" });
+      res.status(400).json({
+        message: "Cannot update: Tourguide is not accepted yet by Admin",
+      });
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -129,21 +151,23 @@ const deleteTourguide = async (req, res) => {
 };
 
 const acceptTourGuide = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
 
-  try
-  {
-    const tourGuide = await tourguideModel.findById(id)
-    if(tourGuide.Accepted) return res.status(400).json({'message': 'TourGuide is already accepted!'})
-    tourGuide.Accepted = true
-    await tourGuide.save()
-    res.status(200).json({message: 'TourGuide accepted successfully!'})
+  try {
+    const tourGuide = await tourguideModel.findById(id);
+    if (tourGuide.Accepted)
+      return res
+        .status(400)
+        .json({ message: "TourGuide is already accepted!" });
+    tourGuide.Accepted = true;
+    await tourGuide.save();
+    res.status(200).json({ message: "TourGuide accepted successfully!" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error accepting tourGuide", error: e.message });
   }
-  catch(error)
-  {
-    return res.status(500).json({ message: 'Error accepting tourGuide', error: e.message })
-  }
-}
+};
 
 module.exports = {
   createTourguideProfile,
@@ -152,5 +176,5 @@ module.exports = {
   allTourguides,
   getTourguideItineraries,
   deleteTourguide,
-  acceptTourGuide
+  acceptTourGuide,
 };

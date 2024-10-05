@@ -18,9 +18,16 @@ const ItinerarySchema = new Schema(
       ref: "TourGuide",
       required: true,
     },
-    Locations: {
-      type: String,
-      required: true,
+    Location: {
+      type: {
+        type: String, // Don't do `{ location: { type: String } }`
+        enum: ["Point"], // 'location.type' must be 'Point'
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
     StartDate: {
       type: Date,

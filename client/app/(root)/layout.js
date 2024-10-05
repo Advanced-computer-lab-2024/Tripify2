@@ -19,9 +19,9 @@ export default async function RootLayout({
   tourismGovernor,
   tourist,
 }) {
-  const session = await getSession()
+  const session = await getSession();
 
-  console.log(session)
+  console.log(session);
 
   return (
     <html lang="en">
@@ -30,15 +30,21 @@ export default async function RootLayout({
           {/* <header>
             <Dashboard params={{ role: "Advertiser" }} />
           </header> */}
-          {
-            session?.user?.role === 'Tourist' ? tourist :
-            session?.user?.role === 'Admin' ? admin :
-            session?.user?.role === 'Advertiser' ? advertiser :
-            session?.user?.role === 'Seller' ? seller :
-            session?.user?.role === 'TourGuide' ? tourGuide :
-            session?.user?.role === 'TourismGovernor' ? tourismGovernor :
-            session?.user?.role === 'Tourist' ? tourist : guest
-          }
+          {session?.user?.role === "Tourist"
+            ? tourist
+            : session?.user?.role === "Admin"
+            ? admin
+            : session?.user?.role === "Advertiser"
+            ? advertiser
+            : session?.user?.role === "Seller"
+            ? seller
+            : session?.user?.role === "TourGuide"
+            ? tourGuide
+            : session?.user?.role === "TourismGovernor"
+            ? tourismGovernor
+            : session?.user?.role === "Tourist"
+            ? tourist
+            : guest}
         </body>
       </AuthProvider>
     </html>

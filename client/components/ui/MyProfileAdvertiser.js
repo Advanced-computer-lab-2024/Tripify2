@@ -2,10 +2,13 @@
 import React, { useState } from "react";
 import Dashboard from "@/components/ui/dashboard";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { fetcher } from "@/lib/fetch-client";
 
 export default function AdvertiserProfile({ advertiser }) {
+  const session = useSession();
   const router = useRouter();
-  const [isEditMode, setIsEditMode] = useState(false); // Track if we're in edit mode
+  const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({
     UserName: advertiser.advertiser.UserId?.UserName || "",
     Email: advertiser.advertiser.UserId?.Email || "",
@@ -15,12 +18,10 @@ export default function AdvertiserProfile({ advertiser }) {
     Document: advertiser.advertiser.Document || "",
   });
 
-  // Toggle edit mode
   const handleEditClick = () => {
     setIsEditMode(true);
   };
 
-  // Handle form inputs change
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -28,25 +29,21 @@ export default function AdvertiserProfile({ advertiser }) {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Submit the updated data to the backend
     // console.log("Test");
     // console.log(formData);
     try {
-      const response = await fetch(
-        "http://localhost:3001/advertisers/66fd00e5af33328b032193cf",
+      console.log(session?.data?.user?.id);
+      const response = await fetcher(
+        `/advertisers/${session?.data?.user?.id}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
-          next: {
-            revalidate: 0,
-          },
         }
       );
 
@@ -57,6 +54,7 @@ export default function AdvertiserProfile({ advertiser }) {
         console.log("Advertiser updated successfully:", result);
         //   setIsEditMode(false);
       } else {
+        alert("Error updating advertiser");
         console.error("Error updating advertiser");
       }
     } catch (error) {

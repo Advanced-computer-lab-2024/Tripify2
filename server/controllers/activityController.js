@@ -2,6 +2,7 @@ const activityModel = require("../models/Activity.js");
 const advertiserModel = require("../models/Advertiser.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
+const Advertiser = require("../models/Advertiser.js");
 const createActivity = async (req, res) => {
   const {
     Name,
@@ -75,6 +76,12 @@ const createActivity = async (req, res) => {
     });
     await newActivity.save();
 
+    await Advertiser.findOneAndUpdate(
+      { UserId: req._id },
+      { $push: { Activities: newActivity } },
+      { new: true }
+    );
+
     res.status(201).json({
       message: "Activity created successfully",
       activity: newActivity,
@@ -116,11 +123,18 @@ const getActivityById = async (req, res) => {
 const updateActivity = async (req, res) => {
   const { id } = req.params;
 
-  const advertiser = await advertiserModel.findOne({ UserId: req._id }, "UserId")
+  const advertiser = await advertiserModel.findOne(
+    { UserId: req._id },
+    "UserId"
+  );
 
-  const updatedActivity = await activityModel.findById(id)
+  const updatedActivity = await activityModel.findById(id);
 
-  if(!updatedActivity || (updatedActivity.AdvertiserId.toString() !== advertiser._id.toString())) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
+  if (
+    !updatedActivity ||
+    updatedActivity.AdvertiserId.toString() !== advertiser._id.toString()
+  )
+    return res.status(400).json({ message: "Unauthorized Advertiser!" });
 
   const {
     Name,
@@ -176,12 +190,18 @@ const updateActivity = async (req, res) => {
 const deleteActivity = async (req, res) => {
   const { id } = req.params;
 
-  const advertiser = await advertiserModel.findOne({ UserId: req._id }, "UserId")
+  const advertiser = await advertiserModel.findOne(
+    { UserId: req._id },
+    "UserId"
+  );
 
-  const deletedActivity = await activityModel.findById(id)
+  const deletedActivity = await activityModel.findById(id);
 
-  if(!deletedActivity || (deletedActivity.AdvertiserId.toString() !== advertiser._id.toString())) return res.status(400).json({'message': 'Unauthorized Advertiser!'})
-
+  if (
+    !deletedActivity ||
+    deletedActivity.AdvertiserId.toString() !== advertiser._id.toString()
+  )
+    return res.status(400).json({ message: "Unauthorized Advertiser!" });
 
   try {
     const deletedActivity = await activityModel.findByIdAndDelete(id);

@@ -7,11 +7,11 @@ export default function MyAdvertiser() {
   const router = useRouter();
 
   const handleProfileClick = () => {
-    router.push("/MyProfile");
+    router.push("/profile");
   };
 
   const handleActivitiesClick = () => {
-    router.push("/MyActivities");
+    router.push("/my-activities");
   };
 
   return (

@@ -7,15 +7,12 @@ const {
   deleteAdvertiser,
   getAdvertiserById,
   getAdvertiserActivities,
-  acceptAdvertiser
+  acceptAdvertiser,
 } = require("../controllers/advertiserController");
 const verifyAdvertiser = require("../middleware/verifyAdvertiser");
 const verifyAdmin = require("../middleware/verifyAdminOnly");
 
-router
-  .route("/")
-  .get(getAdvertisers)
-  .post(createAdvertiser)
+router.route("/").get(getAdvertisers).post(createAdvertiser);
 
 router
   .route("/:id")
@@ -25,10 +22,8 @@ router
 
 router
   .route("/get-all/my-activities")
-  .get(getAdvertiserActivities);
+  .get(verifyAdvertiser, getAdvertiserActivities);
 
-router
-  .route('/accept/:id')
-  .post(verifyAdmin, acceptAdvertiser);
+router.route("/accept/:id").post(verifyAdmin, acceptAdvertiser);
 
 module.exports = router;

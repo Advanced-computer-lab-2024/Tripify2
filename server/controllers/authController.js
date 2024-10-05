@@ -10,7 +10,6 @@ const TourismGovernor = require('../models/TourismGovernor')
 
 async function login(req, res) {
     const { Email, Password } = req.body
-    console.log(Email, Password)
     if(!Email || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
 
     const foundUser = await User.findOne({ Email }).lean().exec()

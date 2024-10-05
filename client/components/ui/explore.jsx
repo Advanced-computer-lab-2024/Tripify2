@@ -17,15 +17,21 @@ export default function Explore({ params }) {
 
   const router = useRouter();
 
-  const filteredPlaces = places.filter((place) =>
-    place.Location.toLowerCase().includes(search.toLowerCase())
-  );
-  const filteredItineraries = itineraries.filter((itinerary) =>
-    itinerary.Locations.toLowerCase().includes(search.toLowerCase())
-  );
-  const filteredActivities = activities.filter((activity) =>
-    activity.Location.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredPlaces = places.length
+    ? places.filter((place) =>
+        place.Name.toLowerCase().includes(search.toLowerCase())
+      )
+    : [];
+  const filteredItineraries = itineraries.length
+    ? itineraries.filter((itinerary) =>
+        itinerary.Locations.toLowerCase().includes(search.toLowerCase())
+      )
+    : [];
+  const filteredActivities = activities.length
+    ? activities.filter((activity) =>
+        activity.Location.toLowerCase().includes(search.toLowerCase())
+      )
+    : [];
 
   const updateRecordsToShow = () => {
     const width = window.innerWidth;
@@ -281,10 +287,10 @@ export default function Explore({ params }) {
                 >
                   <img
                     src={place.Pictures[0]}
-                    alt={place.Location}
+                    alt={place.Name}
                     className="w-full h-32 object-cover rounded-md mb-2"
                   />
-                  <h3 className="text-lg font-medium">{place.Location}</h3>
+                  <h3 className="text-lg font-medium">{place.Name}</h3>
                 </button>
               ))}
             </div>

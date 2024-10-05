@@ -1,13 +1,17 @@
 import TouristAccount from "@/components/ui/touristAccount";
+import { fetcher } from "@/lib/fetch-client";
 
 export default async function Account({ params }) {
   const { id } = params;
-  const touristInfoResponse = await fetch(
-    `http://localhost:3001/tourists/${id}`, // Fetch using the correct id
-    {
-      cache: "no-store",
-    }
-  );
+  // const Session = await getSession();
+  //`/tourists/${Session.user.UserId}`
+
+  const touristInfoResponse = await fetcher(`/tourists/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).catch((e) => console.log(e));
 
   if (!touristInfoResponse.ok) {
     throw new Error("Network response was not ok");

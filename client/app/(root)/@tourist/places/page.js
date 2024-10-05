@@ -1,11 +1,15 @@
 "use client"; // Make sure this is included
 
+import { fetcher } from "@/lib/fetch-client";
 import { useEffect, useState } from "react";
 
 async function getPlaces() {
-  const res = await fetch("http://localhost:3001/places", {
-    cache: "no-store",
-  });
+  const res = await fetcher("/places", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).catch((e) => console.log(e));
   if (!res.ok) {
     throw new Error("Failed to fetch places");
   }
@@ -13,9 +17,12 @@ async function getPlaces() {
 }
 
 async function getTags() {
-  const res = await fetch("http://localhost:3001/tags", {
-    cache: "no-store",
-  });
+  const res = await fetcher("/tags", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).catch((e) => console.log(e));
   if (!res.ok) {
     throw new Error("Failed to fetch tags");
   }
@@ -23,9 +30,12 @@ async function getTags() {
 }
 
 async function getCategories() {
-  const res = await fetch("http://localhost:3001/categories", {
-    cache: "no-store",
-  });
+  const res = await fetcher("/categories", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).catch((e) => console.log(e));
   if (!res.ok) {
     throw new Error("Failed to fetch categories");
   }

@@ -16,6 +16,7 @@ const createActivity = async (req, res) => {
     AdvertiserId,
     Duration,
     Image,
+    Rating,
   } = req.body;
 
   const advertiser = await advertiserModel.findById(AdvertiserId, "UserId");
@@ -73,6 +74,7 @@ const createActivity = async (req, res) => {
       AdvertiserId,
       Duration,
       Image,
+      Rating,
     });
     await newActivity.save();
 
@@ -96,7 +98,11 @@ const createActivity = async (req, res) => {
 
 const getActivity = async (req, res) => {
   try {
-    const activity = await activityModel.find({}).populate();
+    const activity = await activityModel
+      .find({})
+      .populate("Tags")
+      .populate("CategoryId")
+      .populate("AdvertiserId");
     res.status(200).json(activity);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving Activity", error });
@@ -108,7 +114,11 @@ const getActivityById = async (req, res) => {
   //const { Username, Email, Password, Website, Hotline, Profile, Accepted } = req.body;
 
   try {
-    const findActivity = await activityModel.findById(id);
+    const findActivity = await activityModel
+      .findById(id)
+      .populate("Tags")
+      .populate("CategoryId")
+      .populate("AdvertiserId");
 
     if (!findActivity) {
       return res.json({ message: "Activity not found" });

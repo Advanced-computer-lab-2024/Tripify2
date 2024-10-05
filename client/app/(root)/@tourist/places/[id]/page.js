@@ -1,7 +1,12 @@
+import { fetcher } from "@/lib/fetch-client";
+
 async function getPlace(id) {
-  const res = await fetch(`http://localhost:3001/places/${id}`, {
-    cache: "no-store",
-  });
+  const res = await fetcher(`/places/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).catch((e) => console.log(e));
   if (!res.ok) {
     throw new Error("Failed to fetch place details");
   }

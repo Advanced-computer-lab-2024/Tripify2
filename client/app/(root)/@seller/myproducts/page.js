@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Allproducts from "@/components/shared/Allproducts";
+import Myproducts from "@/components/shared/Myproducts";
 import {fetcher} from "@/lib/fetch-client"
 
 export default function Products() {
@@ -10,45 +10,47 @@ export default function Products() {
   const [minPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100);
   const [currentMaxPrice, setCurrentMaxPrice] = useState(100);
-  const [sortOption, setSortOption] = useState("none"); // State for sorting
+  const [sortOption, setSortOption] = useState("none"); 
 
-  // Function to fetch products
-  const fetchProducts = async () => {
-    try {
-      const response = await fetcher("/products", {
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-          "Accept": "application/json",
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-  
-      let data = await response.json();
-  
-      // Stringify the fetched data
-      const stringifiedData = JSON.stringify(data);
-  
-      console.log("Stringified Data: ", stringifiedData); // For debugging
-  
-      setProducts(data);
-      setFilteredProducts(data);
-  
-      // Extract max price from products
-      const prices = data.map((product) => product.Price);
-      const maxPrice = Math.max(...prices);
-      setMaxPrice(maxPrice);
-      setCurrentMaxPrice(maxPrice);
-    } catch (error) {
-      console.error("Error fetching products:", error);
+const fetchProducts = async () => {
+  try {
+    const response = await fetcher("/sellers/get-all/my-products", {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Accept": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
     }
-  };
+
+    let data = await response.json();
+
+    // Stringify the fetched data
+    const stringifiedData = JSON.stringify(data);
+
+    console.log("Stringified Data: ", stringifiedData); // For debugging
+
+    console.log(data)
+
+    setProducts(data.Products);
+    setFilteredProducts(data.Products);
+
+    // Extract max price from products
+    const prices = data.Products.map((product) => product.Price);
+    const maxPrice = Math.max(...prices);
+    setMaxPrice(maxPrice);
+    setCurrentMaxPrice(maxPrice);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
+
 
   const filterByPrice = () => {
-    const filtered = products.filter(
+    const filtered = products?.filter(
       (product) => product.Price >= minPrice && product.Price <= currentMaxPrice
     );
     sortProducts(filtered); // Apply sorting after filtering
@@ -60,6 +62,7 @@ export default function Products() {
   };
 
   const sortProducts = (productsToSort, sortOrder = sortOption) => {
+    console.log("productsToSort: ", productsToSort)
     let sortedProducts = [...productsToSort];
     if (sortOrder === "lowToHigh") {
       sortedProducts.sort((a, b) => a.Rating - b.Rating);
@@ -119,7 +122,7 @@ export default function Products() {
       </div>
 
       {/* Pass filtered products and search query */}
-      <Allproducts products={filteredProducts} searchQuery={searchQuery} />
+      <Myproducts products={filteredProducts} searchQuery={searchQuery} />
     </div>
   );
 }

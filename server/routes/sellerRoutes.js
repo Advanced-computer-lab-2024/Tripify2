@@ -17,6 +17,6 @@ router.route('/accept/:id')
     .post(verifyAdmin, acceptSeller)
 
 router.route('/get-all/my-products')
-    .get(getSellerProducts)
+    .get(verifySeller, getSellerProducts)
 
 module.exports=router;

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 export default function AllproductsGuest({ products, searchQuery }) {
   const router = useRouter();
 
-  console.log(products);
+  // console.log(products);
 
   const filteredProducts = products?.filter(
     (product) =>

@@ -5,7 +5,7 @@ const SellerModel = require("../models/Seller");
 async function getMyProducts(req, res) {
   const { userId } = req.params;
   try {
-    const products = await Product.find({ Seller: userId });
+    const products = await Product.find({ Seller: userId }).populate("Seller");
     return res.json(products);
   } catch (e) {
     return res
@@ -29,7 +29,7 @@ async function getProducts(req, res) {
 
     if (minRating) query.rating = { $gte: parseFloat(minRating) };
 
-    const products = await Product.find(query);
+    const products = await Product.find(query).populate("Seller");
     return res.json(products);
   } catch (e) {
     return res
@@ -41,7 +41,7 @@ async function getProducts(req, res) {
 async function getProductById(req, res) {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate("Seller");
     return res.json(product);
   } catch (e) {
     return res
@@ -63,8 +63,9 @@ async function createProduct(req, res) {
       AvailableQuantity,
     } = req.body;
 
-    const seller = await User.findById(Seller, "_id")
-    if(!seller || (seller._id.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized Seller!'})  
+    const seller = await User.findById(Seller, "_id");
+    if (!seller || seller._id.toString() !== req._id)
+      return res.status(400).json({ message: "Unauthorized Seller!" });
 
     const product = new Product({
       Name,
@@ -77,14 +78,15 @@ async function createProduct(req, res) {
       AvailableQuantity,
     });
 
-    
     await product.save();
-    
+
     await SellerModel.findOneAndUpdate(
       { UserId: req._id },
       { $push: { Products: product._id } },
       { new: true }
-    ).catch(err => console.log(err))
+    )
+      .populate("Seller")
+      .catch((err) => console.log(err));
 
     return res
       .status(201)
@@ -100,9 +102,13 @@ async function updateProduct(req, res) {
   try {
     const { id } = req.params;
 
-    const deletedProduct = await Product.findById(id)
+    const deletedProduct = await Product.findById(id);
 
-    if(!deletedProduct || (deletedProduct.Seller.toString() !== req._id.toString())) return res.status(400).json({'message': 'Unauthorized Seller!'})
+    if (
+      !deletedProduct ||
+      deletedProduct.Seller.toString() !== req._id.toString()
+    )
+      return res.status(400).json({ message: "Unauthorized Seller!" });
 
     const updatedProduct = await Product.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -125,9 +131,13 @@ async function deleteProduct(req, res) {
   try {
     const { id } = req.params;
 
-    const deletedProduct = await Product.findById(id)
+    const deletedProduct = await Product.findById(id);
 
-    if(!deletedProduct || (deletedProduct.Seller.toString() !== req._id.toString())) return res.status(400).json({'message': 'Unauthorized Seller!'})
+    if (
+      !deletedProduct ||
+      deletedProduct.Seller.toString() !== req._id.toString()
+    )
+      return res.status(400).json({ message: "Unauthorized Seller!" });
 
     const product = await Product.findByIdAndDelete(id);
 

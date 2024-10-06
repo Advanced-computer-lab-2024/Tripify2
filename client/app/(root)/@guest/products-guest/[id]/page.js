@@ -1,6 +1,6 @@
 "use client"; // Marking this component as a Client Component
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { fetcher } from "@/lib/fetch-client";
 
 export default function ProductDetail({ params }) {
@@ -47,7 +47,10 @@ export default function ProductDetail({ params }) {
   return (
     <div style={styles.container}>
       <h1>{product.Name}</h1>
-      {product.Image && <img src={product.Image} alt={product.Name} style={styles.image} />}
+      {product.Image && (
+        <img src={product.Image} alt={product.Name} style={styles.image} />
+      )}
+      {/* <p>Seller: {product.Seller.Accepted}</p> */}
       <p>Price: ${product.Price}</p>
       <p>Description: {product.Description}</p>
       {/* <p>Seller Name: {sellerName ? sellerName : 'Loading seller...'}</p> Display seller name */}
@@ -59,17 +62,17 @@ export default function ProductDetail({ params }) {
 
 const styles = {
   container: {
-    padding: '20px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    maxWidth: '600px',
-    margin: '0 auto',
+    padding: "20px",
+    backgroundColor: "#f9f9f9",
+    borderRadius: "8px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    maxWidth: "600px",
+    margin: "0 auto",
   },
   image: {
-    width: '100%', // Adjust as needed
-    height: 'auto',
-    borderRadius: '8px',
-    marginBottom: '15px',
+    width: "100%", // Adjust as needed
+    height: "auto",
+    borderRadius: "8px",
+    marginBottom: "15px",
   },
 };

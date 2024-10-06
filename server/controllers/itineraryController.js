@@ -27,9 +27,6 @@ const createItinerary = async (req, res) => {
   } = req.body;
 
   const tourGuide = await tourGuideModel.findOne({ UserId: req._id }, "UserId");
-  // console.log("-------------------------------");
-  // console.log(tourGuide?.UserId?.toString() !== TourGuide);
-  // console.log("-------------------------------");
   if (!tourGuide || tourGuide?.UserId?.toString() !== TourGuide)
     return res.status(400).json({ message: "Unauthorized TourGuide!" });
 
@@ -58,7 +55,7 @@ const createItinerary = async (req, res) => {
       Name,
       Activities,
       Location,
-      TourGuide,
+      TourGuide: tourGuide,
       StartDate,
       EndDate,
       Language,

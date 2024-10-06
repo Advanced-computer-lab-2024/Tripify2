@@ -125,7 +125,15 @@ export default function CreateItinerary() {
         DatesAndTimes: datesAndTimes,
         // TourGuide: session?.data?.user?.userId,
       };
-      console.log(formData.TourGuide);
+
+      // console.log("-------------------------------------------");
+      // console.log(
+      //   JSON.stringify({
+      //     itineraryData,
+      //     TourGuide: session?.data?.user?.userId,
+      //   })
+      // );
+      // console.log("-------------------------------------------");
 
       const response = await fetcher("/itineraries", {
         method: "POST",
@@ -133,8 +141,22 @@ export default function CreateItinerary() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          itineraryData,
-          TourGuide: session?.data?.user?.userId,
+          Name: itineraryData.Name,
+          Activities: itineraryData.Activities,
+          StartDate: itineraryData.StartDate,
+          EndDate: itineraryData.EndDate,
+          Language: itineraryData.Language,
+          Price: itineraryData.Price,
+          DatesAndTimes: itineraryData.DatesAndTimes,
+          Accesibility: itineraryData.Accesibility,
+          Pickup: itineraryData.Pickup,
+          Dropoff: itineraryData.Dropoff,
+          Category: itineraryData.Category,
+          Tag: itineraryData.Tag,
+          Image: itineraryData.Image,
+          Location: itineraryData.Location,
+          Rating: itineraryData.Rating,
+          TourGuide: session?.data?.user?.userId, // Ensure the TourGuide ID is correct
         }),
       });
 

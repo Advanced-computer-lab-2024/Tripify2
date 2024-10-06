@@ -6,6 +6,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.outlineNone {
+  outline: none !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

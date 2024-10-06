@@ -50,6 +50,7 @@ const createTourist = async (req, res) => {
       UserId: user._id,
     });
     await newTourist.save();
+
     res.status(201).json({
       message: "Tourist created successfully",
       tourist: newTourist,

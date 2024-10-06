@@ -1,5 +1,5 @@
 import { fetcher } from "@/lib/fetch-client";
-import Explore from "@/components/ui/explore";
+import ExploreGuest from "@/components/ui/exploreGuest";
 
 export default async function ExplorePage() {
   const resItinerary = await fetcher(`/itineraries`, {
@@ -35,5 +35,5 @@ export default async function ExplorePage() {
     places,
   };
 
-  return <Explore params={params} />;
+  return <ExploreGuest params={params} />;
 }

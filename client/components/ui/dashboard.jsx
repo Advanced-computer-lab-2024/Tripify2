@@ -90,17 +90,20 @@ export default function Dashboard({ params }) {
         { name: "Sign up", link: "/signup" },
         {
           name: "Itineraries",
-          link: "/itineraries",
+          link: "/itineraries-guest",
           sublinks: [
-            { name: "All Itineraries", link: "/itineraries" },
-            { name: "My Itineraries", link: "/itineraries/my-itineraries" },
+            { name: "All Itineraries", link: "/itineraries-guest" },
+            {
+              name: "My Itineraries",
+              link: "/itineraries-guest/my-itineraries",
+            },
             {
               name: "Upcoming Itineraries",
-              link: "/itineraries/upcoming-itineraries",
+              link: "/itineraries-guest/upcoming-itineraries",
             },
           ],
         },
-        { name: "Products", link: "/products" },
+        { name: "Products", link: "/products-guest" },
         // {
         //   name: "Upcoming",
         //   link: "/upcoming",
@@ -109,8 +112,9 @@ export default function Dashboard({ params }) {
         //     { name: "My Upcoming", link: "/myUpcoming" },
         //   ],
         // },
-        { name: "Places", link: "/places" },
-        { name: "Activities", link: "/activities" },
+        { name: "Places", link: "/places-guest" },
+        { name: "Activities", link: "/activities-guest" },
+        { name: "Explore", link: "/" },
       ];
   }
 

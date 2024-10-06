@@ -69,6 +69,11 @@ const createItinerary = async (req, res) => {
       Image,
       Rating,
     });
+    await tourGuideModel.findOneAndUpdate(
+      { UserId: req._id },
+      { $push: { Itineraries: itinerary } },
+      { new: true }
+    );
     res
       .status(200)
       .json({ msg: "Itinerary created Successfully\n", itinerary });

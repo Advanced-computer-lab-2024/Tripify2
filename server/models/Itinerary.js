@@ -81,6 +81,10 @@ const ItinerarySchema = new Schema(
       type: String,
       required: true,
     },
+    Rating: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -1,19 +1,21 @@
-import ItineraryDetails from "@/components/ui/itineraryDetails";
+import SingleItinerary from "@/components/ui/SingleItinerary";
+import { fetcher } from "@/lib/fetch-client";
 
-export default async function Itinerary({ params }) {
+export default async function DetailsItinerary({ params }) {
   const { id } = params;
-  const itineraryInfoResponse = await fetch(
-    `http://localhost:3001/itineraries/${id}`, // Fetch using the correct id
-    {
-      cache: "no-store",
-    }
-  );
 
-  if (!itineraryInfoResponse.ok) {
+  const itineraryRes = await fetcher(`/itineraries/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).catch((e) => console.log(e));
+
+  if (!itineraryRes.ok) {
     throw new Error("Network response was not ok");
   }
 
-  const itineraryInfo = await itineraryInfoResponse.json();
+  const itinerary = await itineraryRes.json();
 
-  return <ItineraryDetails params={{ itineraryInfo }} />; // Pass data to the component
+  return <SingleItinerary itinerary={itinerary} />;
 }

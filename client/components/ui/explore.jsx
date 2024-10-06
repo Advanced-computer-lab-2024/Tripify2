@@ -24,7 +24,7 @@ export default function Explore({ params }) {
     : [];
   const filteredItineraries = itineraries.length
     ? itineraries.filter((itinerary) =>
-        itinerary.Locations.toLowerCase().includes(search.toLowerCase())
+        itinerary.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
   const filteredActivities = activities.length
@@ -158,10 +158,10 @@ export default function Explore({ params }) {
                 >
                   <img
                     src={itinerary.Image}
-                    alt={itinerary.Locations}
+                    alt={itinerary.Name}
                     className="w-full h-32 object-cover rounded-md mb-2"
                   />
-                  <h3 className="text-lg font-medium">{itinerary.Locations}</h3>
+                  <h3 className="text-lg font-medium">{itinerary.Name}</h3>
                 </button>
               ))}
             </div>

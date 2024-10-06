@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-
 import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
 import { useSession } from "next-auth/react";
@@ -22,14 +21,16 @@ export default function CreateItinerary() {
     Category: [],
     Tag: [],
     Image: "",
-    TourGuide: session?.user?.id, // Assuming the TourGuide ID comes from the session
+    TourGuide: session?.data?.user?.userId, // Assuming the TourGuide ID comes from the session
     Location: null, // New state for location
+    Rating: 5,
   });
 
   const [datesAndTimes, setDatesAndTimes] = useState([]);
   const [categories, setCategories] = useState([]); // Categories fetched from backend
   const [tags, setTags] = useState([]); // Tags fetched from backend
   const [error, setError] = useState(null);
+  const [rating, setRating] = useState(0);
 
   // Fetch categories and tags from the backend
   useEffect(() => {
@@ -63,6 +64,11 @@ export default function CreateItinerary() {
     } else {
       setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
+  };
+
+  // Handle change for the radio buttons
+  const handleRatingChange = (event) => {
+    setRating(Number(event.target.value)); // Update state with the selected rating
   };
 
   // Handle date and time additions
@@ -117,7 +123,7 @@ export default function CreateItinerary() {
       const itineraryData = {
         ...formData,
         DatesAndTimes: datesAndTimes,
-        TourGuide: session?.user?.id,
+        // TourGuide: session?.data?.user?.userId,
       };
 
       const response = await fetcher("/itineraries", {
@@ -398,6 +404,27 @@ export default function CreateItinerary() {
             ))}
           </select>
         </label>
+
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Rate Us (0 to 5)</h2>
+          <div className="mb-4">
+            {/* Create radio buttons for each rating option */}
+            {[0, 1, 2, 3, 4, 5].map((value) => (
+              <label key={value} className="block mb-2">
+                <input
+                  type="radio"
+                  value={value}
+                  checked={rating === value} // Check if the value is the selected rating
+                  onChange={handleRatingChange} // Update state on change
+                  className="mr-2" // Add margin for spacing
+                />
+                {value}
+              </label>
+            ))}
+          </div>
+          <p className="text-sm">Your rating: {rating}</p>{" "}
+          {/* Display the selected rating */}
+        </div>
 
         {/* Submit Button */}
         <button

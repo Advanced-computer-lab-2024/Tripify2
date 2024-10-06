@@ -1,3 +1,4 @@
+"use client";
 import { fetcher } from "@/lib/fetch-client";
 
 async function getPlace(id) {

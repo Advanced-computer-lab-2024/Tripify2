@@ -22,7 +22,7 @@ const ItineraryComponent = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        });
+        }).catch((e) => console.log(e));
 
         if (!response.ok) {
           return <>error</>;

@@ -26,8 +26,8 @@ export default function ItineraryDetails({ activity }) {
     new Date(theTime).toLocaleTimeString() || "Time Not Available";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full h-full bg-gray-100 flex flex-col items-center p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen  p-4">
+      <div className="w-full h-full flex flex-col items-center p-8">
         {/* Image Section */}
         <div className="flex justify-center  w-full mb-6">
           {Image ? (

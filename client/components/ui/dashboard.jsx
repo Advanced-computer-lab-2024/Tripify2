@@ -114,7 +114,7 @@ export default function Dashboard({ params }) {
         // },
         { name: "Places", link: "/places-guest" },
         { name: "Activities", link: "/activities-guest" },
-        { name: "Explore", link: "/" },
+        { name: "Explore", link: "/explore-guest" },
       ];
   }
 

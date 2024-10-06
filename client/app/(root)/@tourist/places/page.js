@@ -101,58 +101,69 @@ const PlacesPage = () => {
 
   const router = useRouter();
   return (
-    <div className="flex container mx-auto px-4">
+    <div className="grid grid-cols-6 h-screen">
       {/* Filter Section */}
-      <div className="w-1/4 p-6 bg-white shadow-md rounded-lg border border-gray-200">
-        <h2 className="text-2xl font-semibold mb-4 text-center">
-          Filter by Tags
-        </h2>
-        {tags.map((tag) => (
-          <div key={tag._id} className="mb-3">
-            <label className="flex items-center">
+      <div className="col-span-1 p-4">
+        <h2 className="text-black font-bold text-lg mb-6">Filter</h2>
+        <div className="mb-4">
+          <h3 className="text-black font-bold mb-2">Tags</h3>
+          {tags.map((tag) => (
+            <div key={tag._id} className="flex items-center mb-2">
               <input
                 type="checkbox"
+                id={tag._id}
                 checked={selectedTags.includes(tag._id)}
                 onChange={() => handleTagChange(tag._id)}
-                className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring focus:ring-blue-500"
+                className="mr-2"
               />
-              <span className="ml-2 text-gray-700">{tag.Tag}</span>
-            </label>
-          </div>
-        ))}
+              <label htmlFor={tag._id} className="text-black">
+                {tag.Tag}
+              </label>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Main Section */}
-      <div className="w-3/4 p-6">
-        {/* Search input */}
-        <div className="mb-4 text-right">
+      <div className="col-span-5 p-4 overflow-auto">
+        <h2 className="text-black font-bold text-2xl mb-4">Places</h2>
+
+        <div className="mb-4">
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by name or tag"
-            className="border rounded-md p-3 text-black w-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            className="w-full p-2 border border-gray-300 rounded"
           />
         </div>
 
         {/* Places Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredPlaces.map((place) => (
             <button
               key={place._id}
-              className="border rounded-lg shadow-lg p-4 hover:shadow-xl transition-shadow bg-white"
+              className="bg-white shadow rounded-lg p-4 transition hover:shadow-lg"
               onClick={() => router.push(`/places/${place._id}`)}
             >
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">
-                {place.Name}
-              </h2>
               {place.Pictures && place.Pictures.length > 0 && (
                 <img
                   src={place.Pictures[0]}
                   alt={place.Name}
-                  className="w-full h-40 object-cover rounded-md mb-2"
+                  className="w-full h-48 object-cover mb-2 rounded-lg"
                 />
               )}
+              <h3 className="font-bold text-lg mb-2">{place.Name}</h3>
+
+              <p className="text-gray-700 mb-1">
+                Tags:{" "}
+                {place.Tags.map((tagId) => {
+                  const foundTag = tags.find(
+                    (actualTag) => actualTag._id === tagId
+                  );
+                  return foundTag ? foundTag.Tag : null;
+                }).join(", ")}
+              </p>
             </button>
           ))}
         </div>

@@ -7,26 +7,41 @@ const TourismGovernor = require("../models/TourismGovernor");
 /////
 
 const addPlace = async (req, res) => {
-  const { 
-  Name,
-  Type,
-  Description,
-  Location,
-  Pictures,
-  OpeningHours,
-  TicketPrices,
-  TourismGovernor } = req.body
+  const {
+    Name,
+    Type,
+    Description,
+    Location,
+    Pictures,
+    OpeningHours,
+    TicketPrices,
+    TourismGovernor,
+  } = req.body;
 
-  if(!Name || !Type || !Description || !Location || !Pictures || !OpeningHours || !TicketPrices || !TourismGovernor) return res.status(400).json({'message': 'All Fields Must Be Given!'})
+  if (
+    !Name ||
+    !Type ||
+    !Description ||
+    !Location ||
+    !Pictures ||
+    !OpeningHours ||
+    !TicketPrices ||
+    !TourismGovernor
+  )
+    return res.status(400).json({ message: "All Fields Must Be Given!" });
 
-  console.log(req.body)
+  console.log(req.body);
 
-  const tourismGovernor = await TourismGovernorModel.findById(TourismGovernor, "UserId")
-  if(!tourismGovernor || (tourismGovernor?.UserId?.toString() !== req._id)) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
-  
+  const tourismGovernor = await TourismGovernorModel.findById(
+    TourismGovernor,
+    "UserId"
+  );
+  if (!tourismGovernor || tourismGovernor?.UserId?.toString() !== req._id)
+    return res.status(400).json({ message: "Unauthorized TourismGovernor!" });
+
   try {
     const { Tags, Categories } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     if (!Tags || Tags.length === 0) {
       return res.status(400).json({ message: "Please provide valid tags" });
     }
@@ -41,8 +56,8 @@ const addPlace = async (req, res) => {
       _id: { $in: Categories },
     });
 
-    console.log(foundTags)
-    console.log(foundCategories)
+    console.log(foundTags);
+    console.log(foundCategories);
 
     if (foundTags.length !== Tags.length) {
       return res.status(400).json({ message: "One or more Tags are invalid" });
@@ -53,8 +68,13 @@ const addPlace = async (req, res) => {
         .json({ message: "One or more Categories are invalid" });
     }
 
-    const thePlaceToAdd = await Places.create(req.body).catch(err => console.log(err));
-    const updatedTourismGovernor = await TourismGovernorModel.findByIdAndUpdate(TourismGovernor, {$push: {AddedPlaces: thePlaceToAdd._id}}).catch(err => console.log(err));
+    const thePlaceToAdd = await Places.create(req.body).catch((err) =>
+      console.log(err)
+    );
+    const updatedTourismGovernor = await TourismGovernorModel.findByIdAndUpdate(
+      TourismGovernor,
+      { $push: { AddedPlaces: thePlaceToAdd._id } }
+    ).catch((err) => console.log(err));
     if (!thePlaceToAdd || !updatedTourismGovernor)
       return res.status(400).json({ message: "Please enter a valid place" });
 
@@ -92,7 +112,7 @@ const getPlacesTourismGovernor = async (req, res) => {
 const getPlace = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id)
+    console.log(id);
     const place = await Places.findById(id)
       .populate("Tags", "Tag")
       .populate("Categories", "Category");
@@ -136,23 +156,31 @@ const updatePlace = async (req, res) => {
   const { id } = req.params;
   const { Name, ...rest } = req.body;
 
-  const toursimGovernor = await TourismGovernor.findOne({ UserId: req._id }, "UserId")
+  const toursimGovernor = await TourismGovernor.findOne(
+    { UserId: req._id },
+    "UserId"
+  );
 
-  const updatedPlace = await Places.findById(id)
+  const updatedPlace = await Places.findById(id);
 
-  if(!updatedPlace || (updatedPlace?.TourismGovernor?.toString() !== toursimGovernor?._id?.toString())) return res.status(400).json({'message': 'Unauthorized ToursimGovernor!'})
+  if (
+    !updatedPlace ||
+    updatedPlace?.TourismGovernor?.toString() !==
+      toursimGovernor?._id?.toString()
+  )
+    return res.status(400).json({ message: "Unauthorized ToursimGovernor!" });
 
   try {
     //findOneAndUpdate takes objects
-    rest.Categories = rest.Categories.map(category => category._id)
-    rest.Tags = rest.Tags.map(tag => tag._id)
+    rest.Categories = rest.Categories.map((category) => category._id);
+    rest.Tags = rest.Tags.map((tag) => tag._id);
 
     const placeToUpdate = await Places.findByIdAndUpdate(
       id,
-      {...rest},
+      { ...rest },
       { new: true } //runValidators runs all the schema validations that need to be met
-    ).catch(err => console.log(err));
-    console.log("placeToUpdate: ", placeToUpdate)
+    ).catch((err) => console.log(err));
+    console.log("placeToUpdate: ", placeToUpdate);
     if (!placeToUpdate)
       return res
         .status(400)
@@ -166,11 +194,18 @@ const updatePlace = async (req, res) => {
 const deletePlace = async (req, res) => {
   const { id } = req.params;
 
-  const tourismGovernor = await TourismGovernor.findOne({ UserId: req._id }, "UserId")
+  const tourismGovernor = await TourismGovernor.findOne(
+    { UserId: req._id },
+    "UserId"
+  );
 
-  const deletedPlace = await Places.findById(id)
+  const deletedPlace = await Places.findById(id);
 
-  if(!deletedPlace || (deletedPlace.TourismGovernor.toString() !== tourismGovernor._id.toString())) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+  if (
+    !deletedPlace ||
+    deletedPlace.TourismGovernor.toString() !== tourismGovernor._id.toString()
+  )
+    return res.status(400).json({ message: "Unauthorized TourismGovernor!" });
 
   try {
     const placeToDelete = await Places.findByIdAndDelete(id);
@@ -195,5 +230,5 @@ module.exports = {
   /*getPlacesTourismGovernor,*/
   // getPlacesTourist,
   getPlace,
-  getPlaces
+  getPlaces,
 };

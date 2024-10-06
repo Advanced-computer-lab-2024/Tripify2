@@ -19,63 +19,73 @@ const PlaceDetailsPage = async ({ params }) => {
   const place = await getPlace(id);
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-4xl font-bold mb-4">{place.Name}</h1>
-      {place.Pictures && place.Pictures.length > 0 && (
-        <img
-          src={place.Pictures[0]}
-          alt={place.Name}
-          className="w-full h-64 object-cover rounded-lg mb-4"
-        />
-      )}
-      <p className="text-lg mb-2">
-        <strong>Type:</strong> {place.Type}
-      </p>
-      <p className="text-lg mb-2">
-        <strong>Description:</strong> {place.Description}
-      </p>
-      {/* <p className="text-lg mb-2">
-        <strong>Location:</strong> {place.Location}
-      </p> */}
-      <p className="text-lg mb-2">
-        <strong>Opening Hours:</strong> {place.OpeningHours}
-      </p>
-      <p className="text-lg font-semibold mb-2">Ticket Prices:</p>
-      <ul className="list-disc ml-5 mb-4">
-        {Object.entries(place.TicketPrices).map(([type, price]) => (
-          <li key={type}>
-            {type}: ${price}
-          </li>
-        ))}
-      </ul>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="max-w-4xl mx-auto p-6 rounded-lg">
+        <div className="image--container">
+          <img
+            src={place.Pictures[0]}
+            alt={place.Name}
+            className="w-full h-64 object-cover rounded-lg mb-4"
+          />
+        </div>
 
-      {/* Displaying Tags */}
-      <p className="text-lg font-semibold mb-2">Tags:</p>
-      <ul className="list-disc ml-5 mb-4">
-        {place.Tags && place.Tags.length > 0 ? (
-          place.Tags.map((tag) => (
-            <li key={tag._id} className="text-lg">
-              {tag.Tag} {/* Accessing the Name property */}
-            </li>
-          ))
-        ) : (
-          <li>No tags available</li>
-        )}
-      </ul>
+        <div className="details--container space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-800">{place.Name}</h1>
+            <div className="flex items-center space-x-2">
+              <p className="text-xl text-yellow-500 font-semibold">
+                {place.Type}
+              </p>
+            </div>
+          </div>
 
-      {/* Displaying Categories */}
-      <p className="text-lg font-semibold mb-2">Categories:</p>
-      <ul className="list-disc ml-5 mb-4">
-        {place.Categories && place.Categories.length > 0 ? (
-          place.Categories.map((category) => (
-            <li key={category._id} className="text-lg">
-              {category.Category} {/* Accessing the Name property */}
-            </li>
-          ))
-        ) : (
-          <li>No categories available</li>
-        )}
-      </ul>
+          <h3 className="text-lg font-semibold">
+            Opening Hours: {place.OpeningHours}
+          </h3>
+
+          <div className="space-y-2">
+            <p className="text-lg font-bold text-gray-800">Ticket Prices:</p>
+            <ul className="list-disc ml-5 mb-4">
+              {Object.entries(place.TicketPrices).map(([type, price]) => (
+                <li key={type}>
+                  {type}: ${price}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="text-lg mb-2">
+          <strong>Description:</strong> {place.Description}
+        </p>
+
+        <p className="text-lg font-semibold mb-2">Tags:</p>
+        <ul className="list-disc ml-5 mb-4">
+          {place.Tags && place.Tags.length > 0 ? (
+            place.Tags.map((tag) => (
+              <li key={tag._id} className="text-lg">
+                {tag.Tag} {/* Accessing the Name property */}
+              </li>
+            ))
+          ) : (
+            <li>No tags available</li>
+          )}
+        </ul>
+
+        {/* Displaying Categories */}
+        <p className="text-lg font-semibold mb-2">Categories:</p>
+        <ul className="list-disc ml-5 mb-4">
+          {place.Categories && place.Categories.length > 0 ? (
+            place.Categories.map((category) => (
+              <li key={category._id} className="text-lg">
+                {category.Category} {/* Accessing the Name property */}
+              </li>
+            ))
+          ) : (
+            <li>No categories available</li>
+          )}
+        </ul>
+      </div>
     </div>
   );
 };

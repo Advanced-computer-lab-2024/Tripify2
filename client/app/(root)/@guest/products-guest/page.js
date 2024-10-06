@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import Allproducts from "@/components/shared/Allproducts";
-import {fetcher} from "@/lib/fetch-client"
+import AllproductsGuest from "@/components/ui/AllproductsGuest";
+import { fetcher } from "@/lib/fetch-client";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -19,24 +19,24 @@ export default function Products() {
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": "no-cache",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-  
+
       let data = await response.json();
-  
+
       // Stringify the fetched data
       const stringifiedData = JSON.stringify(data);
-  
+
       console.log("Stringified Data: ", stringifiedData); // For debugging
-  
+
       setProducts(data);
       setFilteredProducts(data);
-  
+
       // Extract max price from products
       const prices = data.map((product) => product.Price);
       const maxPrice = Math.max(...prices);
@@ -110,7 +110,11 @@ export default function Products() {
         {/* Sort Dropdown */}
         <div>
           <label>Sort by Rating: </label>
-          <select value={sortOption} onChange={handleSortChange} style={styles.dropdown}>
+          <select
+            value={sortOption}
+            onChange={handleSortChange}
+            style={styles.dropdown}
+          >
             <option value="none">None</option>
             <option value="lowToHigh">Lowest to Highest</option>
             <option value="highToLow">Highest to Lowest</option>
@@ -119,7 +123,7 @@ export default function Products() {
       </div>
 
       {/* Pass filtered products and search query */}
-      <Allproducts products={filteredProducts} searchQuery={searchQuery} />
+      <AllproductsGuest products={filteredProducts} searchQuery={searchQuery} />
     </div>
   );
 }

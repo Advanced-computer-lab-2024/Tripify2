@@ -154,7 +154,9 @@ export default function ExploreGuest({ params }) {
                 <button
                   key={itinerary._id}
                   className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left"
-                  onClick={() => router.push(`/itineraries/${itinerary._id}`)}
+                  onClick={() =>
+                    router.push(`/itineraries-guest/${itinerary._id}`)
+                  }
                 >
                   <img
                     src={itinerary.Image}
@@ -218,7 +220,9 @@ export default function ExploreGuest({ params }) {
                 <button
                   key={activity._id}
                   className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left w-full"
-                  onClick={() => router.push(`/activities/${activity._id}`)} // Corrected route
+                  onClick={() =>
+                    router.push(`/activities-guest/${activity._id}`)
+                  } // Corrected route
                 >
                   <img
                     src={activity.Image}
@@ -283,7 +287,7 @@ export default function ExploreGuest({ params }) {
                 <button
                   key={place._id}
                   className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left"
-                  onClick={() => router.push(`/places/${place._id}`)}
+                  onClick={() => router.push(`/places-guest/${place._id}`)}
                 >
                   <img
                     src={place.Pictures[0]}

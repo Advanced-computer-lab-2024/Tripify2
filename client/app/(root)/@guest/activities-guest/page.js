@@ -13,6 +13,8 @@ const ItineraryComponent = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [filteredRating, setFilteredRating] = useState(5);
   const [selectedStartDate, setSelectedStartDate] = useState(""); // State for date filter
+  const [sortOrderRating, setSortOrderRating] = useState("desc");
+  const [sortOrderPrice, setSortOrderPrice] = useState("desc");
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -85,6 +87,22 @@ const ItineraryComponent = () => {
         ? prevSelected.filter((t) => t !== tag)
         : [...prevSelected, tag]
     );
+  };
+
+  // const handleSortRating = () => {
+  //   const sortedActivities = [...activities].sort((a, b) => {
+  //     return sortOrderRating === "desc" ? b.Rating - a.Rating : a.Rating - b.Rating;
+  //   });
+  //   setSortOrderRating(sortOrderRating === "desc" ? "asc" : "desc");
+  //   setActivities(sortedActivities);
+  // };
+
+  const handleSortPrice = () => {
+    const sortedActivities = [...activities].sort((a, b) => {
+      return sortOrderPrice === "desc" ? b.Price - a.Price : a.Price - b.Price;
+    });
+    setSortOrderPrice(sortOrderPrice === "desc" ? "asc" : "desc");
+    setActivities(sortedActivities);
   };
 
   const activitiesWithCategoriesAndTags =
@@ -230,6 +248,24 @@ const ItineraryComponent = () => {
             placeholder="Search..."
             className="w-full p-2 border border-gray-300 rounded"
           />
+        </div>
+
+        {/* <div className="mb-4">
+          <button
+            onClick={handleSortRating}
+            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
+          >
+            Sort by Rating {sortOrderRating === "desc" ? "↑" : "↓"}
+          </button>
+        </div> */}
+
+        <div className="mb-4">
+          <button
+            onClick={handleSortPrice}
+            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
+          >
+            Sort by Price {sortOrderPrice === "desc" ? "↑" : "↓"}
+          </button>
         </div>
 
         <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">

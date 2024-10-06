@@ -1,9 +1,11 @@
 "use client";
 import { fetcher } from "@/lib/fetch-client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 // import StarRating from "../starRating";
 
 const ItineraryComponent = () => {
+  const router = useRouter;
   const [theItineraries, setTheItineraries] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredPrice, setFilteredPrice] = useState(0);
@@ -276,7 +278,7 @@ const ItineraryComponent = () => {
             <button
               key={itinerary.ID}
               className="bg-white rounded-lg overflow-hidden p-4 hover:shadow"
-              /*onClick={()=>{}}*/
+              onClick={() => router.push(`/itineraries-guest/${itinerary._id}`)}
             >
               <img
                 src={itinerary.Image}

@@ -18,11 +18,14 @@ const Dashboard = () => {
   const handlecreateProductClick = () => {
     router.push('/createproduct'); // Redirect to the products page (update the path if necessary)
   };
+  const handleprofileClick = () => {
+    router.push('/seller-profile'); // Redirect to the products page (update the path if necessary)
+  };
   return (
     <div style={styles.container}>
       <h1>Seller Dashboard</h1>
       <div style={styles.buttonContainer}>
-        <button style={styles.button}>
+        <button style={styles.button} onClick={handleprofileClick}>
           My Profile
         </button>
         <button style={styles.button} onClick={handlemyProductsClick}>

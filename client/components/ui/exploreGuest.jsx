@@ -223,7 +223,7 @@ export default function ExploreGuest({ params }) {
                   className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left w-full"
                   onClick={() =>
                     router.push(`/activities-guest/${activity._id}`)
-                  } // Corrected route
+                  }
                 >
                   <img
                     src={activity.Image}

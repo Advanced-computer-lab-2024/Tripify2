@@ -26,7 +26,6 @@ export default function ItineraryDetails({ itinerary }) {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="max-w-4xl mx-auto p-6 rounded-lg">
-        {/* Image Section */}
         <div className="image--container">
           <img
             src={Image}
@@ -35,9 +34,7 @@ export default function ItineraryDetails({ itinerary }) {
           />
         </div>
 
-        {/* Itinerary Details */}
         <div className="details--container space-y-6">
-          {/* Name and Rating */}
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-800">{Name}</h1>
             <div className="flex items-center space-x-2">
@@ -46,21 +43,10 @@ export default function ItineraryDetails({ itinerary }) {
             </div>
           </div>
 
-          {/* Reviews */}
-          {/* <span className="text-sm text-gray-500">{Reviews} reviews</span> */}
-
-          {/* Dates */}
           <h3 className="text-lg font-semibold">
             From: {StartDate} - To: {EndDate}
           </h3>
 
-          {/* Tour Guide & Location */}
-          {/* <div className="text-gray-600"> */}
-          {/* <p className="font-medium">Tour Guide: {TourGuide.Name}</p> */}
-          {/* <p className="font-medium">Location: {Location}</p> */}
-          {/* </div> */}
-
-          {/* Price, Language, Accessibility */}
           <div className="space-y-2">
             <p className="text-lg font-bold text-gray-800">
               Price: <span className="text-green-600">${Price}</span>
@@ -76,7 +62,6 @@ export default function ItineraryDetails({ itinerary }) {
             </p>
           </div>
 
-          {/* Activities */}
           <div className="mt-4">
             <h2 className="text-xl font-semibold">Activities:</h2>
             <ul className="list-disc list-inside">
@@ -88,7 +73,6 @@ export default function ItineraryDetails({ itinerary }) {
             </ul>
           </div>
 
-          {/* Dates and Times */}
           <div className="mt-4">
             <h2 className="text-xl font-semibold">Schedule:</h2>
             <ul className="list-disc list-inside">
@@ -100,7 +84,6 @@ export default function ItineraryDetails({ itinerary }) {
             </ul>
           </div>
 
-          {/* Pickup & Dropoff */}
           <div className="flex justify-between items-start mt-4">
             <div>
               <h2 className="text-md font-semibold">Pickup Location:</h2>
@@ -112,7 +95,6 @@ export default function ItineraryDetails({ itinerary }) {
             </div>
           </div>
 
-          {/* Categories & Tags */}
           <div className="flex flex-wrap space-x-4 mt-4">
             <div>
               <h2 className="text-lg font-semibold">Categories:</h2>

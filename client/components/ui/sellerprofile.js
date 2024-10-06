@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import Dashboard from "@/components/ui/dashboard";
 import { useRouter } from "next/navigation";
 
-export default function sellerProfile({seller }) {
+export default function sellerProfile({ seller }) {
   const router = useRouter();
-  const [isEditMode, setIsEditMode] = useState(false); // Track if we're in edit mode
+  const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({
     Name: seller.seller.UserId?.Name || "",
     Description: seller.seller.Description || "",
@@ -15,7 +15,6 @@ export default function sellerProfile({seller }) {
     setIsEditMode(true);
   };
 
-  // Handle form inputs change
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -23,11 +22,9 @@ export default function sellerProfile({seller }) {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Submit the updated data to the backend
     console.log("Test");
     console.log(formData);
     try {
@@ -97,7 +94,7 @@ export default function sellerProfile({seller }) {
                   />
                 </label>
               </div>
-          
+
               <div>
                 <label>
                   <strong>Description:</strong>
@@ -133,14 +130,12 @@ export default function sellerProfile({seller }) {
           ) : (
             <div>
               <p>
-                <strong>Name:</strong>{" "}
-                {seller.seller.UserId?.UserName || "N/A"}
+                <strong>Name:</strong> {seller.seller.UserId?.UserName || "N/A"}
               </p>
               <p>
-                <strong>Email:</strong>{" "}
-                {seller.seller.UserId?.Email || "N/A"}
+                <strong>Email:</strong> {seller.seller.UserId?.Email || "N/A"}
               </p>
-             
+
               <p>
                 <strong>Description:</strong> {seller.seller.Description}
               </p>

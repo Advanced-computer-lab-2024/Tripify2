@@ -102,7 +102,7 @@ export default function AdvertiserProfile({ advertiser }) {
               </div>
               <div>
                 <label>
-                  <strong>Website:</strong> {/* Moved Website field here */}
+                  <strong>Website:</strong>
                   <input
                     type="text"
                     name="Website"
@@ -169,7 +169,6 @@ export default function AdvertiserProfile({ advertiser }) {
               <p>
                 <strong>Website:</strong>{" "}
                 {advertiser.advertiser.Website || "N/A"}{" "}
-                {/* Display the Website */}
               </p>
               <p>
                 <strong>Hotline:</strong> {advertiser.advertiser.Hotline}

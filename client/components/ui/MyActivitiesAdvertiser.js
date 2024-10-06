@@ -11,12 +11,10 @@ export default function AdvertiserProfile({ Activities }) {
     router.push("/MyActivities/createActivity");
   };
 
-  // Handle Edit Button Click
   const handleEditClick = (id) => {
     router.push(`/MyActivities/${id}`);
   };
 
-  // Handle Delete Button Click
   const handleDeleteClick = async (id) => {
     const confirmed = confirm("Are you sure you want to delete this activity?");
     if (confirmed) {
@@ -27,7 +25,7 @@ export default function AdvertiserProfile({ Activities }) {
 
         if (response.ok) {
           alert("Activity deleted successfully!");
-          router.refresh(); // Refresh the page to update the activities list
+          router.refresh();
         } else {
           alert("Failed to delete the activity.");
         }
@@ -75,7 +73,6 @@ export default function AdvertiserProfile({ Activities }) {
                     <strong>Price:</strong> ${activity.Price}
                   </p>
 
-                  {/* Edit and Delete Buttons */}
                   <div className="flex space-x-4 mt-2">
                     <button
                       onClick={() => handleEditClick(activity._id)}

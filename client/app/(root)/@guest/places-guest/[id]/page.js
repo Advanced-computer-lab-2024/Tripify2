@@ -15,7 +15,7 @@ async function getPlace(id) {
 }
 
 const PlaceDetailsPage = async ({ params }) => {
-  const { id } = params; // Get the place ID from the URL parameters
+  const { id } = params;
   const place = await getPlace(id);
 
   return (
@@ -64,7 +64,7 @@ const PlaceDetailsPage = async ({ params }) => {
           {place.Tags && place.Tags.length > 0 ? (
             place.Tags.map((tag) => (
               <li key={tag._id} className="text-lg">
-                {tag.Tag} {/* Accessing the Name property */}
+                {tag.Tag}
               </li>
             ))
           ) : (
@@ -78,7 +78,7 @@ const PlaceDetailsPage = async ({ params }) => {
           {place.Categories && place.Categories.length > 0 ? (
             place.Categories.map((category) => (
               <li key={category._id} className="text-lg">
-                {category.Category} {/* Accessing the Name property */}
+                {category.Category}
               </li>
             ))
           ) : (

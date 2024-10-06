@@ -18,7 +18,7 @@ const ItineraryComponent = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [selectedStartDate, setSelectedStartDate] = useState(""); // State for date filter
+  const [selectedStartDate, setSelectedStartDate] = useState("");
 
   useEffect(() => {
     const fetchItineraries = async () => {
@@ -129,7 +129,6 @@ const ItineraryComponent = () => {
       const languageMatches =
         selectedLanguage === "" || itinerary.Language === selectedLanguage;
 
-      // Date matching logic
       const startDateMatches =
         selectedStartDate === "" ||
         new Date(itinerary.StartDate) >= new Date(selectedStartDate);
@@ -139,7 +138,7 @@ const ItineraryComponent = () => {
         priceMatches &&
         ratingMatches &&
         languageMatches &&
-        startDateMatches // Added date filter
+        startDateMatches
       );
     }
   );
@@ -149,7 +148,6 @@ const ItineraryComponent = () => {
       <div className="p-4 col-span-1">
         <h2 className="text-black font-bold text-lg mb-6">Filter</h2>
 
-        {/* Categories Filter */}
         <div className="mb-4">
           <h3 className="text-black font-bold mb-2">Categories</h3>
           {allPossibleCategories.map((category) => (
@@ -169,7 +167,6 @@ const ItineraryComponent = () => {
           ))}
         </div>
 
-        {/* Tags Filter */}
         <div className="mb-4">
           <h3 className="text-black font-bold mb-2">Tags</h3>
           {allPossibleTags.map((tag) => (
@@ -189,7 +186,6 @@ const ItineraryComponent = () => {
           ))}
         </div>
 
-        {/* Language Filter */}
         <div className="mb-4">
           <h3 className="text-black font-bold mb-2">Languages</h3>
           <select
@@ -206,7 +202,6 @@ const ItineraryComponent = () => {
           </select>
         </div>
 
-        {/* Date Filter */}
         <div className="mb-4">
           <h3 className="text-black font-bold mb-2">Start Date</h3>
           <input
@@ -248,11 +243,9 @@ const ItineraryComponent = () => {
         </div>
       </div>
 
-      {/* Itineraries List */}
       <div className="col-span-5 p-4 overflow-auto">
         <h2 className="text-black font-bold text-2xl mb-4">Itineraries</h2>
 
-        {/* Search Input at the Top */}
         <div className="mb-4">
           <input
             type="text"
@@ -263,7 +256,6 @@ const ItineraryComponent = () => {
           />
         </div>
 
-        {/* Sorting Button */}
         <div className="mb-4">
           <button
             onClick={handleSortRating}

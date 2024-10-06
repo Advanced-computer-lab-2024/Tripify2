@@ -219,7 +219,7 @@ export default function Explore({ params }) {
                 <button
                   key={activity._id}
                   className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left w-full"
-                  onClick={() => router.push(`/activities/${activity._id}`)} // Corrected route
+                  onClick={() => router.push(`/activities/${activity._id}`)}
                 >
                   <img
                     src={activity.Image}

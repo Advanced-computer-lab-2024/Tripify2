@@ -19,5 +19,5 @@ export default async function Account({ params }) {
 
   const touristInfo = await touristInfoResponse.json();
 
-  return <TouristAccount params={{ touristInfo }} />; // Pass data to the component
+  return <TouristAccount params={{ touristInfo }} />;
 }

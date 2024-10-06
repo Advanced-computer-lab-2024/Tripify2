@@ -18,22 +18,27 @@ export default function Dashboard({ params }) {
     case "Tourist":
       dashboardElements = [
         { name: "Account", link: `/account/${id}` },
-        { name: "Bought Products", link: "/boughtProducts" },
-        {
-          name: "Upcoming",
-          link: "/upcoming",
-          sublinks: [
-            { name: "All Upcoming", link: "/upcoming" },
-            { name: "My Upcoming", link: "/myUpcoming" },
-          ],
-        },
+        { name: "Products", link: "/products" },
+        // {
+        //   name: "Upcoming",
+        //   link: "/upcoming",
+        //   sublinks: [
+        //     { name: "All Upcoming", link: "/upcoming" },
+        //     { name: "My Upcoming", link: "/myUpcoming" },
+        //   ],
+        // },
+        { name: "Places", link: "/places" },
+        { name: "Activities", link: "/activities" },
         {
           name: "Itineraries",
           link: "/itineraries",
           sublinks: [
             { name: "All Itineraries", link: "/itineraries" },
-            { name: "My Itineraries", link: "/myItineraries" },
-            { name: "Upcoming Itineraries", link: "/upcomingItineraries" },
+            { name: "My Itineraries", link: "/itineraries/my-itineraries" },
+            {
+              name: "Upcoming Itineraries",
+              link: "/itineraries/upcoming-itineraries",
+            },
           ],
         },
         { name: "Explore", link: "/explore" },
@@ -81,8 +86,31 @@ export default function Dashboard({ params }) {
       break;
     default:
       dashboardElements = [
-        { name: "Sign in", link: "/signin" },
+        { name: "Sign in", link: "/api/auth/signin" },
         { name: "Sign up", link: "/signup" },
+        {
+          name: "Itineraries",
+          link: "/itineraries",
+          sublinks: [
+            { name: "All Itineraries", link: "/itineraries" },
+            { name: "My Itineraries", link: "/itineraries/my-itineraries" },
+            {
+              name: "Upcoming Itineraries",
+              link: "/itineraries/upcoming-itineraries",
+            },
+          ],
+        },
+        { name: "Products", link: "/products" },
+        // {
+        //   name: "Upcoming",
+        //   link: "/upcoming",
+        //   sublinks: [
+        //     { name: "All Upcoming", link: "/upcoming" },
+        //     { name: "My Upcoming", link: "/myUpcoming" },
+        //   ],
+        // },
+        { name: "Places", link: "/places" },
+        { name: "Activities", link: "/activities" },
       ];
   }
 

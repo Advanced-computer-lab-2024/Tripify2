@@ -1,3 +1,3 @@
 export default function UpcomingItineraries() {
-  return <h1>Upcoming Itineraries!</h1>;
+  return <h1>Not sprint 1</h1>;
 }

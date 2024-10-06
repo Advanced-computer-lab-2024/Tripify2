@@ -21,8 +21,8 @@ export default function CreateItinerary() {
     Category: [],
     Tag: [],
     Image: "",
-    TourGuide: session?.data?.user?.userId, // Assuming the TourGuide ID comes from the session
-    Location: null, // New state for location
+    // TourGuide: session?.data?.user?.userId,
+    Location: null,
     Rating: 5,
   });
 
@@ -125,13 +125,17 @@ export default function CreateItinerary() {
         DatesAndTimes: datesAndTimes,
         // TourGuide: session?.data?.user?.userId,
       };
+      console.log(formData.TourGuide);
 
       const response = await fetcher("/itineraries", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(itineraryData),
+        body: JSON.stringify({
+          itineraryData,
+          TourGuide: session?.data?.user?.userId,
+        }),
       });
 
       if (!response.ok) {

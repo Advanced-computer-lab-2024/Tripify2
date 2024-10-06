@@ -31,6 +31,8 @@ export default function CreateItinerary() {
   const [tags, setTags] = useState([]); // Tags fetched from backend
   const [error, setError] = useState(null);
   const [rating, setRating] = useState(0);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Fetch categories and tags from the backend
   useEffect(() => {
@@ -114,6 +116,45 @@ export default function CreateItinerary() {
     }));
   };
 
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategories((prevSelected) => {
+      if (prevSelected.includes(categoryId)) {
+        // If already selected, remove it
+        return prevSelected.filter((id) => id !== categoryId);
+      } else {
+        // Otherwise, add it
+        return [...prevSelected, categoryId];
+      }
+    });
+
+    // Update form data with the new selected categories
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      Category: selectedCategories.includes(categoryId)
+        ? selectedCategories.filter((id) => id !== categoryId) // Remove category if it's already selected
+        : [...selectedCategories, categoryId], // Add category if it's not selected
+    }));
+  };
+
+  const handleTagChange = (tagId) => {
+    setSelectedTags((prevSelected) => {
+      if (prevSelected.includes(tagId)) {
+        // If already selected, remove it
+        return prevSelected.filter((id) => id !== tagId);
+      } else {
+        // Otherwise, add it
+        return [...prevSelected, tagId];
+      }
+    });
+
+    // Update form data with the new selected categories
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      Tag: selectedTags.includes(tagId)
+        ? selectedTags.filter((id) => id !== tagId) // Remove category if it's already selected
+        : [...selectedTags, tagId], // Add category if it's not selected
+    }));
+  };
   // Form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,7 +196,7 @@ export default function CreateItinerary() {
           Tag: itineraryData.Tag,
           Image: itineraryData.Image,
           Location: itineraryData.Location,
-          Rating: itineraryData.Rating,
+          Rating: rating,
           TourGuide: session?.data?.user?.userId, // Ensure the TourGuide ID is correct
         }),
       });
@@ -382,54 +423,56 @@ export default function CreateItinerary() {
         </label>
 
         {/* Categories */}
-        <label className="block mb-4">
-          Categories:
-          <select
-            multiple
-            name="Category"
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                Category: Array.from(
-                  e.target.selectedOptions,
-                  (option) => option.value
-                ),
-              })
-            }
-            className="block w-full border p-2"
-          >
+        <div className="block mb-4">
+          <span className="block mb-2">Categories:</span>
+          <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
-              <option key={category._id} value={category._id}>
-                {category.name}
-              </option>
+              <label
+                key={category._id}
+                className={`cursor-pointer p-2 border rounded ${
+                  selectedCategories.includes(category._id)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  value={category._id}
+                  onChange={() => handleCategoryChange(category._id)}
+                  checked={selectedCategories.includes(category._id)}
+                  className="hidden" // Hide the default checkbox
+                />
+                {category.Category}
+              </label>
             ))}
-          </select>
-        </label>
+          </div>
+        </div>
 
         {/* Tags */}
-        <label className="block mb-4">
-          Tags:
-          <select
-            multiple
-            name="Tag"
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                Tag: Array.from(
-                  e.target.selectedOptions,
-                  (option) => option.value
-                ),
-              })
-            }
-            className="block w-full border p-2"
-          >
+        <div className="block mb-4">
+          <span className="block mb-2">Tags:</span>
+          <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <option key={tag._id} value={tag._id}>
-                {tag.name}
-              </option>
+              <label
+                key={tag._id}
+                className={`cursor-pointer p-2 border rounded ${
+                  selectedTags.includes(tag._id)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  value={tag._id}
+                  onChange={() => handleTagChange(tag._id)}
+                  checked={selectedTags.includes(tag._id)}
+                  className="hidden" // Hide the default checkbox
+                />
+                {tag.Tag}
+              </label>
             ))}
-          </select>
-        </label>
+          </div>
+        </div>
 
         <div>
           <h2 className="text-lg font-semibold mb-2">Rate Us (0 to 5)</h2>

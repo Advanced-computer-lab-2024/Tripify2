@@ -8,12 +8,9 @@ const {
   deleteItinerary,
 } = require("../controllers/itineraryController");
 
-const verifyTourGuide = require('../middleware/verifyTourGuide')
+const verifyTourGuide = require("../middleware/verifyTourGuide");
 
-router
-  .route("/")
-  .get(getItineraries)
-  .post(verifyTourGuide, createItinerary);
+router.route("/").get(getItineraries).post(verifyTourGuide, createItinerary);
 
 router
   .route("/:id")

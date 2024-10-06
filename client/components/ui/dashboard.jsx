@@ -18,7 +18,7 @@ export default function Dashboard({ params }) {
     case "Tourist":
       dashboardElements = [
         { name: "Account", link: `/account/${id}` },
-        { name: "Products", link: "/products" },
+        { name: "Products", link: "/products-tourist" },
         // {
         //   name: "Upcoming",
         //   link: "/upcoming",
@@ -41,7 +41,7 @@ export default function Dashboard({ params }) {
             },
           ],
         },
-        { name: "Explore", link: "/explore" },
+        { name: "Explore", link: "/" },
       ];
       break;
     case "Tour Guide":

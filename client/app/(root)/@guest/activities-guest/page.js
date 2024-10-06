@@ -1,8 +1,10 @@
 "use client";
 import { fetcher } from "@/lib/fetch-client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const ItineraryComponent = () => {
+  const router = useRouter();
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredPrice, setFilteredPrice] = useState(0);
@@ -89,13 +91,15 @@ const ItineraryComponent = () => {
     );
   };
 
-  // const handleSortRating = () => {
-  //   const sortedActivities = [...activities].sort((a, b) => {
-  //     return sortOrderRating === "desc" ? b.Rating - a.Rating : a.Rating - b.Rating;
-  //   });
-  //   setSortOrderRating(sortOrderRating === "desc" ? "asc" : "desc");
-  //   setActivities(sortedActivities);
-  // };
+  const handleSortRating = () => {
+    const sortedActivities = [...activities].sort((a, b) => {
+      return sortOrderRating === "desc"
+        ? b.Rating - a.Rating
+        : a.Rating - b.Rating;
+    });
+    setSortOrderRating(sortOrderRating === "desc" ? "asc" : "desc");
+    setActivities(sortedActivities);
+  };
 
   const handleSortPrice = () => {
     const sortedActivities = [...activities].sort((a, b) => {
@@ -133,7 +137,7 @@ const ItineraryComponent = () => {
 
       console.log(`${index}: ` + categoryMatches, tagMatches);
       const priceMatches = activity.Price <= filteredPrice;
-      //   const ratingMatches = activity.Rating <= filteredRating;
+      const ratingMatches = activity.Rating <= filteredRating;
       const startDateMatches =
         selectedStartDate === "" ||
         new Date(activity.Date) >= new Date(selectedStartDate);
@@ -141,7 +145,7 @@ const ItineraryComponent = () => {
       return (
         (nameMatches || categoryMatches || tagMatches) &&
         priceMatches &&
-        /*ratingMatches &&*/
+        ratingMatches &&
         startDateMatches
       );
     }
@@ -250,16 +254,13 @@ const ItineraryComponent = () => {
           />
         </div>
 
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <button
             onClick={handleSortRating}
-            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
+            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600 mr-4"
           >
             Sort by Rating {sortOrderRating === "desc" ? "↑" : "↓"}
           </button>
-        </div> */}
-
-        <div className="mb-4">
           <button
             onClick={handleSortPrice}
             className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
@@ -273,6 +274,9 @@ const ItineraryComponent = () => {
             <button
               key={activity._id}
               className="bg-white shadow rounded-lg p-4 transition hover:shadow-lg"
+              onClick={() => {
+                router.push(`/activities-guest/${activity._id}`);
+              }}
             >
               <img
                 src={activity.Image}
@@ -280,9 +284,10 @@ const ItineraryComponent = () => {
                 className="w-full h-48 object-cover mb-2 rounded-lg"
               />
               <h3 className="font-bold text-lg mb-2">{activity.Name}</h3>
+              <p className="text-gray-700 mb-1">Rating: {activity.Rating}</p>
               <p className="text-gray-700 mb-1">Price: ${activity.Price}</p>
               <p className="text-gray-700 mb-1">
-                Advertiser: {activity.AdvertiserId.Name}
+                Advertiser: {activity.AdvertiserId._id}
               </p>
               <p className="text-gray-700 mb-1">
                 Categories:{" "}

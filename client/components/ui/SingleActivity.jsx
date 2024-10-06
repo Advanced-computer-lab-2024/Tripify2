@@ -57,9 +57,9 @@ export default function ItineraryDetails({ activity }) {
           </h3>
 
           {/* Location */}
-          <div className="text-gray-600 text-center">
+          {/* <div className="text-gray-600 text-center">
             <p className="font-medium">Location: {Location}</p>
-          </div>
+          </div> */}
 
           {/* Price and Duration */}
           <div className="space-y-2 text-center">

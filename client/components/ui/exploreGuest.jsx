@@ -29,7 +29,7 @@ export default function ExploreGuest({ params }) {
     : [];
   const filteredActivities = activities.length
     ? activities.filter((activity) =>
-        activity.Location.toLowerCase().includes(search.toLowerCase())
+        activity.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
 
@@ -230,7 +230,7 @@ export default function ExploreGuest({ params }) {
                     alt={activity.Name}
                     className="w-full h-32 object-cover rounded-md mb-2"
                   />
-                  <p className="text-lg font-medium">{activity.Location}</p>
+                  <p className="text-lg font-medium">{activity.Name}</p>
                   <p className="text-gray-500">From: ${activity.Price}</p>
                 </button>
               ))}

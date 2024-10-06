@@ -91,12 +91,22 @@ export default function Tourist()
                     'Content-Type': 'application/json'
                 }
             })
-
-            await signIn("credentials", { email: values.Email, password: values.Password })
+            .then(async (res) => {
+                if(!res?.ok) {
+                    const data = await res.json()
+                    setError(data?.message)
+                }
+                else
+                {
+                    setError(null)
+                    await signIn("credentials", { email: values.Email, password: values.Password })
+                    router.push('/')
+                }
+            })
 
             setLoading(false)
 
-            router.push('/')
+            // router.push('/')
         }
         catch(error)
         {

@@ -20,6 +20,8 @@ const createTourist = async (req, res) => {
 
     const duplicateUser = await userModel.findOne({ Email });
 
+    console.log(duplicateUser)
+
     if (duplicateUser)
       return res.status(400).json({ message: "Email Already Exists!" });
 

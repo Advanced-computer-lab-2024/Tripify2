@@ -60,6 +60,10 @@ export default withUt({
   			sm: 'calc(var(--radius) - 4px)'
   		},
 		keyframes: {
+			spin: {
+				'0%': { transform: 'rotate(0deg)' },
+				'100%': { transform: 'rotate(360deg)' },
+			  },
 			hide: {
 				from: { opacity: "1" },
 				to: { opacity: "0" },
@@ -113,6 +117,7 @@ export default withUt({
   	},
 	animation: {
 		hide: "hide 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+		'spin': 'spin 1s linear infinite',
 		slideDownAndFade: "slideDownAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1)",
 		slideLeftAndFade: "slideLeftAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1)",
 		slideUpAndFade: "slideUpAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1)",

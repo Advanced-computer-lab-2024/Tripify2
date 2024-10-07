@@ -9,10 +9,10 @@ const TourGuide = require('../models/Tourguide')
 const TourismGovernor = require('../models/TourismGovernor')
 
 async function login(req, res) {
-    const { Email, Password } = req.body
-    if(!Email || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
+    const { UserName, Password } = req.body
+    if(!UserName || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
 
-    const foundUser = await User.findOne({ Email }).lean().exec()
+    const foundUser = await User.findOne({ UserName }).lean().exec()
     if(!foundUser) return res.status(400).json({'message': 'User Not Found!'})
 
     const correctPwd = await bcrypt.compare(Password, foundUser.Password)

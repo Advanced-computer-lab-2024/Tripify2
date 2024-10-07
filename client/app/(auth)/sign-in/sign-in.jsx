@@ -19,8 +19,8 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 const signInSchema = z.object({
-    Email: z.string().email({
-        message: 'Invalid email address'
+    UserName: z.string().min(2, {
+        message: 'Invalid username'
     }),
     Password: z.string().min(6, {
         message: 'Password must be at least 6 characters long'
@@ -37,7 +37,7 @@ export default function SignIn()
     const form = useForm({
         resolver: zodResolver(signInSchema),
         defaultValues: {
-            Email: '',
+            UserName: '',
             Password: '',
         },
     })
@@ -48,7 +48,7 @@ export default function SignIn()
             setLoading(true)
             setError(null)
 
-            const signInResult = await signIn("credentials", { email: values.Email, password: values.Password, redirect: false  })
+            const signInResult = await signIn("credentials", { username: values.UserName, password: values.Password, redirect: false  })
             console.log(signInResult)
             if (signInResult?.error)
             {
@@ -72,12 +72,12 @@ export default function SignIn()
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <FormField
                         control={form.control}
-                        name="Email"
+                        name="UserName"
                         render={({ field }) => (
                             <FormItem className='relative'>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>UserName</FormLabel>
                                 <FormControl>
-                                    <Input disabled={loading} className='w-screen max-w-[340px] disabled:opacity-60' placeholder="e.g. johndoe@gmail.com" {...field} />
+                                    <Input disabled={loading} className='w-screen max-w-[340px] disabled:opacity-60' placeholder="e.g. johndoe" {...field} />
                                 </FormControl>
                                 <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
                             </FormItem>

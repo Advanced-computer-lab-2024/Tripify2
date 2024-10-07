@@ -384,6 +384,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Name}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -401,6 +402,7 @@ function ItineraryPage({ itinerary, params }) {
                         handleActivityChange(index, "type", e.target.value)
                       }
                       className="block w-full border p-2"
+                      required
                     />
                   </label>
                   <label className="block mb-2">
@@ -412,6 +414,7 @@ function ItineraryPage({ itinerary, params }) {
                         handleActivityChange(index, "duration", e.target.value)
                       }
                       className="block w-full border p-2"
+                      required
                     />
                   </label>
                   {formData.Activities.length > 1 && (
@@ -459,6 +462,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.StartDate}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -471,6 +475,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.EndDate}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -483,6 +488,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Language}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -495,6 +501,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Price}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -505,6 +512,7 @@ function ItineraryPage({ itinerary, params }) {
                 type="datetime-local"
                 onChange={handleDateChange}
                 className="block w-full border p-2 mb-2"
+                required
               />
               {datesAndTimes.map((dateTime, index) => (
                 <div key={index} className="flex items-center mb-2">
@@ -531,6 +539,7 @@ function ItineraryPage({ itinerary, params }) {
                 checked={formData.Accesibility}
                 onChange={handleInputChange}
                 className="ml-2"
+                required
               />
             </label>
 
@@ -543,6 +552,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Pickup}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -555,6 +565,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Dropoff}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -567,6 +578,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Image}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
+                required
               />
             </label>
 
@@ -586,6 +598,7 @@ function ItineraryPage({ itinerary, params }) {
                   })
                 }
                 className="block w-full border p-2"
+                required
               >
                 {categories.map((category) => (
                   <option key={category._id} value={category._id}>
@@ -611,6 +624,7 @@ function ItineraryPage({ itinerary, params }) {
                   })
                 }
                 className="block w-full border p-2"
+                required
               >
                 {tags.map((tag) => (
                   <option key={tag._id} value={tag._id}>
@@ -632,6 +646,7 @@ function ItineraryPage({ itinerary, params }) {
                       checked={rating === value} // Check if the value is the selected rating
                       onChange={handleRatingChange} // Update state on change
                       className="mr-2" // Add margin for spacing
+                      required
                     />
                     {value}
                   </label>

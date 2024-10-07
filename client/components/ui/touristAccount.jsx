@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 
 export default function TouristAccount({ params }) {
   const { touristInfo } = params;
+
   const Session = useSession();
   const touristDetails = Object.entries(touristInfo).reduce(
     (acc, [key, value]) => {
@@ -24,6 +25,9 @@ export default function TouristAccount({ params }) {
   const [dobChange, setDobChange] = useState(DOB);
   const [occupationChange, setOccupationChange] = useState(Occupation);
   const [nationalityChange, setNationalityChange] = useState(Nationality);
+  const [theEmailChange, setTheEmailChange] = useState(
+    touristInfo.UserId.Email
+  );
 
   const handleChange = (field) => (e) => {
     switch (field) {
@@ -39,29 +43,76 @@ export default function TouristAccount({ params }) {
       case "nationality":
         setNationalityChange(e.target.value);
         break;
+      case "email":
+        setTheEmailChange(e.target.value);
+        break;
       default:
         break;
     }
   };
 
   const handleEdit = async () => {
+    const newUserId = {
+      ...touristInfo.UserId,
+      Email: theEmailChange,
+    };
     const updatedData = {
       MobileNumber: mobileNumberChange,
       DOB: dobChange,
       Occupation: occupationChange,
       Nationality: nationalityChange,
+      UserId: newUserId,
     };
     try {
-      const response = await fetcher(`/tourists/${Session.data.user.id}`, {
-        method: "PATCH",
-        headers: {
+      const usersResponse = await fetcher("/users", {
+        method: "GET",
+        heeader: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedData),
       }).catch((e) => console.log(e));
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      if (!usersResponse.ok) {
+        throw new Error("Network response was not ok!");
+      }
+
+      const dataForUsers = await usersResponse.json();
+
+      const validEmail = dataForUsers.some((user) => {
+        return (
+          user._id !== touristInfo.UserId._id && user.Email === theEmailChange
+        );
+      });
+
+      if (validEmail) {
+        throw new Error(
+          "Please update to an email that is not already in the system!"
+        );
+      } else {
+        const responseUserTwo = await fetcher(
+          `/users/${touristInfo.UserId._id}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Email: theEmailChange }),
+          }
+        );
+
+        if (!responseUserTwo.ok) {
+          throw new Error("Network response was not ok!");
+        }
+        const response = await fetcher(`/tourists/${Session.data.user.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        }).catch((e) => console.log(e));
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
       }
     } catch (error) {
       console.error("Error updating data:", error.message);
@@ -72,7 +123,8 @@ export default function TouristAccount({ params }) {
     mobileNumberChange !== MobileNumber ||
     dobChange !== DOB ||
     occupationChange !== Occupation ||
-    nationalityChange !== Nationality;
+    nationalityChange !== Nationality ||
+    theEmailChange !== touristDetails.UserId.Email;
 
   const currency = "USD";
 
@@ -118,6 +170,14 @@ export default function TouristAccount({ params }) {
             <input
               value={mobileNumberChange}
               onChange={handleChange("mobile")}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200 ease-in-out hover:border-purple-500 hover:ring-2"
+            />
+          </div>
+          <div className="block w-full">
+            <span className="block text-gray-700 font-medium">Email</span>
+            <input
+              value={theEmailChange}
+              onChange={handleChange("email")}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200 ease-in-out hover:border-purple-500 hover:ring-2"
             />
           </div>

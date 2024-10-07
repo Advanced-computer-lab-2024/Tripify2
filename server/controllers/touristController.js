@@ -20,7 +20,7 @@ const createTourist = async (req, res) => {
 
     const duplicateUser = await userModel.findOne({ Email });
 
-    console.log(duplicateUser)
+    console.log(duplicateUser);
 
     if (duplicateUser)
       return res.status(400).json({ message: "Email Already Exists!" });
@@ -74,7 +74,7 @@ const getTourists = async (req, res) => {
 const getTourist = async (req, res) => {
   try {
     const { id } = req.params;
-    const tourist = await touristModel.findById(id);
+    const tourist = await touristModel.findById(id).populate("UserId");
     if (!tourist) return res.status(404).json({ msg: "Tourist not found" });
     return res.status(200).json(tourist);
   } catch (error) {
@@ -175,7 +175,9 @@ const deleteTourist = async (req, res) => {
 
   try {
     const deletedTourist = await touristModel.findByIdAndDelete(id);
-    const deletedUser = await userModel.findByIdAndDelete(deletedTourist.UserId);
+    const deletedUser = await userModel.findByIdAndDelete(
+      deletedTourist.UserId
+    );
 
     if (!deletedTourist) {
       return res.json({ message: "Tourist not found" });

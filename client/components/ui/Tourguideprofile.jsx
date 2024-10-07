@@ -103,6 +103,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
       if (response.ok) {
         setPagestate("Read");
         alert("Successfully updated a tour guide");
+        router.refresh()
         // Redirect back to the activities list page
       } else {
         console.log("PROBLEM");

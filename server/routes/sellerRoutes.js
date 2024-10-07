@@ -1,6 +1,6 @@
 const express = require('express')
 const router=express.Router();
-const {createSeller, getSeller, getSellers, updateSeller, deleteSeller, acceptSeller, getSellerProducts, rejectSeller}= require('../controllers/sellerController')
+const {createSeller, getSeller, getSellers, updateSeller, deleteSeller, acceptSeller, getSellerProducts, rejectSeller, getSellerUser}= require('../controllers/sellerController')
 
 const verifySeller = require('../middleware/verifySeller')
 const verifyAdmin = require('../middleware/verifyAdminOnly')
@@ -21,5 +21,7 @@ router.route('/reject/:id')
 
 router.route('/get-all/my-products')
     .get(verifySeller, getSellerProducts)
+router.route('/user/:id')
+    .get(getSellerUser)
 
 module.exports=router;

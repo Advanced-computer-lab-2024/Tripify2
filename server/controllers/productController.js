@@ -19,15 +19,15 @@ async function getProducts(req, res) {
     const { search, minPrice, maxPrice, minRating } = req.query;
     let query = {};
 
-    if (search) query.name = "/" + search + "/i";
+    if (search) query.Name = { $regex: search, $options: 'i' }
 
     if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+      query.Price = {};
+      if (minPrice) query.Price.$gte = parseFloat(minPrice);
+      if (maxPrice) query.Price.$lte = parseFloat(maxPrice);
     }
 
-    if (minRating) query.rating = { $gte: parseFloat(minRating) };
+    if (minRating) query.Rating = { $gte: parseFloat(minRating) };
 
     const products = await Product.find(query).populate("Seller");
     return res.json(products);
@@ -62,6 +62,8 @@ async function createProduct(req, res) {
       Reviews = [],
       AvailableQuantity,
     } = req.body;
+
+    if(!Name || !Image || !Price || !Description || !Seller || !AvailableQuantity) return res.status(400).json({ message: "All Fields Must Be Given!" });
 
     const seller = await User.findById(Seller, "_id");
     if (!seller || seller._id.toString() !== req._id)
@@ -103,10 +105,12 @@ async function updateProduct(req, res) {
     const { id } = req.params;
 
     const deletedProduct = await Product.findById(id);
+    const user = await User.findById(req._id);
 
     if (
-      !deletedProduct ||
-      deletedProduct.Seller.toString() !== req._id.toString()
+      user.Role !== 'Admin' &&
+      (!deletedProduct ||
+      deletedProduct.Seller.toString() !== req._id.toString())
     )
       return res.status(400).json({ message: "Unauthorized Seller!" });
 
@@ -132,10 +136,12 @@ async function deleteProduct(req, res) {
     const { id } = req.params;
 
     const deletedProduct = await Product.findById(id);
+    const user = await User.findById(req._id);
 
     if (
-      !deletedProduct ||
-      deletedProduct.Seller.toString() !== req._id.toString()
+      user.Role !== 'Admin' &&
+      (!deletedProduct ||
+      deletedProduct.Seller.toString() !== req._id.toString())
     )
       return res.status(400).json({ message: "Unauthorized Seller!" });
 

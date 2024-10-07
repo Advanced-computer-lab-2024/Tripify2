@@ -62,8 +62,22 @@ const createAdvertiser = async (req, res) => {
 };
 const getAdvertisers = async (req, res) => {
   try {
-    const advertisers = await advertiserModel.find();
-    res.status(200).json(advertisers);
+    const { accepted, application } = req.query;
+    if(accepted) 
+    {
+      const advertisers = await advertiserModel.find({ Accepted: true }).populate("UserId");
+      res.status(200).json(advertisers);
+    }
+    else if(application)
+    {
+      const advertisers = await advertiserModel.find({ Accepted: null }).populate("UserId");
+      res.status(200).json(advertisers);
+    }
+    else
+    {
+      const advertisers = await advertiserModel.find().populate("UserId");
+      res.status(200).json(advertisers);
+    }
   } catch (error) {
     res.status(500).json({ message: "Error retrieving advertisers", error });
   }
@@ -162,9 +176,14 @@ const deleteAdvertiser = async (req, res) => {
 
   try {
     const deletedAdvertiser = await advertiserModel.findByIdAndDelete(id);
+    const deletedUser = await userModel.findByIdAndDelete(deletedAdvertiser.UserId);
 
     if (!deletedAdvertiser) {
       return res.json({ message: "Advertiser not found" });
+    }
+
+    if (!deletedUser) {
+      return res.json({ message: "User not found" });
     }
 
     res.status(200).json({ message: "Advertiser deleted successfully" });
@@ -191,6 +210,25 @@ const acceptAdvertiser = async (req, res) => {
       .json({ message: "Error accepting advertiser", error: e.message });
   }
 };
+
+const rejectAdvertiser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const advertiser = await advertiserModel.findById(id);
+    if (advertiser.Accepted)
+      return res
+        .status(400)
+        .json({ message: "Advertiser is already accepted!" });
+    advertiser.Accepted = false;
+    await advertiser.save();
+    res.status(200).json({ message: "Advertiser rejected successfully!" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error rejecting advertiser", error: e.message });
+  }
+};
 // const deletAll = async (req, res) => {
 //   try {
 //     await advertiserModel.deleteMany({});
@@ -208,4 +246,5 @@ module.exports = {
   deleteAdvertiser,
   getAdvertiserActivities,
   acceptAdvertiser,
+  rejectAdvertiser
 };

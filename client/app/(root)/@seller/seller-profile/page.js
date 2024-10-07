@@ -11,7 +11,6 @@ export default function UserProfile() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState(null);
-  const [uniqueError, setUniqueError] = useState({ UserName: null, Email: null });
 
   const [formData, setFormData] = useState({
     UserName: "",
@@ -56,58 +55,13 @@ export default function UserProfile() {
     }));
   };
 
-  const checkUniqueFields = async () => {
-    try {
-      // Check if the fields have been changed, don't check uniqueness if unchanged
-      const isUserNameChanged = formData.UserName !== profile.UserName;
-      const isEmailChanged = formData.Email !== profile.Email;
-
-      if (!isUserNameChanged && !isEmailChanged) {
-        return true; // No change, skip uniqueness check
-      }
-
-      const response = await fetcher("/users/check-uniqueness", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          UserName: isUserNameChanged ? formData.UserName : null,
-          Email: isEmailChanged ? formData.Email : null,
-        }),
-      });
-
-      const result = await response.json();
-      if (result.exists) {
-        setUniqueError({
-          UserName: result.conflict === "UserName" ? "Username already taken. Please choose another." : null,
-          Email: result.conflict === "Email" ? "Email already in use. Please use a different email." : null,
-        });
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Username or Email is already in use.", error);
-      setError("Username or Email is already in use.");
-      return false;
-    }
-  };
-
   const handleSave = async () => {
     setLoading(true);
     setError(null);
     setSuccess(false);
     setPasswordError(null);
-    setUniqueError({ UserName: null, Email: null });
 
     try {
-      const isUnique = await checkUniqueFields();
-      if (!isUnique) {
-        setLoading(false);
-        return;
-      }
-
       if (formData.Password && !formData.CurrentPassword) {
         setPasswordError("Please enter your current password to change it");
         setLoading(false);
@@ -156,11 +110,13 @@ export default function UserProfile() {
   return (
     <div style={styles.container}>
       <h1>My Profile</h1>
+      <p><strong>User Name:</strong> {profile?.UserName || "N/A"}</p>
+      <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
 
       {isEditing ? (
         <>
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Username:</label>
+            <label style={styles.label}>User Name:</label>
             <input
               type="text"
               name="UserName"
@@ -168,7 +124,6 @@ export default function UserProfile() {
               onChange={handleChange}
               style={styles.input}
             />
-            {uniqueError.UserName && <p style={styles.errorMessage}>{uniqueError.UserName}</p>}
           </div>
           <div style={styles.inputGroup}>
             <label style={styles.label}>Email:</label>
@@ -179,7 +134,6 @@ export default function UserProfile() {
               onChange={handleChange}
               style={styles.input}
             />
-            {uniqueError.Email && <p style={styles.errorMessage}>{uniqueError.Email}</p>}
           </div>
           <div style={styles.inputGroup}>
             <label style={styles.label}>Current Password:</label>
@@ -212,10 +166,6 @@ export default function UserProfile() {
         </>
       ) : (
         <>
-          <p><strong>Username:</strong> {profile?.UserName || "N/A"}</p>
-          <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
-          <p><strong>Password:</strong> {"********"} {/* Masked password display */}</p>
-
           <button onClick={() => setIsEditing(true)} style={styles.editButton}>
             Edit Profile
           </button>
@@ -228,7 +178,7 @@ export default function UserProfile() {
 const styles = {
   container: {
     padding: "20px",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "black",
     borderRadius: "8px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     maxWidth: "600px",

@@ -9,7 +9,7 @@ const {
 } = require("../controllers/tagController");
 const verifyTourismGovernor = require('../middleware/verifyTourismGovernor')
 
-router.route("/").get(getTags).post(verifyTourismGovernor,createTag);
+router.route("/").get(getTags).post(verifyTourismGovernor, createTag);
 
 router
   .route("/:id")

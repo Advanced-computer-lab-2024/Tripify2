@@ -4,7 +4,8 @@ const router = express.Router();
 const {
   addTourismgovernor,
   getTourismgovernor,
-  getTourismGovernorPlaces
+  getTourismGovernorPlaces,
+  deleteTourismGovernor
 } = require("../controllers/tourismgovernorController");
 
 const verifyTourismGovernor = require('../middleware/verifyTourismGovernor')
@@ -12,8 +13,10 @@ const verifyAdmin = require('../middleware/verifyAdminOnly')
 
 router.route('/').post(verifyAdmin, addTourismgovernor).get(getTourismgovernor);
 
-router.route('/my-places').get(verifyTourismGovernor, getTourismGovernorPlaces);
-router.route('/my-tags').get(verifyTourismGovernor, getTourismGovernorPlaces);
+router.route('/:id').delete(verifyAdmin, deleteTourismGovernor);
+
+router.route('/get-all/my-places').get(verifyTourismGovernor, getTourismGovernorPlaces);
+router.route('/get-all/my-tags').get(verifyTourismGovernor, getTourismGovernorPlaces);
 
 // router.post("/add", addTourismgovernor);
 // router.get("/", getTourismgovernor);

@@ -41,7 +41,7 @@ const addTourismgovernor = async (req, res) => {
 
 const getTourismgovernor = async (req, res) => {
   try {
-    const tourismGovernors = await TourismGovernor.find({});
+    const tourismGovernors = await TourismGovernor.find({}).populate("UserId");
     if (!tourismGovernors)
       return res
         .status(400)
@@ -82,4 +82,25 @@ const getTourismGovernorTags = async (req, res) => {
   }
 }
 
-module.exports = { addTourismgovernor, getTourismgovernor, getTourismGovernorPlaces, getTourismGovernorTags };
+const deleteTourismGovernor = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedTourismGovernor = await TourismGovernor.findByIdAndDelete(id);
+    const deletedUser = await User.findByIdAndDelete(deletedTourismGovernor.UserId);
+
+    if (!deletedTourismGovernor) {
+      return res.json({ message: "Tourism Governor not found" });
+    }
+
+    if (!deletedUser) {
+      return res.json({ message: "User not found" });
+    }
+    
+    res.status(200).json({ message: "Tourism Governor deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting tourism governor", error });
+  }
+};
+
+module.exports = { deleteTourismGovernor, addTourismgovernor, getTourismgovernor, getTourismGovernorPlaces, getTourismGovernorTags };

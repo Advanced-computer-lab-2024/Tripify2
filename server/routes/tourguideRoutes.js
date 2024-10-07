@@ -7,7 +7,8 @@ const {
   allTourguides,
   getTourguideItineraries,
   deleteTourguide,
-  acceptTourGuide
+  acceptTourGuide,
+  rejectTourGuide,
 } = require("../controllers/tourguideController");
 const verifyTourGuide = require('../middleware/verifyTourGuide')
 const verifyAdmin = require('../middleware/verifyAdminOnly')
@@ -25,5 +26,8 @@ router.route('/get-all/my-itineraries')
 
 router.route('/accept/:id')
       .post(verifyAdmin, acceptTourGuide)
+
+router.route("/reject/:id")
+      .post(verifyAdmin, rejectTourGuide);
 
 module.exports = router;

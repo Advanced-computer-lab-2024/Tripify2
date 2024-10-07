@@ -78,13 +78,31 @@ const getTourguideItineraries = async (req, res) => {
 
 const allTourguides = async (req, res) => {
   try {
-    const tourguideIds = await tourguideModel.find({}).select("_id");
-    const arrayIds = tourguideIds.map((tourguide) => tourguide._id);
-
-    const tourguides = await tourguideModel.find({ _id: { $in: arrayIds } });
-    if (!tourguides)
-      return res.status(400).json({ message: "No tour guides found!" });
-    return res.status(200).json(tourguides);
+    const { accepted, application } = req.query;
+    if(accepted)
+    {
+      const tourguides = await tourguideModel.find({ Accepted: true }).populate("UserId");
+  
+      if (!tourguides)
+        return res.status(400).json({ message: "No tour guides found!" });
+      return res.status(200).json(tourguides);
+    }
+    else if(application)
+    {
+      const tourguides = await tourguideModel.find({ Accepted: null }).populate("UserId");
+  
+      if (!tourguides)
+        return res.status(400).json({ message: "No tour guides found!" });
+      return res.status(200).json(tourguides);
+    }
+    else
+    {
+      const tourguides = await tourguideModel.find({}).populate("UserId");
+  
+      if (!tourguides)
+        return res.status(400).json({ message: "No tour guides found!" });
+      return res.status(200).json(tourguides);
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -136,9 +154,14 @@ const deleteTourguide = async (req, res) => {
 
   try {
     const deletedTourGuide = await tourguideModel.findByIdAndDelete(id);
+    const deletedUser = await userModel.findByIdAndDelete(deletedTourGuide.UserId);
 
     if (!deletedTourGuide) {
       return res.json({ message: "Tour guide not found" });
+    }
+
+    if (!deletedUser) {
+      return res.json({ message: "User not found" });
     }
 
     res.status(200).json({ message: "Tour guide deleted successfully" });
@@ -166,6 +189,25 @@ const acceptTourGuide = async (req, res) => {
   }
 };
 
+const rejectTourGuide = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const tourGuide = await tourguideModel.findById(id);
+    if (tourGuide.Accepted)
+      return res
+        .status(400)
+        .json({ message: "TourGuide is already accepted!" });
+    tourGuide.Accepted = false;
+    await tourGuide.save();
+    res.status(200).json({ message: "TourGuide rejected successfully!" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error rejecting tourGuide", error: e.message });
+  }
+}
+
 module.exports = {
   createTourguideProfile,
   getTourguideProfile,
@@ -174,4 +216,5 @@ module.exports = {
   getTourguideItineraries,
   deleteTourguide,
   acceptTourGuide,
+  rejectTourGuide
 };

@@ -6,7 +6,6 @@ const TagSchema = new Schema(
     Tag: {
       type: String,
       required: true,
-      enum: ['Monuments', 'Museums', 'Religious Sites', 'Palaces/Castles'], // Define the allowed values
     },
     UserId: {
       type: Schema.Types.ObjectId,

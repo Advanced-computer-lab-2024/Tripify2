@@ -54,6 +54,24 @@ export const ourFileRouter = {
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { fileUrl: file.url };
     }),
+  productImages: f({ image: { maxFileSize: "4MB", maxFileCount: 5 } })
+    .middleware(async ({ req }) => {
+      // This code runs on your server before upload
+      const session = await getSession();
+
+      // If you throw, the user will not be able to upload
+      if (!session?.user) throw new UploadThingError("Unauthorized");
+
+      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      //@ts-ignore
+      return { userId: session?.user?.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      // This code RUNS ON YOUR SERVER after upload
+
+      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      return { fileUrl: file.url, userId: metadata.userId };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

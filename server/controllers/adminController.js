@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
 const createAdmin = async(req,res) => {
     const {UserName, Email, Password}=req.body;
 
+    console.log(req.body)
+
     if(!Email || !Password || !UserName) return res.status(400).json({'message': 'All Fields Must Be Given!'})
 
     try {
@@ -57,7 +59,7 @@ const createAdmin = async(req,res) => {
     const getAdmins = async (req, res) => {
         try 
         {
-            const admins = await AdminModel.find().lean().exec();
+            const admins = await AdminModel.find().populate("UserId").lean().exec();
             res.status(200).json(admins);
         } 
         catch (error) 

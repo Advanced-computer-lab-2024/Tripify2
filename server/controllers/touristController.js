@@ -64,7 +64,7 @@ const createTourist = async (req, res) => {
 
 const getTourists = async (req, res) => {
   try {
-    const tourists = await touristModel.find({});
+    const tourists = await touristModel.find({}).populate("UserId");
     res.status(200).json(tourists);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving tourists", error });
@@ -175,9 +175,14 @@ const deleteTourist = async (req, res) => {
 
   try {
     const deletedTourist = await touristModel.findByIdAndDelete(id);
+    const deletedUser = await userModel.findByIdAndDelete(deletedTourist.UserId);
 
     if (!deletedTourist) {
       return res.json({ message: "Tourist not found" });
+    }
+
+    if (!deletedUser) {
+      return res.json({ message: "User not found" });
     }
 
     res.status(200).json({ message: "Tourist deleted successfully" });

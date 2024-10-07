@@ -8,6 +8,7 @@ const {
   getAdvertiserById,
   getAdvertiserActivities,
   acceptAdvertiser,
+  rejectAdvertiser
 } = require("../controllers/advertiserController");
 const verifyAdvertiser = require("../middleware/verifyAdvertiser");
 const verifyAdmin = require("../middleware/verifyAdminOnly");
@@ -25,5 +26,6 @@ router
   .get(verifyAdvertiser, getAdvertiserActivities);
 
 router.route("/accept/:id").post(verifyAdmin, acceptAdvertiser);
+router.route("/reject/:id").post(verifyAdmin, rejectAdvertiser);
 
 module.exports = router;

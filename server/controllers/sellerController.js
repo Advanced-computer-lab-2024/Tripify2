@@ -30,7 +30,7 @@ const createSeller = async(req,res) => {
         const seller = await SellerModel.create({
             Description,
             UserId: newUser._id,
-            Accepted: false,
+            Accepted: null,
             Documents,
         });
 
@@ -62,6 +62,7 @@ const createSeller = async(req,res) => {
    const getSellers = async (req, res) => {
     try {
         const { UserName } = req.body;
+        const { accepted, application } = req.query;
         if (UserName) {
           const user = await SellerModel.findOne({ UserName });
           if (!user) {
@@ -69,16 +70,31 @@ const createSeller = async(req,res) => {
           }
           res.status(200).json(user);
         } else {
-          const users = await SellerModel.find({});
-          if (!users) {
-            return res.status(404).json("No sellers found");
+          if(accepted)
+          {
+            const users = await SellerModel.find({ Accepted: true }).populate("UserId");
+            if (!users) {
+              return res.status(404).json("No sellers found");
+            }
+            res.status(200).json(users);
           }
-          res.status(200).json(users);
+          else if(application)
+          {
+            const users = await SellerModel.find({ Accepted: null }).populate("UserId");
+            if (!users) {
+              return res.status(404).json("No sellers found");
+            }
+            res.status(200).json(users);
+          }
+          else
+          {
+            const users = await SellerModel.find({}).populate("UserId");
+            if (!users) {
+              return res.status(404).json("No sellers found");
+            }
+            res.status(200).json(users);
+          }
         }
-        if (!users) {
-          return res.status(404).json("No sellers found");
-        }
-        res.status(200).json(users);
       } catch (error) {
         console.log(error.message);
         res.status(500).json({ message: error.message });
@@ -110,9 +126,14 @@ const createSeller = async(req,res) => {
   
     try {
       const deletedSeller = await SellerModel.findByIdAndDelete(id);
+      const deletedUser = await User.findByIdAndDelete(deletedSeller.UserId);
   
       if (!deletedSeller) {
         return res.json({ message: "Seller not found" });
+      }
+
+      if (!deletedUser) {
+        return res.json({ message: "User not found" });
       }
   
       res.status(200).json({ message: "Seller deleted successfully" });
@@ -138,6 +159,23 @@ const createSeller = async(req,res) => {
     }
   }
 
+  const rejectSeller = async (req, res) => {
+    const { id } = req.params
+  
+    try
+    {
+      const seller = await SellerModel.findById(id)
+      if(seller.Accepted) return res.status(400).json({'message': 'Seller is already accepted!'})
+      seller.Accepted = false
+      await seller.save()
+      res.status(200).json({message: 'Seller rejected successfully!'})
+    }
+    catch(error)
+    {
+      return res.status(500).json({ message: 'Error rejecting seller', error: e.message })
+    }
+  }
+
   const getSellerProducts = async (req, res) => {
     console.log(req._id)
 
@@ -157,4 +195,4 @@ const createSeller = async(req,res) => {
   }
 
 
- module.exports = {createSeller, getSeller, getSellers, updateSeller, deleteSeller, acceptSeller, getSellerProducts}
+ module.exports = {rejectSeller, createSeller, getSeller, getSellers, updateSeller, deleteSeller, acceptSeller, getSellerProducts}

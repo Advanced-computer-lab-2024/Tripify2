@@ -40,41 +40,35 @@ export const authOptions = {
           },
           async authorize(credentials, req) {
               if(credentials === null) return null
+              
+              const response = await fetch(`${process.env.API_SERVER_ENDPOINT}/auth/login`, { 
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  Email: credentials.email,
+                  Password: credentials.password,
+                }),
+              })
 
-              try
-              {
-                const response = await fetch(`${process.env.API_SERVER_ENDPOINT}/auth/login`, { 
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    Email: credentials.email,
-                    Password: credentials.password,
-                  }),
-                })
+              if(!response?.ok) throw new Error('Wrong credentials')
 
-                if(!response?.ok) return null
+              const data = await response.json()
 
-                const data = await response.json()
-
-                const accessToken = data.accessToken
-                const refreshToken = data.refreshToken
-                
-                return {
-                  id: data.user._id,
-                  userId: data.user.userId,
-                  name: data.user.UserName,
-                  email: data.user.Email,
-                  role: data.user.Role,
-                  accessToken,
-                  refreshToken,
-                }
+              const accessToken = data.accessToken
+              const refreshToken = data.refreshToken
+              
+              return {
+                id: data.user._id,
+                userId: data.user.userId,
+                name: data.user.UserName,
+                email: data.user.Email,
+                role: data.user.Role,
+                accessToken,
+                refreshToken,
               }
-              catch(e)
-              {
-                console.error(e)
-              }
+              
           }
       }),
     ],

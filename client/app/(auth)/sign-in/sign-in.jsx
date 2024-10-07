@@ -48,8 +48,13 @@ export default function SignIn()
             setLoading(true)
             setError(null)
 
-            await signIn("credentials", { email: values.Email, password: values.Password })
-            router.push('/')
+            const signInResult = await signIn("credentials", { email: values.Email, password: values.Password, redirect: false  })
+            console.log(signInResult)
+            if (signInResult?.error)
+            {
+                setError(signInResult?.error)
+            }
+            else router.push('/')
 
             setLoading(false)
         }

@@ -259,7 +259,10 @@ export default function AdvertiserProfile({ advertiser }) {
                 <strong>Hotline:</strong> {advertiser.advertiser.Hotline}
               </p>
               <p>
-                <strong>Document:</strong> {advertiser.advertiser.Document}
+                <strong>Document:</strong> 
+                {advertiser.advertiser.Document.map(doc => (
+                  <iframe className='w-full h-[720px]' src={doc} />
+                ))}
               </p>
 
               <button

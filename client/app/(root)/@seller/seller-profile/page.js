@@ -6,17 +6,16 @@ import { useSession } from "next-auth/react";
 export default function UserProfile() {
   const { data: session } = useSession();
   const [profile, setProfile] = useState(null);
+  const [sellerProfile, setSellerProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [passwordError, setPasswordError] = useState(null);
 
   const [formData, setFormData] = useState({
     UserName: "",
     Email: "",
-    Password: "",
-    CurrentPassword: "",
+    Description: "",
   });
 
   useEffect(() => {
@@ -25,18 +24,21 @@ export default function UserProfile() {
         if (!session?.user?.userId) return;
 
         const response = await fetcher(`/users/${session.user.userId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch user profile");
-        }
-
+        if (!response.ok) throw new Error("Failed to fetch user profile");
         const data = await response.json();
         setProfile(data);
+
+        const sellerResponse = await fetcher(`/sellers/user/${session.user.userId}`);
+        if (!sellerResponse.ok) throw new Error("Failed to fetch seller profile");
+        const sellerData = await sellerResponse.json();
+        const { Seller } = sellerData;
+
+        setSellerProfile(Seller);
 
         setFormData({
           UserName: data.UserName || "",
           Email: data.Email || "",
-          Password: "",
-          CurrentPassword: "",
+          Description: Seller?.Description || "",
         });
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -59,49 +61,76 @@ export default function UserProfile() {
     setLoading(true);
     setError(null);
     setSuccess(false);
-    setPasswordError(null);
 
     try {
-      if (formData.Password && !formData.CurrentPassword) {
-        setPasswordError("Please enter your current password to change it");
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetcher(`/users/${session?.user?.userId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          UserName: formData.UserName,
-          Email: formData.Email,
-          ...(formData.Password && { Password: formData.Password }),
-          CurrentPassword: formData.CurrentPassword,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData?.message === "Incorrect current password") {
-          setPasswordError("Incorrect current password");
-          setLoading(false);
-          return;
+        const usersResponse = await fetcher(`/users`);
+        if (!usersResponse.ok) {
+            throw new Error("Failed to fetch users");
         }
-        throw new Error("Failed to update profile");
-      }
+        const existingUsers = await usersResponse.json();
 
-      const updatedProfile = await response.json();
-      setProfile(updatedProfile);
-      setIsEditing(false);
-      setSuccess(true);
+        const isUsernameTaken = existingUsers.some(user => user.UserName === formData.UserName && user._id !== profile._id);
+        const isEmailTaken = existingUsers.some(user => user.Email === formData.Email && user._id !== profile._id);
+
+        if (isUsernameTaken) {
+            setError("Username is already taken.");
+            return;
+        }
+
+        if (isEmailTaken) {
+            setError("Email is already taken.");
+            return;
+        }
+
+        const userResponse = await fetcher(`/users/${session?.user?.userId}`, {
+          method: "PATCH",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              UserName: formData.UserName,
+              Email: formData.Email,
+          }),
+      });
+      
+      if (!userResponse.ok) {
+          throw new Error("Failed to update user profile");
+      }
+      
+      const sellerResponse = await fetcher(`/sellers/${sellerProfile?._id}`, {
+          method: "PATCH",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              Description: formData.Description,
+          }),
+      });
+      
+
+
+
+        const updatedProfile = await userResponse.json();
+        const updatedSellerProfile = await sellerResponse.json();
+
+        setProfile(updatedProfile);
+        setSellerProfile(updatedSellerProfile.Seller);
+
+        setIsEditing(false);
+        setSuccess(true);
+
+        setTimeout(() => {
+            setSuccess(false);
+        }, 1000);
     } catch (error) {
-      console.error("Error updating profile:", error);
-      setError("Error updating profile");
+        console.error("Error updating profile:", error);
+        setError(error.message || "Error updating profile");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
+
 
   if (!profile) {
     return <div>Loading profile...</div>;
@@ -110,13 +139,11 @@ export default function UserProfile() {
   return (
     <div style={styles.container}>
       <h1>My Profile</h1>
-      <p><strong>User Name:</strong> {profile?.UserName || "N/A"}</p>
-      <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
 
       {isEditing ? (
         <>
           <div style={styles.inputGroup}>
-            <label style={styles.label}>User Name:</label>
+            <label style={styles.label}>Username:</label>
             <input
               type="text"
               name="UserName"
@@ -136,25 +163,12 @@ export default function UserProfile() {
             />
           </div>
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Current Password:</label>
-            <input
-              type="password"
-              name="CurrentPassword"
-              value={formData.CurrentPassword}
+            <label style={styles.label}>Description:</label>
+            <textarea
+              name="Description"
+              value={formData.Description}
               onChange={handleChange}
-              placeholder="Enter current password to change it"
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>New Password:</label>
-            <input
-              type="password"
-              name="Password"
-              value={formData.Password}
-              onChange={handleChange}
-              placeholder="Leave blank to keep unchanged"
-              style={styles.input}
+              style={styles.textArea}
             />
           </div>
           <button onClick={handleSave} style={styles.saveButton} disabled={loading}>
@@ -162,10 +176,13 @@ export default function UserProfile() {
           </button>
           {success && <p style={styles.successMessage}>Profile updated successfully!</p>}
           {error && <p style={styles.errorMessage}>{error}</p>}
-          {passwordError && <p style={styles.passwordError}>{passwordError}</p>}
         </>
       ) : (
         <>
+          <p><strong>Username:</strong> {profile?.UserName || "N/A"}</p>
+          <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
+          <p><strong>Description:</strong> {sellerProfile?.Description || "N/A"}</p>
+
           <button onClick={() => setIsEditing(true)} style={styles.editButton}>
             Edit Profile
           </button>
@@ -198,6 +215,15 @@ const styles = {
     border: "1px solid #ccc",
     width: "100%",
   },
+  textArea: {
+    padding: "10px",
+    fontSize: "14px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    width: "100%",
+    height: "80px",
+    resize: "vertical",
+  },
   editButton: {
     padding: "10px 20px",
     backgroundColor: "black",
@@ -218,10 +244,6 @@ const styles = {
   },
   errorMessage: {
     color: "red",
-    marginTop: "10px",
-  },
-  passwordError: {
-    color: "orange",
     marginTop: "10px",
   },
 };

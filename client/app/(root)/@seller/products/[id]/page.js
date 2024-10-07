@@ -21,16 +21,20 @@ export default function ProductDetail({ params }) {
 
         setProduct(data);
 
-        // Fetch the seller's name using the seller ID
+        // Fetch the seller's name using the UserId from the seller object
         if (data.Seller) {
-          const sellerResponse = await fetcher(`/sellers/${data.Seller}`);
+          const sellerId = data.Seller._id; // Assuming data.Seller is an object with _id
+          const sellerResponse = await fetcher(`/users/${sellerId}`); // Adjusted to use the userId route
           const sellerData = await sellerResponse.json();
 
           // Stringify the seller data
           const stringifiedSellerData = JSON.stringify(sellerData);
           console.log("Stringified Seller Data: ", stringifiedSellerData); // For debugging
 
-          setSellerName(sellerData.Name); // Assuming the seller object has a Name property
+          // Check if the seller data has the UserName and then extract it
+          if (sellerData.UserName) {
+            setSellerName(sellerData.UserName); // Assuming the seller object has UserName directly
+          }
         }
       } catch (error) {
         console.error("Error fetching product details: ", error);
@@ -50,7 +54,7 @@ export default function ProductDetail({ params }) {
       {product.Image && <img src={product.Image} alt={product.Name} style={styles.image} />}
       <p>Price: ${product.Price}</p>
       <p>Description: {product.Description}</p>
-      {/* <p>Seller Name: {sellerName ? sellerName : 'Loading seller...'}</p> Display seller name */}
+      <p>Seller Name: {sellerName ? sellerName : 'Loading seller...'}</p> {/* Display seller name */}
       <p>Rating: {product.Rating}</p>
       <p>Available Quantity: {product.AvailableQuantity}</p>
     </div>

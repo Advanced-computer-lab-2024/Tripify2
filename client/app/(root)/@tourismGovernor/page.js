@@ -321,7 +321,7 @@ export default function MyPlaces() {
     <Button onClick={createPlace}>Create Place</Button>
 
      {/* Tag Creation Section */}
-     <h2>Create a New Tag</h2>
+     <h2 className= "text-xl font-bold">Create a New Tag</h2>
       <input
         type="text"
         placeholder="New Tag (e.g., Monuments, Museums)"

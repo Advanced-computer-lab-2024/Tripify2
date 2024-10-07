@@ -15,11 +15,12 @@ export default function AdvertiserProfile({ advertiser }) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isProfileCreateMode, setIsProfileCreateMode] = useState(false);
   const [isProfileEditMode, setIsProfileEditMode] = useState(false);
+  console.log(advertiser.advertiser)
   const [formData, setFormData] = useState({
     UserName: advertiser.advertiser.UserId?.UserName || "",
     Email: advertiser.advertiser.UserId?.Email || "",
-    Website: advertiser.advertiser.Website || "",
-    Hotline: advertiser.advertiser.Hotline || "",
+    Website: advertiser.advertiser.CompanyProfile.Website || "",
+    Hotline: advertiser.advertiser.CompanyProfile.Hotline || "",
     CompanyProfile: advertiser.advertiser.CompanyProfile || "",
     Document: advertiser.advertiser.Document || "",
   });
@@ -253,10 +254,10 @@ export default function AdvertiserProfile({ advertiser }) {
               </p>
               <p>
                 <strong>Website:</strong>{" "}
-                {advertiser.advertiser.Website || "N/A"}{" "}
+                {advertiser.advertiser.CompanyProfile.Website || "N/A"}{" "}
               </p>
               <p>
-                <strong>Hotline:</strong> {advertiser.advertiser.Hotline}
+                <strong>Hotline:</strong> {advertiser.advertiser.CompanyProfile.Hotline}
               </p>
               <p>
                 <strong>Document:</strong> 

@@ -29,7 +29,7 @@ async function getProducts(req, res) {
 
     if (minRating) query.Rating = { $gte: parseFloat(minRating) };
 
-    const products = await Product.find(query).populate("Seller");
+    const products = await Product.find(query).populate("Seller").populate("Reviews");
     return res.json(products);
   } catch (e) {
     return res

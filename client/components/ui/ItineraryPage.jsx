@@ -31,8 +31,8 @@ function ItineraryPage({ itinerary, params }) {
     Accesibility: itinerary.Accesibility,
     Pickup: itinerary.Pickup,
     Dropoff: itinerary.Dropoff,
-    Category: itinerary.Category.map((tag) => tag.Category),
-    Tag: itinerary.Tag.map((tag) => tag.Tag),
+    Category: itinerary.Category.map(tag => tag.Category),
+    Tag: itinerary.Tag.map(tag => tag.Tag),
     Image: itinerary.Image,
     // TourGuide: session?.data?.user?.userId,
     Location: itinerary.Location,
@@ -67,7 +67,9 @@ function ItineraryPage({ itinerary, params }) {
     }));
   };
 
-  console.log("categoriessssss: " + categories);
+  console.log("categoriessssss:   "+categories)
+
+  
 
   const handleTagChange = (tagId) => {
     setSelectedTags((prevSelected) => {
@@ -100,7 +102,7 @@ function ItineraryPage({ itinerary, params }) {
 
         const categoriesData = await categoriesResponse.json();
         const tagsData = await tagsResponse.json();
-
+        
         setCategories(categoriesData);
         setTags(tagsData);
       } catch (err) {
@@ -307,7 +309,7 @@ function ItineraryPage({ itinerary, params }) {
     <li>{category.Category}</li>
   ));
   const taglist = readtags.map((tag) => <li>{tag.Tag}</li>);
-  console.log(readtags + "hmmmm");
+  console.log(readtags+"hmmmm")
 
   return (
     <>
@@ -424,7 +426,6 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Name}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
-                required
               />
             </label>
 
@@ -442,7 +443,7 @@ function ItineraryPage({ itinerary, params }) {
                         handleActivityChange(index, "type", e.target.value)
                       }
                       className="block w-full border p-2"
-                      required
+                      
                     />
                   </label>
                   <label className="block mb-2">
@@ -454,7 +455,7 @@ function ItineraryPage({ itinerary, params }) {
                         handleActivityChange(index, "duration", e.target.value)
                       }
                       className="block w-full border p-2"
-                      required
+                      
                     />
                   </label>
                   {formData.Activities.length > 1 && (
@@ -528,7 +529,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Language}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
-                required
+                
               />
             </label>
 
@@ -541,7 +542,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Price}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
-                required
+                
               />
             </label>
 
@@ -579,7 +580,7 @@ function ItineraryPage({ itinerary, params }) {
                 checked={formData.Accesibility}
                 onChange={handleInputChange}
                 className="ml-2"
-                required
+                
               />
             </label>
 
@@ -592,7 +593,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Pickup}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
-                required
+                
               />
             </label>
 
@@ -605,7 +606,7 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Dropoff}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
-                required
+                
               />
             </label>
 
@@ -618,61 +619,61 @@ function ItineraryPage({ itinerary, params }) {
                 value={formData.Image}
                 onChange={handleInputChange}
                 className="block w-full border p-2"
-                required
+                
               />
             </label>
 
-            {/* Categories */}
-            <div className="block mb-4">
-              <span className="block mb-2">Categories:</span>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <label
-                    key={category._id}
-                    className={`cursor-pointer p-2 border rounded ${
-                      selectedCategories.includes(category._id)
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      value={category._id}
-                      onChange={() => handleCategoryChange(category._id)}
-                      checked={selectedCategories.includes(category._id)}
-                      //className="hidden" // Hide the default checkbox
-                    />
-                    {category.Category}
-                  </label>
-                ))}
-              </div>
-            </div>
+        {/* Categories */}
+        <div className="block mb-4">
+          <span className="block mb-2">Categories:</span>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <label
+                key={category._id}
+                className={`cursor-pointer p-2 border rounded ${
+                  selectedCategories.includes(category._id)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  value={category._id}
+                  onChange={() => handleCategoryChange(category._id)}
+                  checked={selectedCategories.includes(category._id)}
+                  //className="hidden" // Hide the default checkbox
+                />
+                {category.Category}
+              </label>
+            ))}
+          </div>
+        </div>
 
-            {/* Tags */}
-            <div className="block mb-4">
-              <span className="block mb-2">Tags:</span>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <label
-                    key={tag._id}
-                    className={`cursor-pointer p-2 border rounded ${
-                      selectedTags.includes(tag._id)
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      value={tag._id}
-                      onChange={() => handleTagChange(tag._id)}
-                      checked={selectedTags.includes(tag._id)}
-                      className="hidden" // Hide the default checkbox
-                    />
-                    {tag.Tag}
-                  </label>
-                ))}
-              </div>
-            </div>
+        {/* Tags */}
+        <div className="block mb-4">
+          <span className="block mb-2">Tags:</span>
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <label
+                key={tag._id}
+                className={`cursor-pointer p-2 border rounded ${
+                  selectedTags.includes(tag._id)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  value={tag._id}
+                  onChange={() => handleTagChange(tag._id)}
+                  checked={selectedTags.includes(tag._id)}
+                  className="hidden" // Hide the default checkbox
+                />
+                {tag.Tag}
+              </label>
+            ))}
+          </div>
+        </div>
 
             <div>
               <h2 className="text-lg font-semibold mb-2">Rate Us (0 to 5)</h2>

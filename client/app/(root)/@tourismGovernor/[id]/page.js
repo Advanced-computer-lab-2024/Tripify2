@@ -31,6 +31,7 @@ export default function ViewPlace() {
         const response = await fetch(`http://localhost:3001/places/${params.id}`);
         const data = await response.json();
         setPlace(data);
+        console.log(data);
         setUpdatedPlace({
           Name: data.Name,
           Description: data.Description,
@@ -39,8 +40,8 @@ export default function ViewPlace() {
           OpeningHours: data.OpeningHours,
           Pictures: data.Pictures.join(', '),
           TicketPrices: JSON.stringify(data.TicketPrices),
-          Tags: data.Tags.join(', '),
-          Categories: data.Categories.join(', ')
+          Tags: data.Tags.map(tag=>tag._id),
+          Categories: data.Categories.map(category=>category._id)
         });
         setLoading(false);
       } catch (err) {
@@ -89,8 +90,8 @@ export default function ViewPlace() {
           ...updatedPlace,
           Pictures: updatedPlace.Pictures.split(','),
           TicketPrices: JSON.parse(updatedPlace.TicketPrices),
-          Tags: updatedPlace.Tags.split(','),
-          Categories: updatedPlace.Categories.split(',')
+          Tags: updatedPlace.Tags,
+          Categories: updatedPlace.Categories
         })
       });
 
@@ -160,35 +161,35 @@ export default function ViewPlace() {
         value={updatedPlace.TicketPrices}
         onChange={(e) => setUpdatedPlace({ ...updatedPlace, TicketPrices: e.target.value })}
       />
-       {/* Render Category Radio Buttons */}
-     <h3>Select Category</h3>
-    {categoriesButton.map((category) => (
-      <label key={category._id}>
-        <input
-          type="radio"
-          name="category"
-          value={category._id}
-          checked={updatedPlace.Categories === category._id}
-          onChange={(e) => setUpdatedPlace({ ...updatedPlace, Categories: e.target.value })}
-        />
-        {category.Category}
-      </label>
-    ))}
-    
-    {/* Render Tag Radio Buttons */}
-    <h3>Select Tag</h3>
-    {tagsButton.map((tag) => (
-      <label key={tag._id}>
-        <input
-          type="radio"
-          name="tag"
-          value={tag._id}
-          checked={updatedPlace.Tags === tag._id}
-          onChange={(e) => setUpdatedPlace({ ...updatedPlace, Tags: e.target.value })}
-        />
-        {tag.Tag}
-      </label>
-    ))}
+        {/* Render Category Radio Buttons */}
+<h3>Select Category</h3>
+{categoriesButton.map((category) => (
+  <label key={category._id}>
+    <input
+      type="radio"
+      name="category"
+      value={category._id}
+      checked={updatedPlace.Categories.includes(category._id)}
+      onChange={(e) => setUpdatedPlace({ ...updatedPlace, Categories: [e.target.value] })}
+    />
+    {category.Category}
+  </label>
+))}
+
+{/* Render Tag Radio Buttons */}
+<h3>Select Tag</h3>
+{tagsButton.map((tag) => (
+  <label key={tag._id}>
+    <input
+      type="radio"
+      name="tag"
+      value={tag._id}
+      checked={updatedPlace.Tags.includes(tag._id)}
+      onChange={(e) => setUpdatedPlace({ ...updatedPlace, Tags: [e.target.value] })}
+    />
+    {tag.Tag}
+  </label>
+))}
       <Button onClick={handleUpdate}>Update Place</Button>
     </div>
   );

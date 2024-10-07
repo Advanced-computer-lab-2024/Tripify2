@@ -274,7 +274,7 @@ export default function AdvertiserProfile({ advertiser }) {
 
               <div>
                 <label>
-                  <strong>CompanyProfile:</strong>
+                  <strong>Company Profile:</strong>
                   <div>
                     {(formData?.CompanyProfile && isProfileEditMode) ||
                     (!formData?.CompanyProfile && isProfileCreateMode) ? (

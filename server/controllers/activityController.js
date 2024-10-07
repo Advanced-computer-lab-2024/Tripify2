@@ -171,7 +171,7 @@ const updateActivity = async (req, res) => {
     if (Tags.length == 0) {
       return res.status(400).json({ message: "need to have atleast 1 tag" });
     }
-    if (Categories.length == 0) {
+    if (CategoryId.length == 0) {
       return res
         .status(400)
         .json({ message: "need to have atleast 1 Category" });
@@ -189,7 +189,7 @@ const updateActivity = async (req, res) => {
         Location: Location,
         Price: parsedPrice,
         SpecialDiscounts: parsedDiscount,
-        duration: Duration,
+        Duration: Duration,
         Image: Image,
         CategoryId,
         Tags,
@@ -206,6 +206,7 @@ const updateActivity = async (req, res) => {
       activity: updatedActivity,
     });
   } catch (error) {
+    console.log("ERRROR", error);
     res.status(400).json({ message: "Error updating activity", error });
   }
 };

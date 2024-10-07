@@ -31,8 +31,6 @@ export default async function RootLayout({
 }) {
   const session = await getSession();
 
-  console.log(session);
-
   return (
     <html lang="en" className={`${GeistSans.className} ${poppins.variable} antialiased dark:bg-gray-950`}>
       <AuthProvider>
@@ -52,8 +50,6 @@ export default async function RootLayout({
             ? tourGuide
             : session?.user?.role === "TourismGovernor"
             ? tourismGovernor
-            : session?.user?.role === "Tourist"
-            ? tourist
             : guest}
         </body>
       </AuthProvider>

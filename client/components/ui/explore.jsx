@@ -29,7 +29,8 @@ export default function Explore({ params }) {
     : [];
   const filteredActivities = activities.length
     ? activities.filter((activity) =>
-        activity.Location.toLowerCase().includes(search.toLowerCase())
+        // activity.Location.toLowerCase().includes(search.toLowerCase())
+        null
       )
     : [];
 

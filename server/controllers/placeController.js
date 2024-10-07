@@ -179,7 +179,7 @@ const updatePlace = async (req, res) => {
 
     const placeToUpdate = await Places.findByIdAndUpdate(
       id,
-      { ...rest },
+      { ...rest, Name },
       { new: true } //runValidators runs all the schema validations that need to be met
     ).catch((err) => console.log(err));
     console.log("placeToUpdate: ", placeToUpdate);

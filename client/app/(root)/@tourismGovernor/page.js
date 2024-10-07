@@ -195,10 +195,10 @@ export default function MyPlaces() {
 
   return (
     <div style={styles.container}>
-    <h1>My Created Museums and Historical Places</h1>
+    <h1 className= "text-xl font-bold">My Created Museums and Historical Places</h1>
   
     {/* Create Place Section */}
-    <h2>Create a New Place</h2>
+    <h2 className= "text-xl font-bold">Create a New Place</h2>
     <input
       type="text"
       placeholder="Name"
@@ -289,7 +289,7 @@ export default function MyPlaces() {
       <LocationPicker onLocationSelect={handleLocationSelect} />
     </div>
     {/* Render Category Radio Buttons */}
-<h3>Select Category</h3>
+<h3 className= "text-xl font-bold">Select Category</h3>
 {categoriesButton.map((category) => (
   <label key={category._id}>
     <input
@@ -304,7 +304,7 @@ export default function MyPlaces() {
 ))}
 
 {/* Render Tag Radio Buttons */}
-<h3>Select Tag</h3>
+<h3 className= "text-xl font-bold">Select Tag</h3>
 {tagsButton.map((tag) => (
   <label key={tag._id}>
     <input

@@ -5,13 +5,13 @@ const verifyAdmin = require('../middleware/verifyAdminOnly')
 const { createAdmin, getAdmins, getAdmin, getAdminProducts } = require("../controllers/adminController");
 
 router.route('/')
-    .post(createAdmin)
-    .get(getAdmins)
+    .post(verifyAdmin, createAdmin)
+    .get(verifyAdmin, getAdmins)
 
 router.route('/:id')
-    .get(getAdmin)
+    .get(verifyAdmin, getAdmin)
 
 router.route('/get-all/my-products')
-    .get(getAdminProducts)
+    .get(verifyAdmin, getAdminProducts)
 
 module.exports = router;

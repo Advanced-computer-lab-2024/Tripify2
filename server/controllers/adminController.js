@@ -1,8 +1,10 @@
 const { default: mongoose } = require('mongoose');
 const AdminModel = require('../models/Admin.js');
+const User = require('../models/User.js');
+const bcrypt = require('bcrypt');
 
 const createAdmin = async(req,res) => {
-    const {UserName, Email, Password, UserId}=req.body;
+    const {UserName, Email, Password}=req.body;
 
     if(!Email || !Password || !UserName) return res.status(400).json({'message': 'All Fields Must Be Given!'})
 
@@ -26,7 +28,7 @@ const createAdmin = async(req,res) => {
         await newUser.save();
         
         const admin = await AdminModel.create({
-            UserId,
+            UserId: newUser._id,
             Products: [],
         });
 

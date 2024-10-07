@@ -86,7 +86,7 @@ export default function Dashboard({ params }) {
       break;
     default:
       dashboardElements = [
-        { name: "Sign in", link: "/api/auth/signin" },
+        { name: "Sign in", link: "/sign-in" },
         { name: "Sign up", link: "/sign-up" },
         {
           name: "Itineraries",

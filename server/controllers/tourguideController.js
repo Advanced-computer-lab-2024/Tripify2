@@ -122,32 +122,45 @@ const getTourguideProfile = async (req, res) => {
       .populate("UserId")
       .populate("Itineraries");
 
-    res
-      .status(200)
-      .json({ message: "Tourguides read successfully", tourguide: tourguide });
     if (tourguide.length === 0) {
       return res.status(404).json({
         message: "No tour guides found",
       });
     }
-    res.status(200).json(tourguide);
+
+    return res
+      .status(200)
+      .json({ message: "Tourguides read successfully", tourguide: tourguide });
+    
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
 const updateTourguideProfile = async (req, res) => {
-  const { MobileNumber, YearsOfExperience, PreviousWork, Accepted } = req.body;
+  const { MobileNumber, YearsOfExperience, PreviousWork, Accepted, Email } = req.body;
   const { id } = req.params;
   try {
+    const duplicateUserEmail = await userModel.findOne({ Email });
+    if (duplicateUserEmail && duplicateUserEmail._id.toString() !== req._id) {
+      return res.status(400).json({ message: "Email Already Exists!" });
+    }
     const updatedUser = await tourguideModel.findById(id);
     if (updatedUser.Accepted) {
       if (updatedUser) {
-        updatedUser.MobileNumber = MobileNumber;
-        updatedUser.YearsOfExperience = YearsOfExperience;
-        updatedUser.PreviousWork = PreviousWork;
-        updatedUser.Accepted = Accepted;
-        await updatedUser.save();
+        // updatedUser.MobileNumber = MobileNumber;
+        // updatedUser.YearsOfExperience = YearsOfExperience;
+        // updatedUser.PreviousWork = PreviousWork;
+        await tourguideModel.findByIdAndUpdate(
+          id,
+          { MobileNumber, YearsOfExperience, PreviousWork, Accepted, Email },
+          { new: true }
+        );
+        await userModel.findByIdAndUpdate(
+          req._id,
+          { Email },
+          { new: true }
+        );
         res
           .status(200)
           .json({ message: "Update is successful", tourGuide: updatedUser });

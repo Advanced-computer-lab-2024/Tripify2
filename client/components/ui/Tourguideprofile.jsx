@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 function Tourguideprofile({ tourguide, tourguideid, role }) {
+  console.log(tourguide)
   const router = useRouter();
   const [resultTest, setResultTest] = useState([]);
   let num = 0;
@@ -16,6 +17,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
     YearsOfExperience: tourguide.YearsOfExperience,
     PreviousWork: tourguide.PreviousWork,
     Accepted: tourguide.Accepted,
+    Email: tourguide.UserId.Email
   });
   //   console.log(formData);
   const handleInputChange = (e) => {
@@ -149,6 +151,14 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
           </div>
           <hr />
           <div>
+            <strong>Email:</strong>
+            <h2>
+              {tourguide.UserId.Email !== null
+                ? tourguide.UserId.Email
+                : "No previous work"}
+            </h2>
+          </div>
+          <div>
             <strong>Itineraries:</strong>
             <ul className="flex flex-col gap-2">{itinerarylist}</ul>
           </div>
@@ -202,6 +212,19 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 onChange={handleInputChange}
                 className="border p-2 w-full mb-4"
                 placeholder={`old: ${tourguide.PreviousWork}`}
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              <strong>Email</strong>
+              <input
+                type="text"
+                name="Email"
+                value={formData.Email}
+                onChange={handleInputChange}
+                className="border p-2 w-full mb-4"
+                placeholder={`old: ${tourguide.UserId.Email}`}
               />
             </label>
           </div>

@@ -2,25 +2,30 @@
 import React from "react";
 import Dashboard from "@/components/ui/dashboard";
 import { useRouter } from "next/navigation";
-
+import { fetcher } from "@/lib/fetch-client";
 export default function AdvertiserProfile({ Activities }) {
-  const AllActivities = Activities.activities;
+  const AllActivities = Activities.Activities;
+  // console.log("ALOOOOO");
+  console.log(Activities);
   const router = useRouter();
 
   const handleCreateClick = () => {
-    router.push("/MyActivities/createActivity");
+    router.push("/my-activities/createActivity");
   };
 
   const handleEditClick = (id) => {
-    router.push(`/MyActivities/${id}`);
+    router.push(`/my-activities/${id}`);
   };
 
   const handleDeleteClick = async (id) => {
     const confirmed = confirm("Are you sure you want to delete this activity?");
     if (confirmed) {
       try {
-        const response = await fetch(`http://localhost:3001/activities/${id}`, {
+        const response = await fetcher(`/activities/${id}`, {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
 
         if (response.ok) {

@@ -8,9 +8,6 @@ export default async function MyActivities() {
     headers: {
       "Content-Type": "application/json",
     },
-    next: {
-      revalidate: 0,
-    },
   }).catch((e) => console.log(e));
   if (!res?.ok) {
     console.log("err");

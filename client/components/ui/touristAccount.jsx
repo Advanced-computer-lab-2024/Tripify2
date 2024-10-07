@@ -84,9 +84,7 @@ export default function TouristAccount({ params }) {
       });
 
       if (validEmail) {
-        throw new Error(
-          "Please update to an email that is not already in the system!"
-        );
+        alert("Email already exists on the system!");
       } else {
         const responseUserTwo = await fetcher(
           `/users/${touristInfo.UserId._id}`,

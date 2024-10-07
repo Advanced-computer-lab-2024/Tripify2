@@ -156,6 +156,8 @@ const updatePlace = async (req, res) => {
   const { id } = req.params;
   const { Name, ...rest } = req.body;
 
+  console.log(req.body)
+
   const toursimGovernor = await TourismGovernor.findOne(
     { UserId: req._id },
     "UserId"
@@ -172,12 +174,12 @@ const updatePlace = async (req, res) => {
 
   try {
     //findOneAndUpdate takes objects
-    rest.Categories = rest.Categories.map((category) => category._id);
-    rest.Tags = rest.Tags.map((tag) => tag._id);
+    // rest.Categories = rest.Categories.map((category) => category._id);
+    // rest.Tags = rest.Tags.map((tag) => tag._id);
 
     const placeToUpdate = await Places.findByIdAndUpdate(
       id,
-      { ...rest },
+      { ...rest, Name },
       { new: true } //runValidators runs all the schema validations that need to be met
     ).catch((err) => console.log(err));
     console.log("placeToUpdate: ", placeToUpdate);

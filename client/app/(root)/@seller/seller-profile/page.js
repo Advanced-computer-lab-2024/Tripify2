@@ -33,7 +33,7 @@ export default function UserProfile() {
 
         setFormData({
           Email: data.Email || "",
-          Password: "",
+          Password: "", 
           CurrentPassword: "",
         });
       } catch (error) {
@@ -108,6 +108,7 @@ export default function UserProfile() {
     <div style={styles.container}>
       <h1>My Profile</h1>
       <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
+      <p><strong>Password:</strong> {"********"} {/* Masked password display */}</p>
 
       {isEditing ? (
         <>
@@ -164,7 +165,7 @@ export default function UserProfile() {
 const styles = {
   container: {
     padding: "20px",
-    backgroundColor: "black",
+    backgroundColor: "#f9f9f9",
     borderRadius: "8px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     maxWidth: "600px",

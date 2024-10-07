@@ -68,8 +68,8 @@ const getTourguideItineraries = async (req, res) => {
   try {
     const itineraries = await tourguideModel
       .findOne({ UserId: req._id }, "Itineraries")
-      .lean()
-      .populate("Itineraries");
+      .populate("Itineraries")
+      .lean();
     if (!itineraries)
       return res.status(400).json({ message: "No Itineraries where found!" });
     return res.status(200).json(itineraries);
@@ -84,7 +84,8 @@ const allTourguides = async (req, res) => {
     if (accepted) {
       const tourguides = await tourguideModel
         .find({ Accepted: true })
-        .populate("UserId");
+        .populate("UserId")
+        .populate("Itineraries");
 
       if (!tourguides)
         return res.status(400).json({ message: "No tour guides found!" });
@@ -92,13 +93,17 @@ const allTourguides = async (req, res) => {
     } else if (application) {
       const tourguides = await tourguideModel
         .find({ Accepted: null })
-        .populate("UserId");
+        .populate("UserId")
+        .populate("Itineraries");
 
       if (!tourguides)
         return res.status(400).json({ message: "No tour guides found!" });
       return res.status(200).json(tourguides);
     } else {
-      const tourguides = await tourguideModel.find({}).populate("UserId");
+      const tourguides = await tourguideModel
+        .find({})
+        .populate("UserId")
+        .populate("Itineraries");
 
       if (!tourguides)
         return res.status(400).json({ message: "No tour guides found!" });
@@ -120,7 +125,7 @@ const getTourguideProfile = async (req, res) => {
     res
       .status(200)
       .json({ message: "Tourguides read successfully", tourguide: tourguide });
-    if (acceptedTourGuides.length === 0) {
+    if (tourguide.length === 0) {
       return res.status(404).json({
         message: "No tour guides found",
       });

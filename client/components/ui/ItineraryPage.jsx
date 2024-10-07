@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 
 function ItineraryPage({ itinerary, params }) {
+  const router = useRouter();
   const { id } = useParams();
   let count = 0;
   const [readcategories, setReadcategories] = useState([]);
@@ -195,7 +196,18 @@ function ItineraryPage({ itinerary, params }) {
  router.push(`/MyActivities/${id}`);
  };*/
 
-  function deleteitinerary() {}
+  async function deleteitinerary() {
+    const deleteitineraries = await fetcher(`/itineraries/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).catch((e) => console.log(e));
+    if (!deleteitineraries?.ok) {
+      console.log("err");
+    }
+    return router.push("/myitineraries");
+  }
 
   const dateandtimelist = itinerary.DatesAndTimes.map((date) => (
     <li className="border rounded-md drop-shadow-md border-black w-fit min-w-48 p-2">

@@ -2,10 +2,10 @@ const bcrypt = require("bcrypt");
 
 const advertiserModel = require("../models/Advertiser.js");
 const userModel = require("../models/User.js");
+const CompanyProfile = require("../models/CompanyProfile.js");
 const createAdvertiser = async (req, res) => {
-  const { UserName, Email, Password, Website, Hotline, Accepted, Document } =
+  const { UserName, Email, Password, Website, Hotline, Document, CompanyName, CompanyDescription } =
     req.body;
-  // console.log(req.body);
   try {
     if (
       !UserName ||
@@ -13,7 +13,8 @@ const createAdvertiser = async (req, res) => {
       !Password ||
       !Website ||
       !Hotline ||
-      !Accepted ||
+      !CompanyName ||
+      !CompanyDescription ||
       !Document
     ) {
       return res.status(400).json({ message: "All Fields Must Be Given!" });
@@ -27,7 +28,6 @@ const createAdvertiser = async (req, res) => {
       return res.status(400).json({ message: "UserName Already Exists!" });
     }
     const hashedPwd = await bcrypt.hash(Password, 10);
-    console.log(hashedPwd);
     const user = await userModel.create({
       UserName,
       Email,
@@ -38,10 +38,20 @@ const createAdvertiser = async (req, res) => {
       UserId: user._id,
       Website,
       Hotline,
-      Accepted,
       Document,
     });
-    // await newadvertiser.save();
+    
+    const newCompanyProfile = await CompanyProfile.create({
+      Name: CompanyName,
+      Description: CompanyDescription,
+      Website,
+      Hotline,
+      AdvertiserId: newadvertiser._id,
+    })
+
+    newadvertiser.CompanyProfile = newCompanyProfile._id;
+    await newadvertiser.save();
+
     res.status(201).json({
       message: "Advertiser created successfully",
       tourist: newadvertiser,

@@ -9,7 +9,6 @@ const companyProfileSchema = new Schema(
     },
     Industry: {
       type: String,
-      required: true,
     },
     FoundedDate: {
       type: Date,
@@ -23,6 +22,10 @@ const companyProfileSchema = new Schema(
     },
     Website: {
       type: String,
+    },
+    Hotline: {
+      type: String,
+      required: true,
     },
     Email: {
       type: String,

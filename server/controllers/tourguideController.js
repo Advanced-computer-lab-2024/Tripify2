@@ -13,7 +13,6 @@ const createTourguideProfile = async (req, res) => {
     MobileNumber,
     YearsOfExperience,
     PreviousWork,
-    Accepted,
     Documents,
   } = req.body;
   try {
@@ -23,8 +22,6 @@ const createTourguideProfile = async (req, res) => {
       !Password ||
       !MobileNumber ||
       !YearsOfExperience ||
-      !PreviousWork ||
-      !Accepted ||
       !Documents
     ) {
       return res.status(400).json({ message: "All Fields Must Be Given!" });
@@ -48,17 +45,17 @@ const createTourguideProfile = async (req, res) => {
     const tourGuide = await tourguideModel.create({
       MobileNumber,
       YearsOfExperience,
-      PreviousWork,
-      Accepted,
+      PreviousWork: PreviousWork ?? '',
       Documents,
       UserId: user._id,
     });
+    
     res.status(201).json({
       message: "TourGuide created successfully",
       TourGuide: tourGuide,
     });
   } catch (error) {
-    res.status(400).json({ message: "Error creating TourGuide", error });
+    res.status(400).json({ message: `Error creating TourGuide ${error.message}`, error });
   }
 };
 

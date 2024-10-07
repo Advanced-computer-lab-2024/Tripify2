@@ -13,7 +13,6 @@ const TourGuideSchema = new Schema(
     },
     PreviousWork: {
       type: String,
-      required: true,
     },
     UserId: {
       type: Schema.Types.ObjectId,

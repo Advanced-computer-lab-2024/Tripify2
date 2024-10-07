@@ -8,14 +8,6 @@ const advertiserSchema = new Schema(
       ref: "User",
       required: true,
     },
-    Website: {
-      type: String,
-      required: true,
-    },
-    Hotline: {
-      type: String,
-      required: true,
-    },
     CompanyProfile: {
       type: Schema.Types.ObjectId,
       ref: "CompanyProfile",

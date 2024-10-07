@@ -1,11 +1,13 @@
 import { GeistSans } from "geist/font/sans"; 
 import { Poppins } from "next/font/google";
-
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import "../globals.css";
 import AuthProvider from "@/providers/SessionProvider";
 import Image from "next/image";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { ourFileRouter } from "../api/uploadthing/core";
+import { extractRouterConfig } from "uploadthing/server";
 
 export const metadata = {
   title: "Next.js",
@@ -31,6 +33,9 @@ export default async function RootLayout({
     <html lang="en" className={`${GeistSans.className} ${poppins.variable} antialiased dark:bg-gray-950 bg-[#F7FAFC]`}>
       <AuthProvider>
         <body className="bg-[#F7FAFC]">
+          <NextSSRPlugin
+            routerConfig={extractRouterConfig(ourFileRouter)}
+          />
           {/* <header>
             <Dashboard params={{ role: "Advertiser" }} />
           </header> */}

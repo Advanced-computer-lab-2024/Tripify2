@@ -142,7 +142,7 @@ export default function MyPlaces() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Tag: newTag, TourismGovernor: session?.data?.user?.id }),
+        body: JSON.stringify({ Tag: newTag, UserId: session?.data?.user?.userId }),
       });
 
       const data = await response.json();

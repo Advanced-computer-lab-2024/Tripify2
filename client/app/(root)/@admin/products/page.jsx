@@ -24,6 +24,7 @@ import Search from "@/components/admin/Search"
 import PriceSlider from "@/components/admin/PriceSlider"
 import AddProductBtn from "@/components/admin/AddProductBtn"
 import SortRatingBtn from "@/components/admin/SortRatingBtn"
+import ViewReviewsBtn from "@/components/admin/ViewReviewsBtn"
 import ClearFiltersBtn from "@/components/admin/ClearFiltersBtn"
 import ProductEditBtn from "@/components/admin/ProductEditBtn"
 import {
@@ -106,6 +107,9 @@ export default async function DashboardPage({ searchParams })
                                         Rating
                                     </TableHead>
                                     <TableHead className="hidden md:table-cell">
+                                        Reviews
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
                                         Created at
                                     </TableHead>
                                     <TableHead>
@@ -146,6 +150,9 @@ export default async function DashboardPage({ searchParams })
                                         </TableCell>
                                         <TableCell className="font-medium">
                                             {product?.Rating}
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            <ViewReviewsBtn product={product} />
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             {product?.createdAt}

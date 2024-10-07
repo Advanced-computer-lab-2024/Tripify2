@@ -16,6 +16,8 @@ export default function MyPlaces() {
   const [loading, setLoading] = useState(true);
   const [newTag, setNewTag] = useState('');
   const [error, setError] = useState(null);
+  const [tagsButton, setTagsButton] = useState([]); // To store fetched tags
+  const [categoriesButton, setCategoriesButton] = useState([]); // To store fetched categories
   const [newPlace, setNewPlace] = useState({
     Name: '',
     Description: '',
@@ -28,6 +30,30 @@ export default function MyPlaces() {
   const session = useSession()
   const [key, setKey] = useState('');
   const [value, setValue] = useState('');
+
+  useEffect(() => {
+    const fetchTagsAndCategories = async () => {
+      try {
+        // Fetch Tags
+        const tagResponse = await fetch('http://localhost:3001/tags');
+        const tagData = await tagResponse.json();
+        setTagsButton(tagData);
+
+        // Fetch Categories
+        const categoryResponse = await fetch('http://localhost:3001/categories');
+        const categoryData = await categoryResponse.json();
+        setCategoriesButton(categoryData);
+        
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchTagsAndCategories();
+  }, []);
+
 
   const handleAddPair = () => {
     if (key.trim() !== '') {
@@ -261,18 +287,38 @@ export default function MyPlaces() {
       <h3 className="text-xl font-bold">Location</h3>
       <LocationPicker onLocationSelect={handleLocationSelect} />
     </div>
-    <input
-      type="text"
-      placeholder="Tags (comma-separated IDs)"
-      value={newPlace.Tags}
-      onChange={(e) => setNewPlace({ ...newPlace, Tags: e.target.value.split(',') })}
-    />
-    <input
-      type="text"
-      placeholder="Categories (comma-separated IDs)"
-      value={newPlace.Categories}
-      onChange={(e) => setNewPlace({ ...newPlace, Categories: e.target.value.split(',') })}
-    />
+          
+     {/* Render Category Radio Buttons */}
+     <h3>Select Category</h3>
+    {categories.map((category) => (
+      <label key={category._id}>
+        <input
+          type="radio"
+          placeholder="Categories (comma-separated IDs)"
+          name="category"
+          value={category._id}
+          checked={newPlace.Categories === category._id}
+          onChange={(e) => setNewPlace({ ...newPlace, Categories: e.target.value })}
+        />
+        {category.Category}
+      </label>
+    ))}
+    
+    {/* Render Tag Radio Buttons */}
+    <h3>Select Tag</h3>
+    {tags.map((tag) => (
+      <label key={tag._id}>
+        <input
+          type="radio"
+          placeholder="Tags (comma-separated IDs)"
+          name="tag"
+          value={tag._id}
+          checked={newPlace.Tags === tag._id}
+          onChange={(e) => setNewPlace({ ...newPlace, Tags: e.target.value })}
+        />
+        {tag.Tag}
+      </label>
+    ))}
     <Button onClick={createPlace}>Create Place</Button>
 
      {/* Tag Creation Section */}

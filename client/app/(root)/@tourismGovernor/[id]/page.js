@@ -10,6 +10,8 @@ export default function ViewPlace() {
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tagsButton, setTagsButton] = useState([]); // To store fetched tags
+  const [categoriesButton, setCategoriesButton] = useState([]); // To store fetched categories
   const [updatedPlace, setUpdatedPlace] = useState({
     Name: '',
     Description: '',
@@ -49,6 +51,29 @@ export default function ViewPlace() {
 
     fetchPlace();
   }, [params.id]);
+
+  useEffect(() => {
+    const fetchTagsAndCategories = async () => {
+      try {
+        // Fetch Tags
+        const tagResponse = await fetch('http://localhost:3001/tags');
+        const tagData = await tagResponse.json();
+        setTagsButton(tagData);
+
+        // Fetch Categories
+        const categoryResponse = await fetch('http://localhost:3001/categories');
+        const categoryData = await categoryResponse.json();
+        setCategoriesButton(categoryData);
+        
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchTagsAndCategories();
+  }, []);
 
   // Update place data
   const handleUpdate = async () => {
@@ -134,18 +159,38 @@ export default function ViewPlace() {
         value={updatedPlace.TicketPrices}
         onChange={(e) => setUpdatedPlace({ ...updatedPlace, TicketPrices: e.target.value })}
       />
-      <input
-        type="text"
-        placeholder="Tags (comma-separated IDs)"
-        value={updatedPlace.Tags}
-        onChange={(e) => setUpdatedPlace({ ...updatedPlace, Tags: e.target.value })}
-      />
-      <input
-        type="text"
-        placeholder="Categories (comma-separated IDs)"
-        value={updatedPlace.Categories}
-        onChange={(e) => setUpdatedPlace({ ...updatedPlace, Categories: e.target.value })}
-      />
+       {/* Render Category Radio Buttons */}
+    <h3>Select Category</h3>
+    {categories.map((category) => (
+      <label key={category._id}>
+        <input
+          type="radio"
+          placeholder="Categories (comma-separated IDs)"
+          name="category"
+          value={category._id}
+          checked={updatedPlace.Categories === category._id}
+          onChange={(e) => setUpdatedPlace({ ...updatedPlace, Categories: e.target.value })}
+        />
+        {category.Category}
+      </label>
+    ))}
+    
+    {/* Render Tag Radio Buttons */}
+    <h3>Select Tag</h3>
+    {tags.map((tag) => (
+      <label key={tag._id}>
+        <input
+          type="radio"
+          placeholder="Tags (comma-separated IDs)"
+          name="tag"
+          value={tag._id}
+          checked={updatedPlace.Tags === tag._id}
+          onChange={(e) => setUpdatedPlace({ ...updatedPlace, Tags: e.target.value })}
+        />
+        {tag.Tag}
+      </label>
+    ))}
+
       <Button onClick={handleUpdate}>Update Place</Button>
     </div>
   );

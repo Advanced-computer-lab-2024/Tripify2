@@ -127,7 +127,7 @@ const getAdvertiserById = async (req, res) => {
 
 const updateAdvertiser = async (req, res) => {
   const { id } = req.params;
-  const { UserName, Email, Website, Hotline, Profile, Document } = req.body;
+  const { UserName, Email, Website, Hotline, Document } = req.body;
 
   try {
     const advertiser = await advertiserModel.findById(id).populate("UserId");
@@ -158,9 +158,15 @@ const updateAdvertiser = async (req, res) => {
 
     const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(
       id,
-      { Website, Hotline, Profile, Document },
+      { Document },
       { new: true }
     );
+
+    await CompanyProfile.findByIdAndUpdate(
+      updatedAdvertiser.CompanyProfile,
+      { Website, Hotline },
+      { new: true }
+    )
 
     res.status(200).json({
       message: "Advertiser and user updated successfully",

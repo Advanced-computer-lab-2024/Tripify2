@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "../ui/input"
+import { Callout } from "../ui/Callout"
 
 const newAdminSchema = z.object({
     UserName: z.string().min(2, {
@@ -43,6 +44,7 @@ export default function AddAdminBtn()
 
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("");
 
     const form = useForm({
         resolver: zodResolver(newAdminSchema),
@@ -56,9 +58,7 @@ export default function AddAdminBtn()
     async function onSubmit(values) {
         setLoading(true)
 
-        console.log(values)
-
-        await fetcher('/admins', {
+        const res = await fetcher('/admins', {
             method: 'POST',
             body: JSON.stringify(values),
             headers: {
@@ -66,9 +66,18 @@ export default function AddAdminBtn()
             }
         })
 
-        setLoading(false)
-        setOpen(false)
-        router.refresh()
+        if(!res?.ok) {
+            const data = await res.json()
+            setError(data?.message)
+            setLoading(false)
+        }
+        else
+        {
+            setError(null)
+            setLoading(false)
+            setOpen(false)
+            router.refresh()
+        }
     }
 
     const onClose = () => {
@@ -133,6 +142,11 @@ export default function AddAdminBtn()
                                     </FormItem>
                                 )}
                             />
+                            {error && (
+                                <Callout variant="error" title="Something went wrong">
+                                    {error}
+                                </Callout>
+                            )}
                             <DialogFooter>
                                 <Button type="button" disabled={loading} className='w-[5.5rem]' onClick={onClose}>Cancel</Button>
                                 <Button type="submit" disabled={loading} className='w-[5.5rem]'>

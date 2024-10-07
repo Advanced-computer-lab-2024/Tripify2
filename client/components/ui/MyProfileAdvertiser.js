@@ -15,11 +15,12 @@ export default function AdvertiserProfile({ advertiser }) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isProfileCreateMode, setIsProfileCreateMode] = useState(false);
   const [isProfileEditMode, setIsProfileEditMode] = useState(false);
+  console.log(advertiser.advertiser)
   const [formData, setFormData] = useState({
     UserName: advertiser.advertiser.UserId?.UserName || "",
     Email: advertiser.advertiser.UserId?.Email || "",
-    Website: advertiser.advertiser.Website || "",
-    Hotline: advertiser.advertiser.Hotline || "",
+    Website: advertiser.advertiser.CompanyProfile.Website || "",
+    Hotline: advertiser.advertiser.CompanyProfile.Hotline || "",
     CompanyProfile: advertiser.advertiser.CompanyProfile || "",
     Document: advertiser.advertiser.Document || "",
   });
@@ -67,9 +68,7 @@ export default function AdvertiserProfile({ advertiser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // console.log("Test");
-    // console.log(formData);
+  
     try {
       console.log(session?.data?.user?.id);
       const response = await fetcher(
@@ -82,13 +81,12 @@ export default function AdvertiserProfile({ advertiser }) {
           body: JSON.stringify(formData),
         }
       );
-
-      // console.log(response);
-
+  
       if (response.ok) {
         const result = await response.json();
         console.log("Advertiser updated successfully:", result);
-        //   setIsEditMode(false);
+        setIsEditMode(false);
+        router.refresh(); 
       } else {
         alert("Error updating advertiser");
         console.error("Error updating advertiser");
@@ -96,13 +94,11 @@ export default function AdvertiserProfile({ advertiser }) {
     } catch (error) {
       console.error("Failed to update advertiser:", error);
     }
-    router.refresh();
-    setIsEditMode(false);
   };
-
+  
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (isProfileCreateMode) {
       try {
         const response = await fetcher(`/profile`, {
@@ -112,26 +108,21 @@ export default function AdvertiserProfile({ advertiser }) {
           },
           body: JSON.stringify({ ...profileformData, AdvertiserId: id }),
         });
-
-        // console.log(response);
-
+  
         if (response.ok) {
           const result = await response.json();
-          console.log("Profile Created successfully:", result);
-          router.refresh();
-          //   setIsEditMode(false);
-        } else {
-          const errorData = await response.json(); // Extract the response body
-          console.log(errorData); // Log the full error response
+          console.log("Profile created successfully:", result);
+          setIsProfileCreateMode(false);
+          router.refresh(); 
+          const errorData = await response.json(); 
+          console.log(errorData); 
           alert(errorData.message || "An error occurred");
         }
       } catch (error) {
         console.error("Failed to create profile:", error);
       }
-      setIsProfileCreateMode(false);
     } else if (isProfileEditMode) {
       try {
-        console.log(`/profile`);
         const response = await fetcher(`/profile`, {
           method: "PATCH",
           headers: {
@@ -142,24 +133,23 @@ export default function AdvertiserProfile({ advertiser }) {
             id: formData.CompanyProfile._id,
           }),
         });
-
-        // console.log(response);
-
+  
         if (response.ok) {
           const result = await response.json();
-          console.log("Profile Updated successfully:", result);
+          console.log("Profile updated successfully:", result);
+          setIsProfileEditMode(false);
+          router.refresh(); 
         } else {
-          const errorData = await response.json(); // Extract the response body
-          console.log(errorData); // Log the full error response
+          const errorData = await response.json(); 
+          console.log(errorData); 
           alert(errorData.message || "An error occurred");
         }
       } catch (error) {
         console.error("Failed to update profile:", error);
       }
-      router.refresh();
-      setIsProfileEditMode(false);
     }
   };
+  
 
   return (
     <div>
@@ -253,10 +243,10 @@ export default function AdvertiserProfile({ advertiser }) {
               </p>
               <p>
                 <strong>Website:</strong>{" "}
-                {advertiser.advertiser.Website || "N/A"}{" "}
+                {advertiser.advertiser.CompanyProfile.Website || "N/A"}{" "}
               </p>
               <p>
-                <strong>Hotline:</strong> {advertiser.advertiser.Hotline}
+                <strong>Hotline:</strong> {advertiser.advertiser.CompanyProfile.Hotline}
               </p>
               <p>
                 <strong>Document:</strong> 

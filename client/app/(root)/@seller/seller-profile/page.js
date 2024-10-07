@@ -178,7 +178,7 @@ export default function UserProfile() {
 const styles = {
   container: {
     padding: "20px",
-    backgroundColor: "black",
+    backgroundColor: "#f9f9f9",
     borderRadius: "8px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     maxWidth: "600px",

@@ -35,7 +35,7 @@ export const authOptions = {
       CredentialsProvider({
           name: 'Credentials',
           credentials: {
-              email: { label: 'Email', type: 'email', placeholder: 'example@email.com' },
+              username: { label: 'UserName', type: 'text', placeholder: 'example@email.com' },
               password: { label: 'Password', type: 'password', placeholder: '*******' },
           },
           async authorize(credentials, req) {
@@ -47,7 +47,7 @@ export const authOptions = {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  Email: credentials.email,
+                  UserName: credentials.username,
                   Password: credentials.password,
                 }),
               })

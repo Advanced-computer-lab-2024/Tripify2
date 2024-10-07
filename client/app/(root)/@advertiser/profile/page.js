@@ -17,6 +17,7 @@ export default async function MyProfile() {
   const advertiser = await res.json();
   // console.log(advertiser);
 
+  console.log(advertiser)
   return (
     <div>
       <MyProfileAdvertiser advertiser={advertiser} />

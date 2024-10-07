@@ -104,7 +104,7 @@ export default function Seller()
                 else
                 {
                     setError(null)
-                    await signIn("credentials", { email: values.Email, password: values.Password })
+                    await signIn("credentials", { username: values.UserName, password: values.Password })
                     router.push('/')
                 }
             })

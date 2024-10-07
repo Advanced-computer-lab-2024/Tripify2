@@ -73,7 +73,7 @@ export default function MyPlaces() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await fetcher(`/tourism-governors/my-places`);
+        const response = await fetcher(`/tourism-governors/get-all/my-places`);
 
         console.log(response)
 

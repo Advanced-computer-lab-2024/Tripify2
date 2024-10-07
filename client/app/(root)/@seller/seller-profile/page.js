@@ -13,7 +13,6 @@ export default function UserProfile() {
   const [passwordError, setPasswordError] = useState(null);
 
   const [formData, setFormData] = useState({
-    UserName: "",
     Email: "",
     Password: "",
     CurrentPassword: "",
@@ -33,7 +32,6 @@ export default function UserProfile() {
         setProfile(data);
 
         setFormData({
-          UserName: data.UserName || "",
           Email: data.Email || "",
           Password: "",
           CurrentPassword: "",
@@ -74,7 +72,6 @@ export default function UserProfile() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          UserName: formData.UserName,
           Email: formData.Email,
           ...(formData.Password && { Password: formData.Password }),
           CurrentPassword: formData.CurrentPassword,
@@ -110,21 +107,10 @@ export default function UserProfile() {
   return (
     <div style={styles.container}>
       <h1>My Profile</h1>
-      <p><strong>User Name:</strong> {profile?.UserName || "N/A"}</p>
       <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
 
       {isEditing ? (
         <>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>User Name:</label>
-            <input
-              type="text"
-              name="UserName"
-              value={formData.UserName}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </div>
           <div style={styles.inputGroup}>
             <label style={styles.label}>Email:</label>
             <input

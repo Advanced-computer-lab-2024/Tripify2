@@ -31,6 +31,7 @@ export default function ViewPlace() {
         const response = await fetch(`http://localhost:3001/places/${params.id}`);
         const data = await response.json();
         setPlace(data);
+        console.log(data)
         console.log(data);
         setUpdatedPlace({
           Name: data.Name,

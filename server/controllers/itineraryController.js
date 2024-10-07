@@ -114,8 +114,29 @@ const getItinerary = async (req, res) => {
 
 const updateItinerary = async (req, res) => {
   const { id } = req.params;
+  const {
+    Name,
+    Activities,
+    Location,
+    StartDate,
+    TourGuide,
+    EndDate,
+    Language,
+    Price,
+    DatesAndTimes,
+    Accesibility,
+    Pickup,
+    Dropoff,
+    Category,
+    Tag,
+    Image,
+    Rating,
+  } = req.body;
 
-  const tourGuide = await tourGuideModel.findOne({ UserId: req._id }, "UserId");
+  const tourGuide = await tourGuideModel.findOne(
+    { UserId: req.body.TourGuide },
+    "UserId"
+  );
 
   const updatedItinerary = await ItineraryModel.findById(id);
 
@@ -125,14 +146,42 @@ const updateItinerary = async (req, res) => {
   )
     return res.status(400).json({ message: "Unauthorized TourGuide!" });
 
+  // console.log("==============================");
+  // console.log(req.body);
+  // console.log("==============================");
+
   try {
-    const itinerary = await ItineraryModel.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    })
-      .populate("Tag")
-      .populate("Category")
-      .populate("TourGuide");
+    const itinerary = await ItineraryModel.findByIdAndUpdate(
+      id,
+      {
+        Name, //
+        Activities, //
+        Location, //
+        TourGuide: tourGuide, //
+        StartDate, //
+        EndDate, //
+        Language, //
+        Price, //
+        DatesAndTimes, //
+        Accesibility, //
+        Pickup, //
+        Dropoff, //
+        // Category,
+        // Tag,
+        Image, //
+        Rating, //
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate("TourGuide");
+    // .populate("Tag")
+    // .populate("Category")
+
+    // console.log("==============================");
+    // console.log(itinerary);
+    // console.log("==============================");
 
     if (!itinerary)
       return res

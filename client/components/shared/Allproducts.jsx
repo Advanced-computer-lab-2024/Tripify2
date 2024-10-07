@@ -1,4 +1,4 @@
-"use client"; // Marking this as a client component
+"use client";
 import { useRouter } from "next/navigation";
 
 export default function Allproducts({ products, searchQuery }) {
@@ -17,7 +17,6 @@ export default function Allproducts({ products, searchQuery }) {
   }
 
   const handleViewDetails = (id) => {
-    // Navigate to the product details page
     router.push(`/products/${id}`);
   };
 
@@ -29,7 +28,7 @@ export default function Allproducts({ products, searchQuery }) {
           <p style={styles.productPrice}>Price: ${eachproduct.Price}</p>
           <button
             style={styles.detailsButton}
-            onClick={() => handleViewDetails(eachproduct._id)} // Pass the correct product id
+            onClick={() => handleViewDetails(eachproduct._id)}
           >
             View Details
           </button>

@@ -155,8 +155,11 @@ const updateActivity = async (req, res) => {
     SpecialDiscounts,
     Duration,
     Image,
+    CategoryId,
+    Tags,
   } = req.body;
   try {
+    console.log({ CategoryId, Tags });
     let parsedPrice = typeof Price === "string" ? parseInt(Price, 10) : Price;
     let parsedDiscount =
       typeof SpecialDiscounts === "string"
@@ -165,10 +168,18 @@ const updateActivity = async (req, res) => {
 
     let parsedDate = new Date(dateString);
     let parsedTime = new Date(timeString);
-
+    if (Tags.length == 0) {
+      return res.status(400).json({ message: "need to have atleast 1 tag" });
+    }
+    if (CategoryId.length == 0) {
+      return res
+        .status(400)
+        .json({ message: "need to have atleast 1 Category" });
+    }
     if (isNaN(parsedDate.getTime()) || isNaN(parsedTime.getTime())) {
       return res.status(400).json({ message: "Invalid date or time format" });
     }
+
     const updatedActivity = await activityModel.findByIdAndUpdate(
       id,
       {
@@ -178,8 +189,10 @@ const updateActivity = async (req, res) => {
         Location: Location,
         Price: parsedPrice,
         SpecialDiscounts: parsedDiscount,
-        duration: Duration,
+        Duration: Duration,
         Image: Image,
+        CategoryId,
+        Tags,
       },
       { new: true }
     );
@@ -193,6 +206,7 @@ const updateActivity = async (req, res) => {
       activity: updatedActivity,
     });
   } catch (error) {
+    console.log("ERRROR", error);
     res.status(400).json({ message: "Error updating activity", error });
   }
 };
@@ -225,7 +239,14 @@ const deleteActivity = async (req, res) => {
     res.status(500).json({ message: "Error deleting activity", error });
   }
 };
-
+// const deletAll = async (req, res) => {
+//   try {
+//     await activityModel.deleteMany({});
+//     res.status(200).json("yess");
+//   } catch {
+//     res.status(500).json("noo");
+//   }
+// };
 // const getActivityByAdvertiserId = async (req, res) => {
 //   const { id } = req.params;
 //   try {
@@ -243,6 +264,7 @@ const deleteActivity = async (req, res) => {
 // };
 
 module.exports = {
+  // deletAll,
   // getActivityByAdvertiserId,
   createActivity,
   getActivity,

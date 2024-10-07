@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { FaWallet } from "react-icons/fa"; // Import an icon for the wallet
+import { FaWallet } from "react-icons/fa";
 import { fetcher } from "@/lib/fetch-client";
 import { useSession } from "next-auth/react";
 

@@ -1,20 +1,27 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { fetcher } from "@/lib/fetch-client";
+import LocationPicker from "@/components/shared/LocationPicker";
+import LocationViewer from "@/components/shared/LoactionViewer";
+import { useSession } from "next-auth/react";
 export default function CreateActivity() {
+  const session = useSession();
+  const id = session?.data?.user?.id;
+  console.log(id);
   const [formData, setFormData] = useState({
     Name: "",
     Date: "",
     Time: "",
-    Location: "",
+    Location: null,
     Price: "",
     SpecialDiscounts: "",
     Duration: "",
     Image: "",
     Categories: [],
     Tags: [],
-    AdvertiserId: "66fd00e5af33328b032193cf",
+    AdvertiserId: id,
+    Rating: "",
   });
 
   const [categories, setCategories] = useState([]); // Available categories
@@ -24,10 +31,9 @@ export default function CreateActivity() {
 
   // Fetch categories and tags from API when the component mounts
   useEffect(() => {
-    // Fetch Categories
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:3001/categories");
+        const response = await fetcher("/categories");
         const data = await response.json();
         setCategories(data);
       } catch (error) {
@@ -35,10 +41,9 @@ export default function CreateActivity() {
       }
     };
 
-    // Fetch Tags
     const fetchTags = async () => {
       try {
-        const response = await fetch("http://localhost:3001/tags");
+        const response = await fetcher("/tags");
         const data = await response.json();
         setTags(data);
       } catch (error) {
@@ -85,16 +90,21 @@ export default function CreateActivity() {
     });
   };
 
+  // Handle location selection from LocationPicker
+  const handleLocationSelect = (location) => {
+    setFormData((formData) => ({
+      ...formData,
+      Location: location,
+    }));
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // console.log(formData);
     console.log(JSON.stringify(formData));
     try {
-      const response = await fetch("http://localhost:3001/activities", {
+      const response = await fetcher("/activities", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
@@ -103,10 +113,8 @@ export default function CreateActivity() {
 
       if (response.ok) {
         alert("Successfully created an activity");
-        // Redirect back to the activities list page
-        router.push("/MyActivities");
+        router.push("/my-activities");
       } else {
-        console.log("PROBLEM");
         console.error("Error creating activity");
       }
     } catch (error) {
@@ -148,7 +156,7 @@ export default function CreateActivity() {
           <label>
             <strong>Time:</strong>
             <input
-              type="date"
+              type="datetime-local"
               name="Time"
               value={formData.Time}
               onChange={handleInputChange}
@@ -160,14 +168,7 @@ export default function CreateActivity() {
         <div>
           <label>
             <strong>Location:</strong>
-            <input
-              type="text"
-              name="Location"
-              value={formData.Location}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
-              required
-            />
+            <LocationPicker onLocationSelect={handleLocationSelect} />
           </label>
         </div>
         <div>
@@ -177,6 +178,19 @@ export default function CreateActivity() {
               type="number"
               name="Price"
               value={formData.Price}
+              onChange={handleInputChange}
+              className="border p-2 w-full mb-4"
+              required
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            <strong>Rating:</strong>
+            <input
+              type="number"
+              name="Rating"
+              value={formData.Rating}
               onChange={handleInputChange}
               className="border p-2 w-full mb-4"
               required
@@ -208,8 +222,6 @@ export default function CreateActivity() {
             />
           </label>
         </div>
-
-        {/* Change the Image input to a string input */}
         <div>
           <label>
             <strong>Image (URL or Base64):</strong>
@@ -223,9 +235,8 @@ export default function CreateActivity() {
               required
             />
           </label>
+          <img src={formData.Image} alt="Image" className="w-[300px] p-3"></img>
         </div>
-
-        {/* Categories Checkboxes */}
         <div>
           <strong>Categories:</strong>
           {categories.map((category) => (
@@ -242,8 +253,6 @@ export default function CreateActivity() {
             </div>
           ))}
         </div>
-
-        {/* Tags Checkboxes */}
         <div>
           <strong>Tags:</strong>
           {tags.map((tag) => (
@@ -260,7 +269,6 @@ export default function CreateActivity() {
             </div>
           ))}
         </div>
-
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded"

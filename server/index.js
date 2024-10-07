@@ -30,7 +30,7 @@ app.use("/sellers", require("./routes/sellerRoutes"));
 app.use("/places", require("./routes/placeRoutes"));
 app.use("/tourists", require("./routes/touristRoutes"));
 app.use("/tourism-governors", require("./routes/tourismGovernorRoutes"));
-
+app.use("/profile", require("./routes/profileRoutes"));
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

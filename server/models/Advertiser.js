@@ -19,7 +19,7 @@ const advertiserSchema = new Schema(
     CompanyProfile: {
       type: Schema.Types.ObjectId,
       ref: "CompanyProfile",
-      required: true,
+      required: false,
     },
     Accepted: {
       type: Boolean,

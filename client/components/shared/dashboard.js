@@ -66,7 +66,6 @@ export default function Dashboard({ params }) {
   };
 
   return (
-    //ghayar classNames ==> tailwind
     <div className="dashboard-container">
       <div className="dashboard--left">
         <h3>Logo</h3>

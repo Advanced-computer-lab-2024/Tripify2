@@ -45,20 +45,20 @@ async function getCategories() {
 const PlacesPage = () => {
   const [places, setPlaces] = useState([]);
   const [tags, setTags] = useState([]);
-  const [categories, setCategories] = useState([]); // State for categories
-  const [selectedTags, setSelectedTags] = useState([]); // Array to hold selected tags
-  const [searchTerm, setSearchTerm] = useState(""); // State for the search input
+  const [categories, setCategories] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const placesData = await getPlaces();
         const tagsData = await getTags();
-        const categoriesData = await getCategories(); // Fetch categories data
-        // console.log("Fetched tags:", tagsData); // Log the tags data
+        const categoriesData = await getCategories();
+        // console.log("Fetched tags:", tagsData);
         setPlaces(placesData);
         setTags(tagsData);
-        setCategories(categoriesData); // Set categories data
+        setCategories(categoriesData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -67,29 +67,24 @@ const PlacesPage = () => {
     fetchData();
   }, []);
 
-  // Helper function to get tag name by ID
   const getTagNameById = (tagId) => {
     const tag = tags.find((tag) => tag._id === tagId);
-    return tag ? tag.Tag : ""; // Return the Tag name or empty string if not found
+    return tag ? tag.Tag : "";
   };
 
-  // Handle tag selection
   const handleTagChange = (tagId) => {
-    setSelectedTags(
-      (prev) =>
-        prev.includes(tagId)
-          ? prev.filter((id) => id !== tagId) // Deselect tag if already selected
-          : [...prev, tagId] // Select tag if not selected
+    setSelectedTags((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId]
     );
   };
 
-  // Filter places by the selected tags and search term
   const filteredPlaces = places.filter((place) => {
     const matchesTag = selectedTags.length
       ? selectedTags.some((tagId) => place.Tags.includes(tagId))
       : true;
 
-    // Check if the search term matches the place name or any tag name
     const matchesSearch =
       place.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       place.Tags.some((tagId) =>
@@ -102,7 +97,6 @@ const PlacesPage = () => {
   const router = useRouter();
   return (
     <div className="grid grid-cols-6 h-screen">
-      {/* Filter Section */}
       <div className="col-span-1 p-4">
         <h2 className="text-black font-bold text-lg mb-6">Filter</h2>
         <div className="mb-4">
@@ -124,7 +118,6 @@ const PlacesPage = () => {
         </div>
       </div>
 
-      {/* Main Section */}
       <div className="col-span-5 p-4 overflow-auto">
         <h2 className="text-black font-bold text-2xl mb-4">Places</h2>
 
@@ -138,7 +131,6 @@ const PlacesPage = () => {
           />
         </div>
 
-        {/* Places Cards */}
         <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredPlaces.map((place) => (
             <button

@@ -5,20 +5,15 @@ export default function MainPageGuest() {
   return (
     <div className="h-screen flex items-center justify-start p-10">
       <div className="max-w-xlg">
-        {/* Main Heading */}
         <h1 className="text-9xl font-extrabold text-gray-800 leading-snug mb-6">
           Plan Your <br /> Dream Trip
         </h1>
 
-        {/* Description */}
-        {/* <div className="max-w-lg"> */}
         <p className="text-2xl text-gray-600 mb-12">
           Discover new destinations, organize your perfect getaway, and embark
           on a journey of a lifetime.
         </p>
-        {/* </div> */}
 
-        {/* Buttons */}
         <div className="flex space-x-6 gap-3">
           <button
             onClick={() => {

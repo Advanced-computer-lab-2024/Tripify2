@@ -10,9 +10,8 @@ export default function Products() {
   const [minPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100);
   const [currentMaxPrice, setCurrentMaxPrice] = useState(100);
-  const [sortOption, setSortOption] = useState("none"); // State for sorting
+  const [sortOption, setSortOption] = useState("none");
 
-  // Function to fetch products
   const fetchProducts = async () => {
     try {
       const response = await fetcher("/products", {
@@ -29,15 +28,13 @@ export default function Products() {
 
       let data = await response.json();
 
-      // Stringify the fetched data
       const stringifiedData = JSON.stringify(data);
 
-      console.log("Stringified Data: ", stringifiedData); // For debugging
+      console.log("Stringified Data: ", stringifiedData);
 
       setProducts(data);
       setFilteredProducts(data);
 
-      // Extract max price from products
       const prices = data.map((product) => product.Price);
       const maxPrice = Math.max(...prices);
       setMaxPrice(maxPrice);
@@ -51,7 +48,7 @@ export default function Products() {
     const filtered = products.filter(
       (product) => product.Price >= minPrice && product.Price <= currentMaxPrice
     );
-    sortProducts(filtered); // Apply sorting after filtering
+    sortProducts(filtered);
   };
 
   const handleSortChange = (event) => {
@@ -73,13 +70,13 @@ export default function Products() {
     fetchProducts();
     const intervalId = setInterval(() => {
       fetchProducts();
-    }, 60000); // Fetch every minute
+    }, 60000);
 
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
-    filterByPrice(); // Filter and sort when the price changes
+    filterByPrice();
   }, [currentMaxPrice]);
 
   return (
@@ -92,7 +89,6 @@ export default function Products() {
         style={styles.searchInput}
       />
 
-      {/* Single Price Slider */}
       <div style={styles.filterContainer}>
         <div>
           <label>Max Price: ${currentMaxPrice.toFixed(2)}</label>
@@ -102,12 +98,11 @@ export default function Products() {
             max={maxPrice}
             step="0.01"
             value={currentMaxPrice}
-            onChange={(e) => setCurrentMaxPrice(parseFloat(e.target.value))} // Parse as float
+            onChange={(e) => setCurrentMaxPrice(parseFloat(e.target.value))}
             style={styles.slider}
           />
         </div>
 
-        {/* Sort Dropdown */}
         <div>
           <label>Sort by Rating: </label>
           <select
@@ -122,7 +117,6 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Pass filtered products and search query */}
       <AllproductsGuest products={filteredProducts} searchQuery={searchQuery} />
     </div>
   );

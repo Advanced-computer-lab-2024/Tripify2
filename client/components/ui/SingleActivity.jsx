@@ -2,7 +2,7 @@
 
 export default function ItineraryDetails({ activity }) {
   if (!activity) {
-    return <p>Loading...</p>; // Fallback for loading or undefined activity
+    return <p>Loading...</p>;
   }
 
   const {
@@ -12,11 +12,11 @@ export default function ItineraryDetails({ activity }) {
     Location = "Location Not Available",
     Price = 0,
     Duration = "Duration Not Available",
-    Image = "", // Default to an empty string if no image
+    Image = "",
     SpecialDiscounts = 0,
     Tags = [],
     CategoryId = [],
-    AdvertiserId = {}, // Ensure it's an object
+    AdvertiserId = {},
   } = activity;
 
   // Format Date and Time
@@ -28,13 +28,12 @@ export default function ItineraryDetails({ activity }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen  p-4">
       <div className="w-full h-full flex flex-col items-center p-8">
-        {/* Image Section */}
         <div className="flex justify-center  w-full mb-6">
           {Image ? (
             <img
               src={Image}
               className="w-50 h-64 object-cover rounded-md"
-              style={{ objectFit: "cover" }} // Maintain aspect ratio
+              style={{ objectFit: "cover" }}
               alt="Activity"
             />
           ) : (
@@ -44,24 +43,19 @@ export default function ItineraryDetails({ activity }) {
           )}
         </div>
 
-        {/* Itinerary Details */}
         <div className="w-full space-y-6">
-          {/* Name */}
           <h1 className="text-4xl font-bold text-gray-800 text-center">
             {Name}
           </h1>
 
-          {/* Date and Time */}
           <h3 className="text-lg font-semibold text-center">
             Date: {formattedDate} - Time: {formattedTime}
           </h3>
 
-          {/* Location */}
-          <div className="text-gray-600 text-center">
+          {/* <div className="text-gray-600 text-center">
             <p className="font-medium">Location: {Location}</p>
-          </div>
+          </div> */}
 
-          {/* Price and Duration */}
           <div className="space-y-2 text-center">
             <p className="text-xl font-bold text-gray-800">
               Price: <span className="text-green-600">${Price}</span>
@@ -69,14 +63,12 @@ export default function ItineraryDetails({ activity }) {
             <p className="text-md text-gray-700">Duration: {Duration}</p>
           </div>
 
-          {/* Special Discounts */}
           {SpecialDiscounts > 0 && (
             <p className="text-md text-gray-700 text-center">
               Special Discounts: {SpecialDiscounts}%
             </p>
           )}
 
-          {/* Tags */}
           <div className="mt-4">
             <h2 className="text-xl font-semibold text-center">Tags:</h2>
             <ul className="flex flex-wrap justify-center space-x-2">
@@ -95,7 +87,6 @@ export default function ItineraryDetails({ activity }) {
             </ul>
           </div>
 
-          {/* Categories */}
           <div className="mt-4">
             <h2 className="text-xl font-semibold text-center">Categories:</h2>
             <ul className="flex flex-wrap justify-center space-x-2">
@@ -114,7 +105,6 @@ export default function ItineraryDetails({ activity }) {
             </ul>
           </div>
 
-          {/* Advertiser Information */}
           <div className="mt-4">
             <h2 className="text-xl font-semibold text-center">
               Advertiser Information:

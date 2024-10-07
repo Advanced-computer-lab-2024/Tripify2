@@ -1,36 +1,32 @@
-"use client"; // Marking this component as a Client Component
+"use client";
 
 import { useEffect, useState } from "react";
 import { fetcher } from "@/lib/fetch-client";
 
 export default function ProductDetail({ params }) {
-  const { id } = params; // Access the dynamic product ID from the URL parameters
+  const { id } = params;
   const [product, setProduct] = useState(null);
-  const [sellerName, setSellerName] = useState(null); // State for storing seller name
+  const [sellerName, setSellerName] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        // Fetch the product details
         const response = await fetcher(`/products/${id}`);
         let data = await response.json();
 
-        // Stringify the product data
         const stringifiedProductData = JSON.stringify(data);
-        console.log("Stringified Product Data: ", stringifiedProductData); // For debugging
+        // console.log("Stringified Product Data: ", stringifiedProductData);
 
         setProduct(data);
 
-        // Fetch the seller's name using the seller ID
         if (data.Seller) {
           const sellerResponse = await fetcher(`/sellers/${data.Seller}`);
           const sellerData = await sellerResponse.json();
 
-          // Stringify the seller data
           const stringifiedSellerData = JSON.stringify(sellerData);
-          console.log("Stringified Seller Data: ", stringifiedSellerData); // For debugging
+          // console.log("Stringified Seller Data: ", stringifiedSellerData);
 
-          setSellerName(sellerData.Name); // Assuming the seller object has a Name property
+          setSellerName(sellerData.Name);
         }
       } catch (error) {
         console.error("Error fetching product details: ", error);
@@ -70,7 +66,7 @@ const styles = {
     margin: "0 auto",
   },
   image: {
-    width: "100%", // Adjust as needed
+    width: "100%",
     height: "auto",
     borderRadius: "8px",
     marginBottom: "15px",

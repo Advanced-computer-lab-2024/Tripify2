@@ -45,17 +45,19 @@ const createTourguideProfile = async (req, res) => {
     const tourGuide = await tourguideModel.create({
       MobileNumber,
       YearsOfExperience,
-      PreviousWork: PreviousWork ?? '',
+      PreviousWork: PreviousWork ?? "",
       Documents,
       UserId: user._id,
     });
-    
+
     res.status(201).json({
       message: "TourGuide created successfully",
       TourGuide: tourGuide,
     });
   } catch (error) {
-    res.status(400).json({ message: `Error creating TourGuide ${error.message}`, error });
+    res
+      .status(400)
+      .json({ message: `Error creating TourGuide ${error.message}`, error });
   }
 };
 
@@ -79,26 +81,25 @@ const getTourguideItineraries = async (req, res) => {
 const allTourguides = async (req, res) => {
   try {
     const { accepted, application } = req.query;
-    if(accepted)
-    {
-      const tourguides = await tourguideModel.find({ Accepted: true }).populate("UserId");
-  
+    if (accepted) {
+      const tourguides = await tourguideModel
+        .find({ Accepted: true })
+        .populate("UserId");
+
       if (!tourguides)
         return res.status(400).json({ message: "No tour guides found!" });
       return res.status(200).json(tourguides);
-    }
-    else if(application)
-    {
-      const tourguides = await tourguideModel.find({ Accepted: null }).populate("UserId");
-  
+    } else if (application) {
+      const tourguides = await tourguideModel
+        .find({ Accepted: null })
+        .populate("UserId");
+
       if (!tourguides)
         return res.status(400).json({ message: "No tour guides found!" });
       return res.status(200).json(tourguides);
-    }
-    else
-    {
+    } else {
       const tourguides = await tourguideModel.find({}).populate("UserId");
-  
+
       if (!tourguides)
         return res.status(400).json({ message: "No tour guides found!" });
       return res.status(200).json(tourguides);
@@ -107,11 +108,18 @@ const allTourguides = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
 const getTourguideProfile = async (req, res) => {
   const { id } = req.params;
   try {
-    const tourguide = await userModel.find({ Accepted: true });
-    res.status(200).json({ message: "Tourguides read successfully" });
+    const tourguide = await tourguideModel
+      .findById(id)
+      .populate("UserId")
+      .populate("Itineraries");
+
+    res
+      .status(200)
+      .json({ message: "Tourguides read successfully", tourguide: tourguide });
     if (acceptedTourGuides.length === 0) {
       return res.status(404).json({
         message: "No tour guides found",
@@ -154,7 +162,9 @@ const deleteTourguide = async (req, res) => {
 
   try {
     const deletedTourGuide = await tourguideModel.findByIdAndDelete(id);
-    const deletedUser = await userModel.findByIdAndDelete(deletedTourGuide.UserId);
+    const deletedUser = await userModel.findByIdAndDelete(
+      deletedTourGuide.UserId
+    );
 
     if (!deletedTourGuide) {
       return res.json({ message: "Tour guide not found" });
@@ -190,7 +200,7 @@ const acceptTourGuide = async (req, res) => {
 };
 
 const rejectTourGuide = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
 
   try {
     const tourGuide = await tourguideModel.findById(id);
@@ -206,7 +216,7 @@ const rejectTourGuide = async (req, res) => {
       .status(500)
       .json({ message: "Error rejecting tourGuide", error: e.message });
   }
-}
+};
 
 module.exports = {
   createTourguideProfile,
@@ -216,5 +226,5 @@ module.exports = {
   getTourguideItineraries,
   deleteTourguide,
   acceptTourGuide,
-  rejectTourGuide
+  rejectTourGuide,
 };

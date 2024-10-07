@@ -193,6 +193,25 @@ const createSeller = async(req,res) => {
       return res.status(500).json({ message: error.message });
     }
   }
+  const getSellerUser = async (req, res) => {
+    try {
+      const { id } = req.params; 
+  
+      const Seller = await SellerModel.findOne({ UserId: id }).populate('UserId');
+  
+      if (Seller && Seller.Accepted) {
+        return res.status(200).json({Seller});
+      } else if (Seller) {
+        return res.status(404).json("Seller is not accepted");
+      } else {
+        return res.status(404).json({ msg: "Cannot find any seller with UserId " + id });
+      }
+    } catch (error) {
+      return res.status(500).json({ message: 'Error fetching seller', error: error.message });
+    }
+  };
+  
+  
 
 
- module.exports = {rejectSeller, createSeller, getSeller, getSellers, updateSeller, deleteSeller, acceptSeller, getSellerProducts}
+ module.exports = {rejectSeller, createSeller, getSeller, getSellers, updateSeller, deleteSeller, acceptSeller, getSellerProducts, getSellerUser}

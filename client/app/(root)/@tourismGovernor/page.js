@@ -129,6 +129,7 @@ export default function MyPlaces() {
       const data = await response.json();
       setPlaces([...places, data]); // Update the places list with the new place
       setNewPlace({ Name: '', Description: '', Categories: [], Tags: [] }); // Reset the newPlace state
+      router.refresh();
     } catch (err) {
       setError(err.message);
     }
@@ -288,36 +289,35 @@ export default function MyPlaces() {
       <LocationPicker onLocationSelect={handleLocationSelect} />
     </div>
     {/* Render Category Radio Buttons */}
-    <h3>Select Category</h3>
-    {categoriesButton.map((category) => (
-      <label key={category._id}>
-        <input
-          type="radio"
-          placeholder="Categories (comma-separated IDs)"
-          name="category"
-          value={category._id}
-          checked={newPlace.Categories === category._id}
-          onChange={(e) => setNewPlace({ ...newPlace, Categories: e.target.value })}
-        />
-        {category.Category}
-      </label>
-    ))}
-    
-    {/* Render Tag Radio Buttons */}
-    <h3>Select Tag</h3>
-    {tagsButton.map((tag) => (
-      <label key={tag._id}>
-        <input
-          type="radio"
-          placeholder="Tags (comma-separated IDs)"
-          name="tag"
-          value={tag._id}
-          checked={newPlace.Tags === tag._id}
-          onChange={(e) => setNewPlace({ ...newPlace, Tags: e.target.value })}
-        />
-        {tag.Tag}
-      </label>
-    ))}
+<h3>Select Category</h3>
+{categoriesButton.map((category) => (
+  <label key={category._id}>
+    <input
+      type="radio"
+      name="category"
+      value={category._id}
+      checked={newPlace.Categories.includes(category._id)}
+      onChange={(e) => setNewPlace({ ...newPlace, Categories: [e.target.value] })}
+    />
+    {category.Category}
+  </label>
+))}
+
+{/* Render Tag Radio Buttons */}
+<h3>Select Tag</h3>
+{tagsButton.map((tag) => (
+  <label key={tag._id}>
+    <input
+      type="radio"
+      name="tag"
+      value={tag._id}
+      checked={newPlace.Tags.includes(tag._id)}
+      onChange={(e) => setNewPlace({ ...newPlace, Tags: [e.target.value] })}
+    />
+    {tag.Tag}
+  </label>
+))}
+
     <Button onClick={createPlace}>Create Place</Button>
 
      {/* Tag Creation Section */}

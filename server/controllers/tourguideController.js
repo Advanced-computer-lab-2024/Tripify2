@@ -138,7 +138,7 @@ const getTourguideProfile = async (req, res) => {
 };
 
 const updateTourguideProfile = async (req, res) => {
-  const { MobileNumber, YearsOfExperience, PreviousWork, Accepted, Email } = req.body;
+  const { MobileNumber, YearsOfExperience, PreviousWork, Accepted, Email, Image } = req.body;
   const { id } = req.params;
   try {
     const duplicateUserEmail = await userModel.findOne({ Email });
@@ -153,7 +153,7 @@ const updateTourguideProfile = async (req, res) => {
         // updatedUser.PreviousWork = PreviousWork;
         await tourguideModel.findByIdAndUpdate(
           id,
-          { MobileNumber, YearsOfExperience, PreviousWork, Accepted, Email },
+          { MobileNumber, YearsOfExperience, PreviousWork, Accepted, Email, Image: Image ?? (updatedUser.Image ?? "") },
           { new: true }
         );
         await userModel.findByIdAndUpdate(

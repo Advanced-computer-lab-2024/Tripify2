@@ -27,6 +27,9 @@ const UserSchema = new Schema(
       ],
       required: true,
     },
+    RequestDelete: {
+      type: Boolean,
+    }
   },
   { timestamps: true }
 );

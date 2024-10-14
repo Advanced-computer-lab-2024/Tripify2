@@ -22,6 +22,8 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Textarea } from "@/components/ui/TextAreaInput"
 import { useUploadThing } from "@/lib/uploadthing-hook"
+import { Checkbox } from "@/components/ui/CheckBoxInput"
+import { Label } from "@/components/ui/LabelInput"
 
 const tourguideSignUpSchema = z.object({
   UserName: z.string().min(2, {
@@ -43,6 +45,9 @@ const tourguideSignUpSchema = z.object({
   YearsOfExperience: z.number().min(1, {
     message: 'Please enter a valid YearsOfExperience'
   }),
+  AccpetedTerms: z.boolean().refine(value => value === true, {
+    message: 'Please accept the terms and conditions'
+  })
 })
 
 export default function Tourguide() 
@@ -80,7 +85,8 @@ export default function Tourguide()
             MobileNumber: '',
             PreviousWork: '',
             Documents: [],
-            YearsOfExperience: 0
+            YearsOfExperience: 0,
+            AccpetedTerms: false
         },
     })
 
@@ -92,7 +98,9 @@ export default function Tourguide()
 
             const uploadResult = await startUpload(files)
 
-            const newValues = {...values, Documents: uploadResult?.map(file => file.url)}
+            const { AccpetedTerms, ...rest } = values
+
+            const newValues = {...rest, Documents: uploadResult?.map(file => file.url)}
 
             await fetcher('/tourguides', {
                 method: 'POST',
@@ -254,6 +262,21 @@ export default function Tourguide()
                                             </ul>
                                         )}
                                     </div>
+                                </FormControl>
+                                <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="AccpetedTerms"
+                        render={({ field }) => (
+                            <FormItem className='relative'>
+                                <FormControl>
+                                <div className="flex items-center justify-start gap-2">
+                                    <Checkbox {...field} onCheckedChange={field.onChange} id="r1" />
+                                    <Label htmlFor="r1">Accept terms and conditions</Label>
+                                </div>
                                 </FormControl>
                                 <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
                             </FormItem>

@@ -30,7 +30,10 @@ const TourGuideSchema = new Schema(
     Itineraries: [{
       type: Schema.Types.ObjectId,
       ref: "Itinerary",
-    }]
+    }],
+    Image: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

@@ -2,7 +2,9 @@
 import { useState } from "react";
 import { FaWallet } from "react-icons/fa";
 import { fetcher } from "@/lib/fetch-client";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "./dialog";
+import { Button } from "./button";
 
 export default function TouristAccount({ params }) {
   const { touristInfo } = params;
@@ -28,6 +30,10 @@ export default function TouristAccount({ params }) {
   const [theEmailChange, setTheEmailChange] = useState(
     touristInfo.UserId.Email
   );
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (field) => (e) => {
     switch (field) {
@@ -45,6 +51,12 @@ export default function TouristAccount({ params }) {
         break;
       case "email":
         setTheEmailChange(e.target.value);
+        break;
+      case "oldPassword":
+        setOldPassword(e.target.value);
+        break;
+      case "newPassword":
+        setNewPassword(e.target.value);
         break;
       default:
         break;
@@ -86,6 +98,19 @@ export default function TouristAccount({ params }) {
       if (validEmail) {
         alert("Email already exists on the system!");
       } else {
+        if (oldPassword !== "" && newPassword !== "") {
+          const changePasswordRes = await fetcher(`/users/change-password/${Session?.data?.user?.userId}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ oldPassword, newPassword }),
+          })
+
+          if (!changePasswordRes.ok) {
+            throw new Error("Network response was not ok!");
+          }
+        }
         const responseUserTwo = await fetcher(
           `/users/${touristInfo.UserId._id}`,
           {
@@ -122,7 +147,8 @@ export default function TouristAccount({ params }) {
     dobChange !== DOB ||
     occupationChange !== Occupation ||
     nationalityChange !== Nationality ||
-    theEmailChange !== touristDetails.UserId.Email;
+    theEmailChange !== touristDetails.UserId.Email ||
+    (oldPassword !== "" && newPassword !== "");
 
   const currency = "USD";
 
@@ -210,9 +236,27 @@ export default function TouristAccount({ params }) {
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200 ease-in-out hover:border-purple-500 hover:ring-2"
             />
           </div>
+          <div className="block w-full relative">
+            <span className="block text-gray-700 font-medium">Old Password</span>
+            <input
+              value={oldPassword}
+              type='password'
+              onChange={handleChange("oldPassword")}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200 ease-in-out hover:border-purple-500 hover:ring-2"
+            />
+          </div>
+          <div className="block w-full">
+            <span className="block text-gray-700 font-medium">New Password</span>
+            <input
+              value={newPassword}
+              type='password'
+              onChange={handleChange("newPassword")}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 transition duration-200 ease-in-out hover:border-purple-500 hover:ring-2"
+            />
+          </div>
         </div>
 
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-4 gap-4">
           <button
             onClick={handleEdit}
             disabled={!hasChanges}
@@ -224,6 +268,29 @@ export default function TouristAccount({ params }) {
           >
             Edit
           </button>
+          <button
+            onClick={() => setRequestOpen(true)}
+            className="bg-red-500 text-white px-4 rounded"
+          >
+            Request Deletion
+          </button>
+
+          <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
+            <DialogContent>
+              <DialogHeader>Are you sure you want to request deletion of your account?</DialogHeader>
+              <DialogFooter>
+                <Button disabled={loading} onClick={() => setRequestOpen(false)}>Cancel</Button>
+                <Button disabled={loading} variant='destructive' onClick={async () => {
+                  setLoading(true)
+                  await fetcher(`/users/request-deletion/${Session?.data.user?.userId}`, {
+                    method: 'POST'
+                  })
+                  await signOut({ redirect: true, callbackUrl: '/' })
+                  setLoading(false)
+                }}>Request Deletion</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

@@ -195,6 +195,9 @@ export default function MyPlaces() {
 
   return (
     <div style={styles.container}>
+      <nav className='h-16 w-full bg-black flex items-center justify-end px-4'>
+        <Button onClick={() => router.push('/change-password')} variant="outline">Change Password</Button>
+      </nav>
     <h1 className= "text-xl font-bold">My Created Museums and Historical Places</h1>
   
     {/* Create Place Section */}

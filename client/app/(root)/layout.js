@@ -19,6 +19,10 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
+// const poppins = {
+//   variable: "--font-poppins",
+// }
+
 export default async function RootLayout({
   children,
   guest,

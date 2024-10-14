@@ -127,7 +127,7 @@ const getAdvertiserById = async (req, res) => {
 
 const updateAdvertiser = async (req, res) => {
   const { id } = req.params;
-  const { UserName, Email, Website, Hotline, Document } = req.body;
+  const { UserName, Email, Website, Hotline, Document, Image } = req.body;
 
   try {
     const advertiser = await advertiserModel.findById(id).populate("UserId");
@@ -156,9 +156,11 @@ const updateAdvertiser = async (req, res) => {
       { new: true }
     );
 
+    console.log("Image: ", Image)
+
     const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(
       id,
-      { Document },
+      { Document, Image: Image ?? (advertiser.Image ?? "") },
       { new: true }
     );
 

@@ -25,6 +25,9 @@ const SellerSchema = new Schema({
       ref: 'Product',
     },
   ],
+  Image: {
+    type: String,
+  },
 }, { timestamps: true });
 
 const Seller = mongoose.model('Seller', SellerSchema);

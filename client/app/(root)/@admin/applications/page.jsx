@@ -21,6 +21,7 @@ import {
   } from "@/components/ui/tabs"
 import { fetcher } from "@/lib/fetch-client"
 import ApplicationActionBtns from "@/components/admin/ApplicationActionBtns"
+import ViewDocuments from "./view-documents"
 
 export default async function DashboardPage() 
 {
@@ -97,6 +98,9 @@ export default async function DashboardPage()
                                     <TableHead className="hidden md:table-cell">
                                         Created at
                                     </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Documents
+                                    </TableHead>
                                     <TableHead>
                                         <span className="sr-only">Actions</span>
                                     </TableHead>
@@ -116,6 +120,9 @@ export default async function DashboardPage()
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             {user?.UserId?.createdAt}
+                                        </TableCell>
+                                        <TableCell className="hidden underline md:table-cell">
+                                            <ViewDocuments documents={user.Document} />
                                         </TableCell>
                                         <TableCell>
                                         {/* <DropdownMenu>
@@ -176,6 +183,9 @@ export default async function DashboardPage()
                                     <TableHead className="hidden md:table-cell">
                                         Created at
                                     </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Documents
+                                    </TableHead>
                                     <TableHead>
                                         <span className="sr-only">Actions</span>
                                     </TableHead>
@@ -195,6 +205,9 @@ export default async function DashboardPage()
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             {user?.UserId?.createdAt}
+                                        </TableCell>
+                                        <TableCell className="hidden underline md:table-cell">
+                                            <ViewDocuments documents={user.Documents} />
                                         </TableCell>
                                         <TableCell>
                                         {/* <DropdownMenu>
@@ -255,6 +268,9 @@ export default async function DashboardPage()
                                     <TableHead className="hidden md:table-cell">
                                         Created at
                                     </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Documents
+                                    </TableHead>
                                     <TableHead>
                                         <span className="sr-only">Actions</span>
                                     </TableHead>
@@ -274,6 +290,9 @@ export default async function DashboardPage()
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             {user?.UserId?.createdAt}
+                                        </TableCell>
+                                        <TableCell className="hidden underline md:table-cell">
+                                            <ViewDocuments documents={user.Documents} />
                                         </TableCell>
                                         <TableCell>
                                         {/* <DropdownMenu>

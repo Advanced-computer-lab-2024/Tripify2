@@ -9,6 +9,10 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Image from "next/image"
 import AccountAdmin from "@/components/admin/AccountAdmin"
+import localFont from 'next/font/local'
+
+const geistMono = localFont({ src: '../../../public/fonts/GeistMonoVF.woff' })
+const geistSans = localFont({ src: '../../../public/fonts/GeistVF.woff' })
 
 export const metadata = {
     title: 'Next.js',
@@ -18,7 +22,7 @@ export const metadata = {
   export default function RootLayout({ children }) {
     return (
       <html lang="en">
-        <body>
+        <body className={`${geistSans.className}`}>
           <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
             <div className="hidden border-r bg-muted/40 md:block">
               <div className="flex h-full max-h-screen flex-col gap-2">

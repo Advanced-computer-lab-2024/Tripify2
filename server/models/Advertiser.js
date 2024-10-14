@@ -27,6 +27,9 @@ const advertiserSchema = new Schema(
         ref: "Activity",
       },
     ],
+    Image: {
+      type: String,
+    }
   },
   { timestamps: true }
 );

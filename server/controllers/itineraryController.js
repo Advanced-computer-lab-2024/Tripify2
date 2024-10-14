@@ -134,11 +134,15 @@ const updateItinerary = async (req, res) => {
   } = req.body;
 
   const tourGuide = await tourGuideModel.findOne(
-    { UserId: req.body.TourGuide },
+    { UserId: TourGuide },
     "UserId"
   );
 
+  console.log(tourGuide)
+
   const updatedItinerary = await ItineraryModel.findById(id);
+
+  console.log(updatedItinerary)
 
   if (
     !updatedItinerary ||
@@ -219,10 +223,28 @@ const deleteItinerary = async (req, res) => {
   }
 };
 
+const getMyItineraries = async (req, res) => {
+  const tourGuide = await tourGuideModel.findOne({ UserId: req._id }, "UserId");
+
+  if (!tourGuide) return res.status(400).json({ message: "Unauthorized User!" });
+
+  try {
+    const itineraries = await ItineraryModel.find({ TourGuide: tourGuide._id })
+      .populate("Tag")
+      .populate("Category")
+      .populate("TourGuide");
+
+    return res.status(200).json(itineraries);
+  } catch (e) {
+    res.status(400).json({ msg: "Failed to find itinerary" });
+  }
+}
+
 module.exports = {
   createItinerary,
   getItineraries,
   getItinerary,
   updateItinerary,
   deleteItinerary,
+  getMyItineraries
 };

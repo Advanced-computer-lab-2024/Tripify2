@@ -1,10 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Dashboard from "@/components/ui/dashboard";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { format } from "date-fns";
 import { fetcher } from "@/lib/fetch-client";
+import { useUploadThing } from "@/lib/uploadthing-hook";
+import { UploadIcon } from "lucide-react";
+import Image from "next/image";
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "./dialog";
+import { Button } from "./button";
 ("");
 
 export default function AdvertiserProfile({ advertiser }) {
@@ -12,6 +17,14 @@ export default function AdvertiserProfile({ advertiser }) {
   const id = session?.data?.user?.id;
   console.log("iddd", id);
   const router = useRouter();
+
+  const [image, setImage] = useState(advertiser.advertiser?.Image ?? null)
+  console.log(advertiser)
+  const { startUpload } = useUploadThing('imageUploader')
+  const inputRef = useRef(null)
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [isEditMode, setIsEditMode] = useState(false);
   const [isProfileCreateMode, setIsProfileCreateMode] = useState(false);
   const [isProfileEditMode, setIsProfileEditMode] = useState(false);
@@ -34,6 +47,9 @@ export default function AdvertiserProfile({ advertiser }) {
     Website: advertiser?.advertiser?.CompanyProfile?.Website,
     Email: advertiser?.advertiser?.CompanyProfile?.Email,
   });
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const handleEditClick = () => {
     setIsEditMode(true);
@@ -71,6 +87,32 @@ export default function AdvertiserProfile({ advertiser }) {
   
     try {
       console.log(session?.data?.user?.id);
+      if(oldPassword !== "" && newPassword !== "") {
+        const changePasswordRes = await fetcher(`/users/change-password/${session?.data?.user?.userId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ oldPassword, newPassword }),
+        })
+
+        if (!changePasswordRes.ok) {
+          alert("Failed to change password")
+          return
+        }
+      }
+
+      let Image = ''
+
+      if(image) {
+        const imageUploadResult = await startUpload([image])
+        if(!imageUploadResult.length) {
+          alert("Failed to upload image")
+          return
+        }
+        Image = imageUploadResult[0].url
+      }
+
       const response = await fetcher(
         `/advertisers/${session?.data?.user?.id}`,
         {
@@ -78,7 +120,7 @@ export default function AdvertiserProfile({ advertiser }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({...formData, Image}),
         }
       );
   
@@ -123,6 +165,21 @@ export default function AdvertiserProfile({ advertiser }) {
       }
     } else if (isProfileEditMode) {
       try {
+        if(oldPassword !== "" && newPassword !== "") {
+          const changePasswordRes = await fetcher(`/users/change-password/${session?.data?.user?.userId}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ oldPassword, newPassword }),
+          })
+
+          if (!changePasswordRes.ok) {
+            alert("Failed to change password")
+            return
+          }
+        }
+
         const response = await fetcher(`/profile`, {
           method: "PATCH",
           headers: {
@@ -177,6 +234,40 @@ export default function AdvertiserProfile({ advertiser }) {
               </div>
               <div>
                 <label>
+                  <strong>Image:</strong>
+                  {image ? (
+                    <div className='relative w-16 h-16 cursor-pointer rounded-full overflow-hidden'>
+                      <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={inputRef}
+                        name="Image"
+                        onChange={(e) => {
+                          setImage(e.target.files[0])
+                        }}
+                        className="hidden w-full h-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className='relative flex items-center justify-center cursor-pointer bg-gray-300 w-16 h-16 rounded-full overflow-hidden'>
+                        <UploadIcon size={24} />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          ref={inputRef}
+                          name="Image"
+                          onChange={(e) => {
+                            setImage(e.target.files[0])
+                          }}
+                          className="hidden w-full h-full"
+                        />
+                    </div>
+                  )}
+                </label>
+              </div>
+              <div>
+                <label>
                   <strong>Email:</strong>
                   <input
                     type="email"
@@ -211,19 +302,29 @@ export default function AdvertiserProfile({ advertiser }) {
                   />
                 </label>
               </div>
+
               <div>
                 <label>
-                  <strong>Document:</strong>
+                  <strong>Old Password:</strong>
                   <input
-                    type="text"
-                    name="Document"
-                    value={formData.Document}
-                    onChange={handleInputChange}
+                    type="password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
                     className="border p-2 w-full"
                   />
                 </label>
               </div>
-
+              <div>
+                <label>
+                  <strong>New Password:</strong>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="border p-2 w-full"
+                  />
+                </label>
+              </div>
               <button
                 type="submit"
                 className="bg-blue-500 text-white py-2 px-4 mt-4 rounded"
@@ -261,6 +362,30 @@ export default function AdvertiserProfile({ advertiser }) {
               >
                 Edit
               </button>
+              <button
+                onClick={() => setRequestOpen(true)}
+                className="bg-red-500 text-white py-2 px-4 mt-4 ml-2 rounded"
+              >
+                Request Deletion
+              </button>
+
+              <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
+                <DialogContent>
+                  <DialogHeader>Are you sure you want to request deletion of your account?</DialogHeader>
+                  <DialogFooter>
+                    <Button disabled={loading} onClick={() => setRequestOpen(false)}>Cancel</Button>
+                    <Button disabled={loading} variant='destructive' onClick={async () => {
+                      setLoading(true)
+                      await fetcher(`/users/request-deletion/${session?.data.user?.userId}`, {
+                        method: 'POST'
+                      })
+                      await signOut({ redirect: true, callbackUrl: '/' })
+                      setLoading(false)
+                    }}>Request Deletion</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
               <div>
                 <hr className="m-4" />
               </div>

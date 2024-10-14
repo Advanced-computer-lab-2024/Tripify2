@@ -104,7 +104,37 @@ const createSeller = async(req,res) => {
    const updateSeller = async (req, res) => {
     try{
         const { id } = req.params
-        const Seller = await SellerModel.findByIdAndUpdate(id, req.body, { new: true });
+        const { Image, Description, Email, UserName } = req.body
+
+        console.log(req.body)
+
+      const seller = await SellerModel.findById(id).populate('UserId');
+
+      const duplicatedUserEmail = await User.findOne({ Email });
+      const duplicatedUserName = await User.findOne({ UserName });
+      if (
+        duplicatedUserEmail &&
+        duplicatedUserEmail._id.toString() !== seller.UserId._id.toString()
+      ) {
+        return res.status(500).json({ message: "Email already in use" });
+      }
+
+      if (
+        duplicatedUserName &&
+        duplicatedUserName._id.toString() !== seller.UserId._id.toString()
+      ) {
+        return res.status(500).json({ message: "Username already taken" });
+      }
+      const userId = seller.UserId._id;
+      // console.log(userId);
+
+      await User.findByIdAndUpdate(
+        userId,
+        { UserName, Email }, // Update UserName and Email
+        { new: true }
+      );
+
+        const Seller = await SellerModel.findByIdAndUpdate(id, { Description , Image: Image ?? (seller.Image ?? "")}, { new: true });
         if(Seller && Seller.Accepted){
             return res.status(200).json("changed Seller Info successfully with id "+id);
         }

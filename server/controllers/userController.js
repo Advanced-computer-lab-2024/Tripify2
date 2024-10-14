@@ -61,10 +61,6 @@ const getAllUsers = async (req, res) => {
       }
       res.status(200).json(users);
     }
-    if (!users) {
-      return res.status(404).json("No users found");
-    }
-    res.status(200).json(users);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
@@ -130,4 +126,64 @@ const deleteUser = async (req, res) => {
     res.status(500).json({ Error: error.message });
   }
 };
-module.exports = { getAllUsers, getUser, updateUser, deleteUser, createUser };
+
+const updatePassword = async (req, res) => {
+	const { oldPassword, newPassword } = req.body
+
+	if(!oldPassword || !newPassword) return res.status(400).json({ message: "All Fields Must Be Given!" })
+
+	const { id } = req.params
+
+	try 
+	{
+		console.log(req._id)
+		console.log(id)
+
+		if(id !== req._id) return res.status(403).json({ message: "You are not authorized to change this user's password!" })
+
+		const user = await userModel.findById(id)
+
+		if(!user) return res.status(404).json({ message: "User not found!" })
+
+		const isPasswordValid = await bcrypt.compare(oldPassword, user.Password)
+
+		if(!isPasswordValid) return res.status(401).json({ message: "Invalid password!" })
+
+		const hashedPwd = await bcrypt.hash(newPassword, 10)
+
+		user.Password = hashedPwd
+
+		await user.save()
+
+		res.status(200).json({ message: "Password updated successfully!" })
+	}
+	catch(e)
+	{
+		res.status(500).json({ message: e.message })
+	}
+}
+
+const requestDeleteUser = async (req, res) => {
+	const { id } = req.params
+
+	if(id !== req._id) return res.status(403).json({ message: "You are not authorized to delete this user!" })
+
+	try
+	{
+		const user = await userModel.findById(id)
+
+		if(!user) return res.status(404).json({ message: "User not found!" })
+
+		user.RequestDelete = true
+
+		await user.save()
+		
+		res.status(200).json({ message: "User deletion requested successfully!" })
+	}
+	catch(e)
+	{
+		res.status(500).json({ message: e.message })
+	}
+} 
+
+module.exports = { requestDeleteUser, getAllUsers, getUser, updateUser, deleteUser, createUser, updatePassword };

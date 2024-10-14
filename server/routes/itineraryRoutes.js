@@ -6,6 +6,7 @@ const {
   getItinerary,
   updateItinerary,
   deleteItinerary,
+  getMyItineraries
 } = require("../controllers/itineraryController");
 
 const verifyTourGuide = require("../middleware/verifyTourGuide");
@@ -17,5 +18,7 @@ router
   .get(getItinerary)
   .patch(verifyTourGuide, updateItinerary)
   .delete(verifyTourGuide, deleteItinerary);
+
+router.route('/get-all/my-itineraries').get(verifyTourGuide, getMyItineraries);
 
 module.exports = router;

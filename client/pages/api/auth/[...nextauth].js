@@ -52,7 +52,10 @@ export const authOptions = {
                 }),
               })
 
-              if(!response?.ok) throw new Error('Wrong credentials')
+              if(!response?.ok) {
+                const data = await response.json()
+                throw new Error(data.message)
+              }
 
               const data = await response.json()
 

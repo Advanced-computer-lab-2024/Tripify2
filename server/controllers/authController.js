@@ -15,6 +15,8 @@ async function login(req, res) {
     const foundUser = await User.findOne({ UserName }).lean().exec()
     if(!foundUser) return res.status(400).json({'message': 'User Not Found!'})
 
+    if(foundUser.RequestDelete) return res.status(400).json({'message': 'User Requested To Delete!'})
+
     const correctPwd = await bcrypt.compare(Password, foundUser.Password)
     if(!correctPwd) return res.status(400).json({'message': 'Password Is Wrong!'})
 

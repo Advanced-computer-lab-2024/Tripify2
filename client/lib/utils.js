@@ -37,3 +37,13 @@ export const hasErrorInput = [
   // ring color
   "ring-red-200 dark:ring-red-700/30",
 ]
+
+const usdToEur = 0.92;
+const usdToEgp = 48.59;
+
+export const convertPrice = (price, currency) => {
+  if(currency === 'USD') return price;
+  if(currency === 'EUR') return (price * usdToEur).toFixed(2);
+  if(currency === 'EGP') return (price * usdToEgp).toFixed(2);
+  return price;
+}

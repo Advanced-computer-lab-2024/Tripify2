@@ -32,7 +32,7 @@ export default async function DashboardPage()
     return (
         <Tabs defaultValue="all">
             <div className="flex items-center">
-                <div className="ml-auto flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-auto">
                     {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm" className="h-8 gap-1">
@@ -98,6 +98,7 @@ export default async function DashboardPage()
                                                 src={(itinerary?.Image.startsWith('http') || itinerary?.Image.startsWith('https') || itinerary?.Image.startsWith('www') || itinerary?.Image.startsWith('i.') || itinerary?.Image.startsWith('m.')) ? itinerary?.Image : `/images/placeholder.jpg`}
                                                 width={60}
                                                 height={60}
+                                                alt={itinerary?.Name}
                                             />
                                         </TableCell>
                                         <TableCell className="font-medium">

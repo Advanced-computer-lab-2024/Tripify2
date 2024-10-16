@@ -1,11 +1,16 @@
 "use client";
 import { fetcher } from "@/lib/fetch-client";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 // import StarRating from "../starRating";
 
 const ItineraryComponent = () => {
   const router = useRouter();
+
+  const { currency } = useCurrencyStore();
+
   const [theItineraries, setTheItineraries] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredPrice, setFilteredPrice] = useState(0);
@@ -33,7 +38,7 @@ const ItineraryComponent = () => {
         setTheItineraries(data);
 
         const maxPriceFromData = Math.max(
-          ...data.map((itinerary) => itinerary.Price)
+          ...data.map((itinerary) => convertPrice(itinerary.Price, currency))
         );
         setMaxPrice(maxPriceFromData);
         setFilteredPrice(maxPriceFromData);
@@ -124,7 +129,8 @@ const ItineraryComponent = () => {
       const tagMatches = itinerary.Tag.some((tag) => {
         return tag.Tag.toLowerCase().includes(lowerCaseSearch);
       });
-      const priceMatches = itinerary.Price <= filteredPrice;
+      const itineraryPrice = convertPrice(itinerary.Price, currency);
+      const priceMatches = Number(itineraryPrice) <= filteredPrice;
       const ratingMatches = itinerary.Rating <= filteredRating;
       const languageMatches =
         selectedLanguage === "" || itinerary.Language === selectedLanguage;
@@ -144,12 +150,12 @@ const ItineraryComponent = () => {
   );
 
   return (
-    <div className="grid grid-cols-6 h-screen">
-      <div className="p-4 col-span-1">
-        <h2 className="text-black font-bold text-lg mb-6">Filter</h2>
+    <div className="grid h-screen grid-cols-6">
+      <div className="col-span-1 p-4">
+        <h2 className="mb-6 text-lg font-bold text-black">Filter</h2>
 
         <div className="mb-4">
-          <h3 className="text-black font-bold mb-2">Categories</h3>
+          <h3 className="mb-2 font-bold text-black">Categories</h3>
           {allPossibleCategories.map((category) => (
             <div key={category} className="flex items-center mb-2">
               <input
@@ -168,7 +174,7 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="mb-4">
-          <h3 className="text-black font-bold mb-2">Tags</h3>
+          <h3 className="mb-2 font-bold text-black">Tags</h3>
           {allPossibleTags.map((tag) => (
             <div key={tag} className="flex items-center mb-2">
               <input
@@ -187,7 +193,7 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="mb-4">
-          <h3 className="text-black font-bold mb-2">Languages</h3>
+          <h3 className="mb-2 font-bold text-black">Languages</h3>
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -203,7 +209,7 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="mb-4">
-          <h3 className="text-black font-bold mb-2">Start Date</h3>
+          <h3 className="mb-2 font-bold text-black">Start Date</h3>
           <input
             type="date"
             value={selectedStartDate}
@@ -221,7 +227,7 @@ const ItineraryComponent = () => {
             type="range"
             className="w-full range"
             min="0"
-            max={maxPrice}
+            max={Math.round(maxPrice)}
             value={filteredPrice}
             onChange={handleRangeChangePrice}
           />
@@ -244,7 +250,7 @@ const ItineraryComponent = () => {
       </div>
 
       <div className="col-span-5 p-4 overflow-auto">
-        <h2 className="text-black font-bold text-2xl mb-4">Itineraries</h2>
+        <h2 className="mb-4 text-2xl font-bold text-black">Itineraries</h2>
 
         <div className="mb-4">
           <input
@@ -259,30 +265,30 @@ const ItineraryComponent = () => {
         <div className="mb-4">
           <button
             onClick={handleSortRating}
-            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
+            className="p-2 text-black bg-blue-500 rounded hover:bg-blue-600"
           >
             Sort by Rating {sortOrder === "desc" ? "↑" : "↓"}
           </button>
         </div>
 
-        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
           {filteredItineraries.map((itinerary) => (
             <button
               key={itinerary.ID}
-              className="bg-white rounded-lg overflow-hidden p-4 hover:shadow"
+              className="p-4 overflow-hidden bg-white rounded-lg hover:shadow"
               onClick={() => router.push(`/itineraries/${itinerary._id}`)}
             >
               <img
                 src={itinerary.Image}
                 alt={itinerary.Name}
-                className="w-full h-48 object-cover mb-2 rounded-lg"
+                className="object-cover w-full h-48 mb-2 rounded-lg"
               />
-              <h3 className="font-bold text-lg mb-2">{itinerary.Name}</h3>
+              <h3 className="mb-2 text-lg font-bold">{itinerary.Name}</h3>
               <div className="flex justify-center mb-2">
                 {itinerary.Rating}
                 {/* <StarRating rating={itinerary.Rating} /> */}
               </div>
-              <p className="text-black-600">Price: ${itinerary.Price}</p>
+              <p className="text-black-600">Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(itinerary.Price, currency)}</p>
               <p className="text-black-600">Language: {itinerary.Language}</p>
               <p className="text-black-600">
                 Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}

@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { fetcher } from "@/lib/fetch-client";
+import { useCurrencyStore } from '@/providers/CurrencyProvider';
+import { convertPrice } from '@/lib/utils';
 
 export default function ProductDetail({ params }) {
+  const { currency } = useCurrencyStore();
+
   const { id } = params; // Access the dynamic product ID from the URL parameters
   const [product, setProduct] = useState(null);
   const [sellerName, setSellerName] = useState(null); // State for storing seller name
@@ -52,7 +56,7 @@ export default function ProductDetail({ params }) {
     <div style={styles.container}>
       <h1>{product.Name}</h1>
       {product.Image && <img src={product.Image} alt={product.Name} style={styles.image} />}
-      <p>Price: ${product.Price}</p>
+      <p>Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'}{convertPrice(product.Price, currency)}</p>
       <p>Description: {product.Description}</p>
       <p>Seller Name: {sellerName ? sellerName : 'Loading seller...'}</p> {/* Display seller name */}
       <p>Rating: {product.Rating}</p>

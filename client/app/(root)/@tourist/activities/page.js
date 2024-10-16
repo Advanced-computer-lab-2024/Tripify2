@@ -1,9 +1,13 @@
 "use client";
 import { fetcher } from "@/lib/fetch-client";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const ItineraryComponent = () => {
+  const { currency } = useCurrencyStore();
+
   const router = useRouter();
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState("");
@@ -34,9 +38,9 @@ const ItineraryComponent = () => {
 
         const data = await response.json();
         setActivities(data);
-
+        
         const maxPriceFromData = Math.max(
-          ...data.map((activity) => activity.Price)
+          ...data.map((activity) => convertPrice(activity.Price, currency))
         );
         setMaxPrice(maxPriceFromData);
         setFilteredPrice(maxPriceFromData);
@@ -136,7 +140,8 @@ const ItineraryComponent = () => {
       });
 
       // console.log(`${index}: ` + categoryMatches, tagMatches);
-      const priceMatches = activity.Price <= filteredPrice;
+      const newActivityPrice = convertPrice(activity.Price, currency);
+      const priceMatches = Number(newActivityPrice) <= filteredPrice;
       const ratingMatches = activity.Rating <= filteredRating;
       const startDateMatches =
         selectedStartDate === "" ||
@@ -152,12 +157,12 @@ const ItineraryComponent = () => {
   );
 
   return (
-    <div className="grid grid-cols-6 h-screen">
-      <div className="p-4 col-span-1">
-        <h2 className="text-black font-bold text-lg mb-6">Filter</h2>
+    <div className="grid h-screen grid-cols-6">
+      <div className="col-span-1 p-4">
+        <h2 className="mb-6 text-lg font-bold text-black">Filter</h2>
 
         <div className="mb-4">
-          <h3 className="text-black font-bold mb-2">Categories</h3>
+          <h3 className="mb-2 font-bold text-black">Categories</h3>
           {allPossibleCategories.map((category) => (
             <div key={category} className="flex items-center mb-2">
               <input
@@ -176,7 +181,7 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="mb-4">
-          <h3 className="text-black font-bold mb-2">Tags</h3>
+          <h3 className="mb-2 font-bold text-black">Tags</h3>
           {allPossibleTags.map((tag) => (
             <div key={tag} className="flex items-center mb-2">
               <input
@@ -195,7 +200,7 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="mb-4">
-          <h3 className="text-black font-bold mb-2">Start Date</h3>
+          <h3 className="mb-2 font-bold text-black">Start Date</h3>
           <input
             type="date"
             value={selectedStartDate}
@@ -213,7 +218,7 @@ const ItineraryComponent = () => {
             type="range"
             className="w-full range"
             min="0"
-            max={maxPrice}
+            max={Math.round(maxPrice)}
             value={filteredPrice}
             onChange={handleRangeChangePrice}
           />
@@ -237,7 +242,7 @@ const ItineraryComponent = () => {
       </div>
 
       <div className="col-span-5 p-4 overflow-auto">
-        <h2 className="text-black font-bold text-2xl mb-4">Activities</h2>
+        <h2 className="mb-4 text-2xl font-bold text-black">Activities</h2>
 
         <div className="mb-4">
           <input
@@ -252,47 +257,47 @@ const ItineraryComponent = () => {
         <div className="mb-4">
           <button
             onClick={handleSortPrice}
-            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600 mr-4"
+            className="p-2 mr-4 text-black bg-blue-500 rounded hover:bg-blue-600"
           >
             Sort by Price {sortOrderPrice === "desc" ? "↑" : "↓"}
           </button>
 
           <button
             onClick={handleSortRating}
-            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
+            className="p-2 text-black bg-blue-500 rounded hover:bg-blue-600"
           >
             Sort by Rating {sortOrderRating === "desc" ? "↑" : "↓"}
           </button>
         </div>
 
-        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
           {filteredActivities.map((activity) => (
             <button
               key={activity._id}
-              className="bg-white shadow rounded-lg p-4 transition hover:shadow-lg"
+              className="p-4 transition bg-white rounded-lg shadow hover:shadow-lg"
               onClick={() => router.push(`/activities/${activity._id}`)}
             >
               <img
                 src={activity.Image}
                 alt={activity.Name}
-                className="w-full h-48 object-cover mb-2 rounded-lg"
+                className="object-cover w-full h-48 mb-2 rounded-lg"
               />
-              <h3 className="font-bold text-lg mb-2">{activity.Name}</h3>
-              <p className="text-gray-700 mb-1">Rating: {activity.Rating}</p>
-              <p className="text-gray-700 mb-1">Price: ${activity.Price}</p>
-              <p className="text-gray-700 mb-1">
+              <h3 className="mb-2 text-lg font-bold">{activity.Name}</h3>
+              <p className="mb-1 text-gray-700">Rating: {activity.Rating}</p>
+              <p className="mb-1 text-gray-700">Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'}{convertPrice(activity.Price, currency)}</p>
+              <p className="mb-1 text-gray-700">
                 Advertiser: {activity.AdvertiserId._id}
               </p>
-              <p className="text-gray-700 mb-1">
+              <p className="mb-1 text-gray-700">
                 Categories:{" "}
                 {activity.CategoryId.map((category) => category.Category).join(
                   ", "
                 )}
               </p>
-              <p className="text-gray-700 mb-1">
+              <p className="mb-1 text-gray-700">
                 Tags: {activity.Tags.map((tag) => tag.Tag).join(", ")}
               </p>
-              <p className="text-gray-700 mb-1">
+              <p className="mb-1 text-gray-700">
                 Date: {new Date(activity.Date).toLocaleDateString()}
               </p>
             </button>

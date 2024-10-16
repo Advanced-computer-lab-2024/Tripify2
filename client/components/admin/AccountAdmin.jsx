@@ -17,7 +17,7 @@ export default function AccountAdmin()
     const router = useRouter()
 
     const handleLogout= async () => {
-        await signOut()
+        await signOut({ redirect: true, callbackUrl: '/' })
     }
     return(
         <DropdownMenu>

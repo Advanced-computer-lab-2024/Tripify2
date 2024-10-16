@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-const verifyAdmin = (req, res, next) => {
+const verifySeller = (req, res, next) => {
     const authHeader = req.headers.authorization || req.headers.Authorization
 
     if (!authHeader?.startsWith('Bearer ')) {
@@ -8,6 +8,8 @@ const verifyAdmin = (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1]
+
+    console.log(token)
 
     if(process.env.ACCESS_TOKEN_SECRET)
     {
@@ -22,14 +24,14 @@ const verifyAdmin = (req, res, next) => {
                     {
                         req._id = decoded?.user?.userId
                         req.role = decoded?.user?.role
-                        console.log(decoded)
-                        if(decoded?.user?.role === 'Admin') next()
+                        if(decoded?.user?.role === 'Tourist') next()
                         else return res.status(403).json({ message: 'Forbidden' })
-                    }   
+                    }
+                        
                 }
             }
         )
     }
 }
 
-module.exports = verifyAdmin
+module.exports = verifySeller

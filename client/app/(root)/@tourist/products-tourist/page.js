@@ -2,8 +2,12 @@
 import { useEffect, useState } from "react";
 import AllproductsTourist from "@/components/ui/AllproductsTourist";
 import { fetcher } from "@/lib/fetch-client";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
 
 export default function Products() {
+  const { currency } = useCurrencyStore();
+
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,8 +38,8 @@ export default function Products() {
 
       setProducts(data);
       setFilteredProducts(data);
-
-      const prices = data.map((product) => product.Price);
+      
+      const prices = data.map((product) => convertPrice(product.Price, currency));
       const maxPrice = Math.max(...prices);
       setMaxPrice(maxPrice);
       setCurrentMaxPrice(maxPrice);
@@ -91,7 +95,7 @@ export default function Products() {
 
       <div style={styles.filterContainer}>
         <div>
-          <label>Max Price: ${currentMaxPrice.toFixed(2)}</label>
+          <label>Max Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'}{currentMaxPrice.toFixed(2)}</label>
           <input
             type="range"
             min={minPrice}
@@ -120,6 +124,7 @@ export default function Products() {
       <AllproductsTourist
         products={filteredProducts}
         searchQuery={searchQuery}
+        currentMaxPrice={currentMaxPrice}
       />
     </div>
   );

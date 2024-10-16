@@ -1,15 +1,22 @@
 "use client";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 
-export default function AllproductsTourist({ products, searchQuery }) {
+export default function AllproductsTourist({ products, searchQuery, currentMaxPrice }) {
+  const { currency } = useCurrencyStore();
+
   const router = useRouter();
 
   // console.log(products);
 
+  console.log("Max Price: ", currentMaxPrice)
+  products.forEach((product) => console.log("Price: ", Number(convertPrice(product.Price, currency)) <= currentMaxPrice));
   const filteredProducts = products?.filter(
     (product) =>
-      product.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.Price.toString().includes(searchQuery)
+      product.Name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      // product.Price.toString().includes(searchQuery)
+      Number(convertPrice(product.Price, currency)) <= currentMaxPrice
   );
 
   if (!filteredProducts || filteredProducts.length === 0) {
@@ -25,7 +32,7 @@ export default function AllproductsTourist({ products, searchQuery }) {
       {filteredProducts.map((eachproduct) => (
         <div key={eachproduct._id} style={styles.productCard}>
           <h2 style={styles.productName}>{eachproduct.Name}</h2>
-          <p style={styles.productPrice}>Price: ${eachproduct.Price}</p>
+          <p style={styles.productPrice}>Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'}{convertPrice(eachproduct.Price, currency)}</p>
           <button
             style={styles.detailsButton}
             onClick={() => handleViewDetails(eachproduct._id)}

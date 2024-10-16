@@ -1,7 +1,13 @@
 "use client";
+
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+
 // import StarRating from "../starRating";
 
 export default function ItineraryDetails({ itinerary }) {
+  const { currency } = useCurrencyStore()
+
   if (!itinerary) return <p>Loading...</p>;
 
   const {
@@ -25,20 +31,20 @@ export default function ItineraryDetails({ itinerary }) {
   } = itinerary;
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="max-w-4xl mx-auto p-6 rounded-lg">
+      <div className="max-w-4xl p-6 mx-auto rounded-lg">
         <div className="image--container">
           <img
             src={Image}
-            className="w-full h-64 object-cover rounded-md mb-6"
+            className="object-cover w-full h-64 mb-6 rounded-md"
             alt="Tour"
           />
         </div>
 
-        <div className="details--container space-y-6">
-          <div className="flex justify-between items-center">
+        <div className="space-y-6 details--container">
+          <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-800">{Name}</h1>
             <div className="flex items-center space-x-2">
-              <p className="text-xl text-yellow-500 font-semibold">{Rating}</p>
+              <p className="text-xl font-semibold text-yellow-500">{Rating}</p>
               {/* <StarRating rating={Rating} /> */}
             </div>
           </div>
@@ -49,9 +55,9 @@ export default function ItineraryDetails({ itinerary }) {
 
           <div className="space-y-2">
             <p className="text-lg font-bold text-gray-800">
-              Price: <span className="text-green-600">${Price}</span>
+              Price: <span className="text-green-600">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(Price, currency)}</span>
             </p>
-            <p className="text-md text-gray-700">Language: {Language}</p>
+            <p className="text-gray-700 text-md">Language: {Language}</p>
             <p className="text-md">
               Accessibility:{" "}
               {Accesibility ? (
@@ -84,25 +90,25 @@ export default function ItineraryDetails({ itinerary }) {
             </ul>
           </div>
 
-          <div className="flex justify-between items-start mt-4">
+          <div className="flex items-start justify-between mt-4">
             <div>
-              <h2 className="text-md font-semibold">Pickup Location:</h2>
+              <h2 className="font-semibold text-md">Pickup Location:</h2>
               <p className="text-gray-700">{Pickup}</p>
             </div>
             <div>
-              <h2 className="text-md font-semibold">Dropoff Location:</h2>
+              <h2 className="font-semibold text-md">Dropoff Location:</h2>
               <p className="text-gray-700">{Dropoff}</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap space-x-4 mt-4">
+          <div className="flex flex-wrap mt-4 space-x-4">
             <div>
               <h2 className="text-lg font-semibold">Categories:</h2>
               <ul className="flex flex-wrap space-x-2">
                 {Category.map((cat) => (
                   <li
                     key={cat._id}
-                    className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
+                    className="px-3 py-1 text-sm text-blue-800 bg-blue-100 rounded-full"
                   >
                     {cat.Category}
                   </li>
@@ -115,7 +121,7 @@ export default function ItineraryDetails({ itinerary }) {
                 {Tag.map((tag) => (
                   <li
                     key={tag._id}
-                    className="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full"
+                    className="px-3 py-1 text-sm text-yellow-800 bg-yellow-100 rounded-full"
                   >
                     {tag.Tag}
                   </li>

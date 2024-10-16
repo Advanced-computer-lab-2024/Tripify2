@@ -17,16 +17,17 @@ import {
     Tabs,
     TabsContent,
   } from "@/components/ui/tabs"
+import ItineraryActions from './itinerary-actions'
 import { fetcher } from "@/lib/fetch-client"
-import AddAdminBtn from "@/components/admin/AddAdminBtn"
+import Image from "next/image"
 
 export default async function DashboardPage() 
 {
-    const adminsResponse = await fetcher('/admins').catch(err => err)
+    const itinerariesResponse = await fetcher('/itineraries').catch(err => err)
 
-    let admins = []
+    let itineraries = []
 
-    if(adminsResponse?.ok) admins = await adminsResponse.json()
+    if(itinerariesResponse?.ok) itineraries = await itinerariesResponse.json()
 
     return (
         <Tabs defaultValue="all">
@@ -54,15 +55,14 @@ export default async function DashboardPage()
                         </DropdownMenuContent>
                     </DropdownMenu>
                     */}
-                    <AddAdminBtn />
                 </div>
             </div>
             <TabsContent value="all">
                 <Card x-chunk="dashboard-06-chunk-0">
                     <CardHeader>
-                        <CardTitle>Admins</CardTitle>
+                        <CardTitle>Itineraries</CardTitle>
                         <CardDescription>
-                            View all admins currently on the platform.
+                            View all itineraries currently on the platform.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -72,12 +72,15 @@ export default async function DashboardPage()
                                     {/* <TableHead className="hidden w-[100px] sm:table-cell">
                                         <span className="sr-only">Image</span>
                                     </TableHead> */}
-                                    <TableHead>Name</TableHead>
+                                    <TableHead>Image</TableHead>
                                     <TableHead className="hidden md:table-cell">
-                                        Email
+                                        Name
                                     </TableHead>
                                     <TableHead className="hidden md:table-cell">
-                                        Role
+                                        Price
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Tour Guide
                                     </TableHead>
                                     <TableHead className="hidden md:table-cell">
                                         Created at
@@ -88,19 +91,29 @@ export default async function DashboardPage()
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {admins?.sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
-                                    <TableRow key={user?._id}>
+                                {itineraries?.sort((a, b) => a?.createdAt - b?.createdAt).map((itinerary) => itinerary.TourGuide?._id ? (
+                                    <TableRow key={itinerary?._id}>
                                         <TableCell className="hidden sm:table-cell">
-                                            {user?.UserId?.UserName}
+                                            <Image
+                                                src={(itinerary?.Image.startsWith('http') || itinerary?.Image.startsWith('https') || itinerary?.Image.startsWith('www') || itinerary?.Image.startsWith('i.') || itinerary?.Image.startsWith('m.')) ? itinerary?.Image : `/images/placeholder.jpg`}
+                                                width={60}
+                                                height={60}
+                                            />
                                         </TableCell>
                                         <TableCell className="font-medium">
-                                            {user?.UserId?.Email}
+                                            {itinerary?.Name}
                                         </TableCell>
-                                        <TableCell>
-                                            {user?.UserId?.Role}
+                                        <TableCell className="font-medium">
+                                            ${itinerary?.Price}
+                                        </TableCell>
+                                        <TableCell className="hidden sm:table-cell">
+                                            {itinerary?.TourGuide?.UserId.UserName}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            {user?.UserId?.createdAt}
+                                            {itinerary?.createdAt}
+                                        </TableCell>
+                                        <TableCell className="hidden md:table-cell">
+                                            <ItineraryActions itinerary={itinerary} />
                                         </TableCell>
                                     </TableRow>
                                 ) : null)}
@@ -110,7 +123,7 @@ export default async function DashboardPage()
                     {/* <CardFooter>
                         <div className="text-xs text-muted-foreground">
                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                        products
+                        itinerarys
                         </div>
                     </CardFooter> */}
                 </Card>

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Binoculars, Container, FileUser, Package, ShieldHalf, Tags, Users } from "lucide-react";
+import { Binoculars, Container, FileUser, Package, ShieldHalf, Tags, TramFront, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function SideBarLinks() {
@@ -30,6 +30,13 @@ export default function SideBarLinks() {
             >
             <Package className="h-4 w-4" />
             Products{" "}
+            </Link>
+            <Link
+            href="/itineraries"
+            className={cn("flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-black", pathname.includes("/itineraries") ? "bg-muted text-black" : "text-muted-foreground")}
+            >
+            <TramFront className="h-4 w-4" />
+            Itineraries{" "}
             </Link>
             <Link
             href="/categories"

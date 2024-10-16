@@ -83,10 +83,17 @@ const createItinerary = async (req, res) => {
 };
 const getItineraries = async (req, res) => {
   try {
+    console.log("Test")
     const itineraries = await ItineraryModel.find({})
       .populate("Tag")
       .populate("Category")
-      .populate("TourGuide");
+      .populate({
+        path: 'TourGuide',
+        populate: {
+          path: 'UserId',
+          select: 'UserName'
+        }
+      });
 
     return res.status(200).json(itineraries);
   } catch (e) {
@@ -146,7 +153,7 @@ const updateItinerary = async (req, res) => {
 
   if (
     !updatedItinerary ||
-    updatedItinerary.TourGuide.toString() !== tourGuide._id.toString()
+    updatedItinerary.TourGuide.toString() !== tourGuide?._id.toString()
   )
     return res.status(400).json({ message: "Unauthorized TourGuide!" });
 
@@ -206,7 +213,7 @@ const deleteItinerary = async (req, res) => {
 
   if (
     !deletedItinerary ||
-    deletedItinerary.TourGuide.toString() !== tourGuide._id.toString()
+    deletedItinerary.TourGuide.toString() !== tourGuide?._id.toString()
   )
     return res.status(400).json({ message: "Unauthorized TourGuide!" });
 

@@ -31,6 +31,13 @@ export default function SideBarLinks() {
                 Products
             </Link>
             <Link
+                href="/itineraries"
+                className={cn("flex items-center rounded-[4px] gap-4 px-2.5 py-2.5 hover:text-foreground", pathname.includes("/itineraries") ? "bg-muted text-black" : "text-muted-foreground")}
+            >
+                <Package className="h-5 w-5" />
+                Itineraries
+            </Link>
+            <Link
                 href="/categories"
                 className={cn("flex items-center rounded-[4px] gap-4 px-2.5 py-2.5 hover:text-foreground", pathname.includes("/categories") ? "bg-muted text-black" : "text-muted-foreground")}
             >

@@ -3,7 +3,6 @@ const ItineraryModel = require("../models/Itinerary.js");
 const tourGuideModel = require("../models/Tourguide.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createItinerary = async (req, res) => {
   //add a new itinerary to the database with
@@ -83,8 +82,10 @@ const createItinerary = async (req, res) => {
   }
 };
 const getItineraries = async (req, res) => {
+  const { categories, tags } = req.query;
   try {
-    console.log("Test")
+    if(!categories || !tags || categories?.length === 0 || tags?.length === 0) {
+      console.log("categories inside")
     const itineraries = await ItineraryModel.find({})
       .populate("Tag")
       .populate("Category")
@@ -97,6 +98,23 @@ const getItineraries = async (req, res) => {
       });
 
     return res.status(200).json(itineraries);
+    }
+    else {
+      console.log(categories)
+      console.log(tags)
+      const itineraries = await ItineraryModel.find({ Category: { $in: categories.split(',') }, Tag: { $in: tags.split(',') } })
+        .populate("Tag")
+        .populate("Category")
+        .populate({
+          path: 'TourGuide',
+          populate: {
+            path: 'UserId',
+            select: 'UserName'
+          }
+        });
+
+      return res.status(200).json(itineraries);
+    }
   } catch (e) {
     res.status(400).json({ msg: "Failed to find itinerary" });
   }
@@ -262,71 +280,6 @@ const flagItinerary = async (req, res) => {
   }
 }
 
-const createItineraryBooking = async (req, res) => {
-  const { id } = req.params;
-
-  
-  try {
-    const itinerary = await ItineraryModel.findById(id)
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: itinerary.Name,
-            },
-            unit_amount: Math.round(itinerary.Price),
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
-      cancel_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
-    })
-
-    res.status(200).json({ url: session.url });
-    // const itinerary = await ItineraryModel.findByIdAndUpdate(
-    //   id,
-    //   [
-    //     {
-    //       $set: {
-    //         RemainingBookings: {
-    //           $cond: {
-    //             if: { $gt: ["$RemainingBookings", 0] },
-    //             then: { $subtract: ["$RemainingBookings", 1] },
-    //             else: "$RemainingBookings"
-    //           }
-    //         }
-    //       }
-    //     }
-    //   ], 
-    //   { new: true });
-  }
-  catch (e) {
-    res.status(400).json({ msg: "Operation Failed" });
-  }
-}
-
-const acceptItineraryBooking = async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-
-  let event;
-    
-  try {
-      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_ENDPOINT_SECRET);
-  } catch (err) {
-      // console.error('Webhook Error:', err.message);
-      // return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  if(req.body.type === 'checkout.session.completed') {
-    
-  }
-}
-
 module.exports = {
   createItinerary,
   getItineraries,
@@ -335,5 +288,4 @@ module.exports = {
   deleteItinerary,
   getMyItineraries,
   flagItinerary,
-  createItineraryBooking
 };

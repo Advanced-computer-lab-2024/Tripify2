@@ -1,3 +1,4 @@
+const { convertToUSD } = require("../config/currencyHelpers.js");
 const touristModel = require("../models/Tourist.js");
 const userModel = require("../models/User.js");
 const bcrypt = require("bcrypt");
@@ -202,10 +203,36 @@ const deleteTourist = async (req, res) => {
 //   }
 // };
 
+const redeemPoints = async (req, res) => {
+
+  try 
+  {
+    const tourist = await touristModel.findOne({UserId: req._id}).lean().exec()
+
+    if (!tourist) 
+    {
+      return res.status(404).json({ message: "Tourist not found" });
+    }
+
+    const LoyaltyPoints = tourist.LoyaltyPoints
+
+    const newWallet = Number(tourist.Wallet) + Number(convertToUSD(LoyaltyPoints * 0.01, 'EGP'))
+
+    await touristModel.findOneAndUpdate({UserId: req._id}, { Wallet: newWallet, LoyaltyPoints: 0 }, { new: true }).exec()
+
+    res.status(200).json({ message: "Points redeemed successfully" });
+  }
+  catch(error) 
+  {
+    res.status(500).json({ message: "Error redeeming points", error });
+  }
+}
+
 module.exports = {
   createTourist,
   getTourists,
   getTourist,
   updateTourist,
   deleteTourist,
+  redeemPoints,
 };

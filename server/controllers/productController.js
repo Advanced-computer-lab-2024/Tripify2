@@ -42,7 +42,15 @@ async function getProducts(req, res) {
 async function getProductById(req, res) {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id).populate("Seller");
+    console.log(id)
+    const product = await Product.findById(id).populate({
+      path: "Seller",
+    }).populate({
+      path: "Reviews",
+      populate: {
+        path: "UserId",
+      },
+    })
     return res.json(product);
   } catch (e) {
     return res

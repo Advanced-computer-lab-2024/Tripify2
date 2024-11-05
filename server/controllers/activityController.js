@@ -97,13 +97,25 @@ const createActivity = async (req, res) => {
 };
 
 const getActivity = async (req, res) => {
+  const { categories, tags } = req.query;
+
   try {
-    const activity = await activityModel
-      .find({})
-      .populate("Tags")
-      .populate("CategoryId")
-      .populate("AdvertiserId");
-    res.status(200).json(activity);
+    if(!categories || !tags || categories?.length === 0 || tags?.length === 0) {
+      const activity = await activityModel
+        .find({ CategoryId: { $in: categories }, Tags: { $in: tags } })
+        .populate("Tags")
+        .populate("CategoryId")
+        .populate("AdvertiserId");
+      res.status(200).json(activity);
+    }
+    else {
+      const activity = await activityModel
+        .find({})
+        .populate("Tags")
+        .populate("CategoryId")
+        .populate("AdvertiserId");
+      res.status(200).json(activity);
+    }
   } catch (error) {
     res.status(500).json({ message: "Error retrieving Activity", error });
   }
@@ -118,7 +130,18 @@ const getActivityById = async (req, res) => {
       .findById(id)
       .populate("Tags")
       .populate("CategoryId")
-      .populate("AdvertiserId");
+      .populate({
+        path: "AdvertiserId",
+        populate: [
+          {
+            path: "UserId",
+            select: "UserName",
+          },
+          {
+            path: "CompanyProfile",
+          }
+        ]
+      });
 
     if (!findActivity) {
       return res.json({ message: "Activity not found" });

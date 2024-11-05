@@ -11,14 +11,16 @@ export type CurrencyActions = {
 export type CurrencyStore = CurrencyState & CurrencyActions;
 
 export const defaultInitialState: CurrencyState = {
-    currency: localStorage.getItem('currency') as 'USD' | 'EUR' | 'EGP' ?? 'USD'
+    currency: 'USD'
 }
 
 export const createCurrencyStore = (initState: CurrencyState = defaultInitialState) => {
     return createStore<CurrencyStore>()((set) => ({
         ...initState,
         setCurrency: (currency) => {
-            localStorage.setItem('currency', currency);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('currency', currency);
+            }
             set(() => ({ currency }))
         }
     }))

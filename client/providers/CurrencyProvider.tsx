@@ -20,7 +20,11 @@ export const CurrencyStoreProvider = ({
 }: CurrencyStoreProviderProps) => {
   const storeRef = useRef<CurrencyStoreApi>()
   if (!storeRef.current) {
-    storeRef.current = createCurrencyStore()
+    // if (typeof window !== 'undefined') {
+    //   storeRef.current = createCurrencyStore({ currency: (localStorage.getItem('currency') as 'USD' | 'EUR' | 'EGP') ?? 'USD' })
+    // }
+    // else storeRef.current = createCurrencyStore()
+    storeRef.current = createCurrencyStore({ currency: (localStorage.getItem('currency') as 'USD' | 'EUR' | 'EGP') ?? 'USD' })
   }
 
   return (

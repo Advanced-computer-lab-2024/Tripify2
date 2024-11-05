@@ -34,6 +34,17 @@ const TourGuideSchema = new Schema(
     Image: {
       type: String,
     },
+    Reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
+    Rating: {
+      type: String,
+      required: true,
+      default: "0",
+    },
   },
   { timestamps: true }
 );

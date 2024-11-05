@@ -12,6 +12,10 @@ const ReviewSchema = new Schema(
       type: String,
       required: true,
     },
+    Rating: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

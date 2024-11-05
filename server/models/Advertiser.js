@@ -29,7 +29,17 @@ const advertiserSchema = new Schema(
     ],
     Image: {
       type: String,
-    }
+    },
+    Rating: {
+      type: Number,
+      required: true,
+    },
+    Reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   { timestamps: true }
 );

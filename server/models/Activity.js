@@ -66,6 +66,12 @@ const ActivitySchema = new Schema(
       type: Number,
       required: true,
     },
+    Reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -37,6 +37,10 @@ const ProductSchema = new Schema(
         },
         Archived: {
             type:Boolean
+        },
+        TotalSales: {
+            type: Number,
+            default: 0,
         }
     },
     {

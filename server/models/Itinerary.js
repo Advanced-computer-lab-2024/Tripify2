@@ -89,7 +89,13 @@ const ItinerarySchema = new Schema(
       type: Number,
       required: true,
       default: 0,
-    }
+    },
+    Reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   { timestamps: true }
 );

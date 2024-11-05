@@ -52,6 +52,18 @@ const TouristSchema = new Schema(
       ref: "Product",
       default: [],
     }],
+    LoyaltyPoints: {
+      type: Number,
+      default: 0,
+    },
+    TotalLoyaltyPoints: {
+      type: Number,
+      default: 0,
+    },
+    Badge: {
+      type: String,
+      default: "Bronze",
+    },
   },
   { timestamps: true }
 );

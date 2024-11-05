@@ -6,8 +6,14 @@ import {
   AiOutlineArrowLeft,
   AiOutlineSearch,
 } from "react-icons/ai";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import { convertPrice } from "@/lib/utils";
+import Link from "next/link";
+import { ArrowRight, Plane } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Explore({ params }) {
+  const { currency } = useCurrencyStore();
   const { itineraries, activities, places } = params;
   const [search, setSearch] = useState("");
   const [currentItineraryIndex, setCurrentItineraryIndex] = useState(0);
@@ -115,10 +121,29 @@ export default function Explore({ params }) {
   };
 
   return (
-    <div className="mx-20 sm:mx-22 md:mx-24 lg:mx-26 xl:mx-30 mt-5">
+    <div className="mx-20 mt-5 sm:mx-22 md:mx-24 lg:mx-26 xl:mx-30">
+      <div className="w-full mb-6 text-white bg-gradient-to-r from-blue-600 to-blue-700">
+        <div className="flex flex-col items-center justify-between px-4 py-6 mx-auto max-w-7xl sm:flex-row">
+          <div className="flex items-center gap-4 mb-4 sm:mb-0">
+            <Plane className="w-8 h-8" />
+            <div>
+              <h2 className="text-2xl font-bold">Design Your Dream Getaway</h2>
+              <p className="text-blue-100">Create a personalized vacation package tailored just for you</p>
+            </div>
+          </div>
+          <Link href='/create-vacation'>
+            <Button 
+              className="flex items-center gap-2 px-6 py-2 font-semibold text-blue-600 transition-colors bg-white rounded-full hover:bg-blue-50"
+            >
+              Start Planning
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
+      </div>
       <div className="relative">
         <span
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+          className="absolute text-gray-500 transform -translate-y-1/2 left-2 top-1/2"
           style={{ fontSize: "25px" }}
         >
           <AiOutlineSearch />
@@ -126,7 +151,7 @@ export default function Explore({ params }) {
         <input
           type="text"
           placeholder="Where are you going?"
-          className="pl-10 pr-4 py-2 w-full rounded-lg bg-gray-100 text-gray-700 focus:outline-none focus:bg-white transition duration-200"
+          className="w-full py-2 pl-10 pr-4 text-gray-700 transition duration-200 bg-gray-100 rounded-lg focus:outline-none focus:bg-white"
           style={{ border: "none", boxShadow: "none" }}
           value={search}
           onChange={(e) => {
@@ -139,28 +164,28 @@ export default function Explore({ params }) {
       </div>
 
       <section className="my-8">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center justify-between">
+        <h2 className="flex items-center justify-between mb-6 text-2xl font-semibold">
           <span>Itineraries ({filteredItineraries.length})</span>
           <button
             onClick={() => router.push("/itineraries")}
-            className="text-sm bg-gray-400 text-white rounded px-2 py-1 hover:bg-gray-500 transition duration-200"
+            className="px-2 py-1 text-sm text-white transition duration-200 bg-gray-400 rounded hover:bg-gray-500"
           >
             View All
           </button>
         </h2>
         {filteredItineraries.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
               {getDisplayedItineraries().map((itinerary) => (
                 <button
                   key={itinerary._id}
-                  className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left"
+                  className="text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
                   onClick={() => router.push(`/itineraries/${itinerary._id}`)}
                 >
                   <img
                     src={itinerary.Image}
                     alt={itinerary.Name}
-                    className="w-full h-32 object-cover rounded-md mb-2"
+                    className="object-cover w-full h-32 mb-2 rounded-md"
                   />
                   <h3 className="text-lg font-medium">{itinerary.Name}</h3>
                 </button>
@@ -203,31 +228,31 @@ export default function Explore({ params }) {
       <hr />
 
       <section className="my-8">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center justify-between">
+        <h2 className="flex items-center justify-between mb-6 text-2xl font-semibold">
           <span>Activities ({filteredActivities.length})</span>
           <button
             onClick={() => router.push("/activities")}
-            className="text-sm bg-gray-400 text-white rounded px-2 py-1 hover:bg-gray-500 transition duration-200"
+            className="px-2 py-1 text-sm text-white transition duration-200 bg-gray-400 rounded hover:bg-gray-500"
           >
             View All
           </button>
         </h2>
         {filteredActivities.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 w-full">
+            <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
               {getDisplayedActivities().map((activity) => (
                 <button
                   key={activity._id}
-                  className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left w-full"
+                  className="w-full text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
                   onClick={() => router.push(`/activities/${activity._id}`)}
                 >
                   <img
                     src={activity.Image}
                     alt={activity.Name}
-                    className="w-full h-32 object-cover rounded-md mb-2"
+                    className="object-cover w-full h-32 mb-2 rounded-md"
                   />
                   <p className="text-lg font-medium">{activity.Name}</p>
-                  <p className="text-gray-500">From: ${activity.Price}</p>
+                  <p className="text-gray-500">From: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(activity.Price, currency)}</p>
                 </button>
               ))}
             </div>
@@ -268,28 +293,28 @@ export default function Explore({ params }) {
       <hr />
 
       <section className="my-8">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center justify-between">
+        <h2 className="flex items-center justify-between mb-6 text-2xl font-semibold">
           <span>Places ({filteredPlaces.length})</span>
           <button
             onClick={() => router.push("/places")}
-            className="text-sm bg-gray-400 text-white rounded px-2 py-1 hover:bg-gray-500 transition duration-200"
+            className="px-2 py-1 text-sm text-white transition duration-200 bg-gray-400 rounded hover:bg-gray-500"
           >
             View All
           </button>
         </h2>
         {filteredPlaces.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
               {getDisplayedPlaces().map((place) => (
                 <button
                   key={place._id}
-                  className="rounded-lg hover:shadow-lg transition-shadow duration-200 text-left"
+                  className="text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
                   onClick={() => router.push(`/places/${place._id}`)}
                 >
                   <img
                     src={place.Pictures[0]}
                     alt={place.Name}
-                    className="w-full h-32 object-cover rounded-md mb-2"
+                    className="object-cover w-full h-32 mb-2 rounded-md"
                   />
                   <h3 className="text-lg font-medium">{place.Name}</h3>
                 </button>

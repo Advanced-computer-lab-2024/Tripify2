@@ -1,8 +1,24 @@
-"use client";
+"use client"
 
-export default function ItineraryDetails({ activity }) {
+import React, { useState } from 'react'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { CalendarIcon, ClockIcon, MapPinIcon, TagIcon, DollarSignIcon, PhoneIcon, GlobeIcon, UserIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useCurrencyStore } from '@/providers/CurrencyProvider'
+import { useRouter } from 'next/navigation'
+import { convertPrice } from '@/lib/utils'
+import { fetcher } from '@/lib/fetch-client'
+
+export default function ActivityDetails({ activity }) {
+  const [numParticipants, setNumParticipants] = useState(1)
+  const [error, setError] = useState('');
+  const router = useRouter()
+
+  const { currency } = useCurrencyStore()
+
   if (!activity) {
-    return <p>Loading...</p>;
+    return <div className="flex items-center justify-center h-screen">Loading...</div>
   }
 
   const {
@@ -17,113 +33,214 @@ export default function ItineraryDetails({ activity }) {
     Tags = [],
     CategoryId = [],
     AdvertiserId = {},
-  } = activity;
+  } = activity
 
   // Format Date and Time
-  const formattedDate =
-    new Date(theDate).toLocaleDateString() || "Date Not Available";
-  const formattedTime =
-    new Date(theTime).toLocaleTimeString() || "Time Not Available";
+  const formattedDate = new Date(theDate).toLocaleDateString() || "Date Not Available"
+  const formattedTime = new Date(theTime).toLocaleTimeString() || "Time Not Available"
+
+  const generateLink = (latitude, longitude) => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      setError('Please enter valid coordinates.');
+      setLink('');
+      return;
+    }
+
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      setError('Coordinates are out of range.');
+      setLink('');
+      return;
+    }
+
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    
+    return url;
+  }
+  
+  const handleBook = async () => {
+    try
+    {
+      const response = await fetcher(`/bookings/activities/create-booking/${activity._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          currency,
+          Participants: numParticipants
+        })
+      })
+
+      if(!response?.ok) {
+        const data = await response.json()
+        console.log(data.msg)
+        return
+      }
+
+      const data = await response.json()
+
+      if(!data) {
+        console.log('Error creating booking')
+        return
+      }
+
+      router.push(data.url)
+    }
+    catch (error)
+    {
+      console.log(error)
+    }
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen  p-4">
-      <div className="w-full h-full flex flex-col items-center p-8">
-        <div className="flex justify-center  w-full mb-6">
-          {Image ? (
-            <img
-              src={Image}
-              className="w-50 h-64 object-cover rounded-md"
-              style={{ objectFit: "cover" }}
-              alt="Activity"
-            />
-          ) : (
-            <div className="h-64 bg-gray-300 rounded-md flex items-center justify-center">
-              <p>No Image Available</p>
+    <div className="container p-6 mx-auto">
+      <h1 className="mb-6 text-3xl font-bold">{Name}</h1>
+      <div className="mb-6">
+        {Image ? (
+          <img src={Image} alt={Name} className="object-cover w-full h-64 rounded-lg" />
+        ) : (
+          <div className="flex items-center justify-center w-full h-64 bg-gray-300 rounded-lg">
+            <p>No Image Available</p>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Activity Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center">
+                <CalendarIcon className="w-5 h-5 mr-2 text-blue-500" />
+                <span>{formattedDate}</span>
+              </div>
+              <div className="flex items-center">
+                <ClockIcon className="w-5 h-5 mr-2 text-green-500" />
+                <span>{formattedTime}</span>
+              </div>
+              <div className="flex items-center">
+                <MapPinIcon className="w-5 h-5 mr-2 text-red-500" />
+                <Link target='_blank' href={generateLink(Location.coordinates[0], Location.coordinates[1])}>
+                  {generateLink(Location.coordinates[0], Location.coordinates[1])}
+                </Link>
+              </div>
+              <div className="flex items-center">
+                <DollarSignIcon className="w-5 h-5 mr-2 text-yellow-500" />
+                <span className="mr-1 text-sm font-light line-through">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(Price, currency)}</span>
+                <span className="font-bold">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice((Price * ((100 - SpecialDiscounts) / 100)), currency)}</span>
+                {SpecialDiscounts > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {SpecialDiscounts}% off
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center">
+                <ClockIcon className="w-5 h-5 mr-2 text-purple-500" />
+                <span>{Duration}</span>
+              </div>
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="w-full space-y-6">
-          <h1 className="text-4xl font-bold text-gray-800 text-center">
-            {Name}
-          </h1>
+        <Card>
+          <CardHeader>
+            <CardTitle>Categories and Tags</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h3 className="mb-2 font-semibold">Categories:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {Array.isArray(CategoryId) && CategoryId.length > 0 ? (
+                    CategoryId.map((category) => (
+                      <Badge key={category._id} variant="outline">
+                        {category.Category || "Category Not Available"}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-gray-500">No Categories Available</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <h3 className="mb-2 font-semibold">Tags:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {Tags.length > 0 ? (
+                    Tags.map((tag) => (
+                      <Badge key={tag._id} variant="secondary">
+                        {tag.Tag || "Tag Not Available"}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-gray-500">No Tags Available</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-          <h3 className="text-lg font-semibold text-center">
-            Date: {formattedDate} - Time: {formattedTime}
-          </h3>
-
-          {/* <div className="text-gray-600 text-center">
-            <p className="font-medium">Location: {Location}</p>
-          </div> */}
-
-          <div className="space-y-2 text-center">
-            <p className="text-xl font-bold text-gray-800">
-              Price: <span className="text-green-600">${Price}</span>
-            </p>
-            <p className="text-md text-gray-700">Duration: {Duration}</p>
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Advertiser Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="flex items-center">
+              <UserIcon className="w-5 h-5 mr-2 text-blue-500" />
+              <span>Name: {AdvertiserId.UserId.UserName || "Not Available"}</span>
+            </div>
+            <div className="flex items-center">
+              <GlobeIcon className="w-5 h-5 mr-2 text-green-500" />
+              <span>Website: {AdvertiserId.CompanyProfile.Website || "Not Available"}</span>
+            </div>
+            <div className="flex items-center">
+              <PhoneIcon className="w-5 h-5 mr-2 text-red-500" />
+              <span>Hotline: {AdvertiserId.CompanyProfile.Hotline || "Not Available"}</span>
+            </div>
           </div>
-
-          {SpecialDiscounts > 0 && (
-            <p className="text-md text-gray-700 text-center">
-              Special Discounts: {SpecialDiscounts}%
-            </p>
-          )}
-
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold text-center">Tags:</h2>
-            <ul className="flex flex-wrap justify-center space-x-2">
-              {Tags.length > 0 ? (
-                Tags.map((tag) => (
-                  <li
-                    key={tag._id}
-                    className="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full"
-                  >
-                    {tag.Tag || "Tag Not Available"}
-                  </li>
-                ))
-              ) : (
-                <li className="text-gray-600">No Tags Available</li>
-              )}
-            </ul>
-          </div>
-
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold text-center">Categories:</h2>
-            <ul className="flex flex-wrap justify-center space-x-2">
-              {Array.isArray(CategoryId) && CategoryId.length > 0 ? (
-                CategoryId.map((category) => (
-                  <li
-                    key={category._id}
-                    className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
-                  >
-                    {category.Category || "Category Not Available"}
-                  </li>
-                ))
-              ) : (
-                <li className="text-gray-600">No Categories Available</li>
-              )}
-            </ul>
-          </div>
-
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold text-center">
-              Advertiser Information:
-            </h2>
-            <p className="text-gray-700 text-center">
-              Advertiser ID: {AdvertiserId._id || "Advertiser ID Not Available"}
-            </p>
-            <p className="text-gray-700 text-center">
-              Website: {AdvertiserId.Website || "Website Not Available"}
-            </p>
-            <p className="text-gray-700 text-center">
-              Hotline: {AdvertiserId.Hotline || "Hotline Not Available"}
-            </p>
-            <p className="text-gray-700 text-center">
-              Profile: {AdvertiserId.Profile || "Profile Not Available"}
-            </p>
+        </CardContent>
+      </Card>
+      <div className="p-6 mt-6 mb-8 bg-gray-100 rounded-lg">
+        <h2 className="mb-4 text-2xl font-semibold">Book Now</h2>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div>
+            <label htmlFor="participants" className="block mb-1 text-sm font-medium text-gray-700">Number of Participants</label>
+            <select
+              id="participants"
+              value={numParticipants}
+              onChange={(e) => setNumParticipants(parseInt(e.target.value))}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {[1,2,3,4,5].map(num => (
+                <option disabled={activity.RemainingBookings < num} key={num} value={num}>
+                  {num} {num === 1 ? 'Participant' : 'Participants'}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
+
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-lg text-gray-700">Total Price</p>
+          <p className="text-3xl font-bold text-blue-600">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice((activity.Price * numParticipants) * ((100 - SpecialDiscounts) / 100), currency)}</p>
+        </div>
+        <button
+          onClick={handleBook}
+          disabled={activity.RemainingBookings === 0}
+          className="px-6 py-3 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg disabled:opacity-65 disabled:hover:scale-100 disabled:hover:bg-gray-500 disabled:bg-gray-500 hover:bg-blue-600 hover:scale-105"
+        >
+          Book Now
+        </button>
+      </div>
     </div>
-  );
+  )
 }

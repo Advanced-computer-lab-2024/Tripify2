@@ -18,17 +18,9 @@ export default function Dashboard({ params }) {
     case "Tourist":
       dashboardElements = [
         { name: "Account", link: `/account/${id}` },
-        { name: "Products", link: "/products-tourist" },
-        // {
-        //   name: "Upcoming",
-        //   link: "/upcoming",
-        //   sublinks: [
-        //     { name: "All Upcoming", link: "/upcoming" },
-        //     { name: "My Upcoming", link: "/myUpcoming" },
-        //   ],
-        // },
+        { name: "Products", link: "/products-tourist", sublinks: [ { name: "All Products", link: "/products-tourist" }, { name: "My Products", link: "/products-tourist/my-products" } ] },
         { name: "Places", link: "/places" },
-        { name: "Activities", link: "/activities" },
+        { name: "Activities", link: "/activities", sublinks: [ { name: "My Activities", link: "/activities/my-activities" } ] },
         {
           name: "Itineraries",
           link: "/itineraries",
@@ -41,6 +33,8 @@ export default function Dashboard({ params }) {
             },
           ],
         },
+        { name: "Flights", sublinks: [ { name: "All Flights", link: "/flights" }, { name: "My Flights", link: "/flights/my-flights" } ] },
+        { name: "Hotels", sublinks: [ { name: "All Hotels", link: "/hotels" }, { name: "My Hotels", link: "/hotels/my-hotels" } ] },
         { name: "Explore", link: "/" },
       ];
       break;
@@ -189,7 +183,7 @@ export default function Dashboard({ params }) {
   }, [sublinkRef]);
 
   return (
-    <div className="flex justify-between items-center bg-white text-black p-4 border-b border-gray-300">
+    <div className="flex items-center justify-between p-4 text-black bg-white border-b border-gray-300">
       <div className="flex-shrink-0">
         <h3 className="text-lg font-bold">Logo</h3>
       </div>
@@ -198,7 +192,7 @@ export default function Dashboard({ params }) {
         {showHamburger ? (
           <button
             onClick={toggleSidebar}
-            className="text-black text-2xl p-2 focus:outline-none"
+            className="p-2 text-2xl text-black focus:outline-none"
           >
             <FiMenu />
           </button>
@@ -207,7 +201,7 @@ export default function Dashboard({ params }) {
             className={`navbar-links flex-grow overflow-visible relative`}
             ref={sublinkRef}
           >
-            <nav className="flex space-x-4 p-4">
+            <nav className="flex p-4 space-x-4">
               {dashboardElements.map((element, index) => {
                 const isActive = pathname === element.link;
                 return (
@@ -227,7 +221,7 @@ export default function Dashboard({ params }) {
                       {element.name}
                     </button>
                     {activeSublinks.includes(index) && element.sublinks && (
-                      <div className="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg z-10">
+                      <div className="absolute left-0 z-10 w-48 mt-2 bg-white rounded shadow-lg">
                         {element.sublinks.map((sublink, sublinkIndex) => (
                           <button
                             key={sublinkIndex}
@@ -251,7 +245,7 @@ export default function Dashboard({ params }) {
 
       {sidebarVisible && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10"
+          className="fixed inset-0 z-10 bg-black bg-opacity-50"
           onClick={toggleSidebar}
         />
       )}
@@ -269,12 +263,12 @@ export default function Dashboard({ params }) {
                   if (element.sublinks) toggleSublinks(index);
                   else handleReroute(element.link);
                 }}
-                className="text-black font-normal py-2 px-4 rounded hover:bg-gray-200 transition duration-300 ease-in-out"
+                className="px-4 py-2 font-normal text-black transition duration-300 ease-in-out rounded hover:bg-gray-200"
               >
                 {element.name}
               </button>
               {activeSublinks.includes(index) && element.sublinks && (
-                <div className="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg z-10">
+                <div className="absolute left-0 z-10 w-48 mt-2 bg-white rounded shadow-lg">
                   {element.sublinks.map((sublink, sublinkIndex) => (
                     <button
                       key={sublinkIndex}

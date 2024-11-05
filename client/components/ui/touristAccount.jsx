@@ -6,10 +6,17 @@ import { signOut, useSession } from "next-auth/react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "./dialog";
 import { Button } from "./button";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import { Coins } from "lucide-react";
+import { Badge } from "./badge";
+import { cn, convertPrice, convertToUSD } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { Callout } from "./Callout";
 
 export default function TouristAccount({ params }) {
   const { touristInfo } = params;
+  const router = useRouter();
   const { currency, setCurrency } = useCurrencyStore()
+  const [error, setError] = useState(null)
 
   const Session = useSession();
   const touristDetails = Object.entries(touristInfo).reduce(
@@ -19,7 +26,7 @@ export default function TouristAccount({ params }) {
     },
     {}
   );
-  const { UserName, MobileNumber, DOB, Occupation, Wallet, Nationality, _id } =
+  const { UserName, MobileNumber, DOB, Occupation, Wallet, Nationality, _id, LoyaltyPoints, Badge } =
     touristDetails;
 
   const imgSrcForNow =
@@ -36,6 +43,7 @@ export default function TouristAccount({ params }) {
   const [newPassword, setNewPassword] = useState("");
   const [requestOpen, setRequestOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redeemOpen, setRedeemOpen] = useState(false);
 
   const handleChange = (field) => (e) => {
     switch (field) {
@@ -152,6 +160,27 @@ export default function TouristAccount({ params }) {
     theEmailChange !== touristDetails.UserId.Email ||
     (oldPassword !== "" && newPassword !== "");
 
+  const handleRedeem = async () => {
+    setLoading(true)
+    const response = await fetcher(`/tourists/points/redeem`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    setLoading(false)
+    
+    if (!response.ok) {
+      const data = await response.json()
+      setError(data.message)
+      return
+    }
+
+    setRedeemOpen(false)
+    router.refresh()
+  }
+
   return (
     <div className="flex flex-col items-center p-4 my-10">
       <div className="flex items-center justify-center w-full mb-4">
@@ -161,15 +190,36 @@ export default function TouristAccount({ params }) {
           className="w-24 h-24 mr-4 rounded-full"
         />
         <div className="flex flex-col p-4 justify-left items-left">
-          <h1 className="text-2xl font-bold text-purple-600 ">{UserName}</h1>
+          <div className="flex items-center gap-1">
+            <h1 className="text-2xl font-bold text-purple-600">
+              {UserName}
+            </h1>
+            <Badge className={cn('rounded-[12px] px-4 h-6 text-white', Badge === 'Bronze' ? 'bg-[#CD7F32]' : Badge === 'Silver' ? 'bg-[#C0C0C0]' : 'bg-[#FFD700]')}>
+              {Badge}
+            </Badge>
+          </div>
 
-          <h2 className="mt-3 text-3xl font-semibold">
-            {currency} {Wallet}
-          </h2>
+          <div className="flex items-center justify-start gap-2">
+            <div className="flex items-center">
+              <FaWallet className="w-6 h-6 mr-1 text-purple-600" />
+              {/* <p className="text-base text-gray-700">Current balance</p> */}
+            </div>
+            <p className="text-2xl font-semibold">
+              {currency} {convertPrice(Wallet, currency)}
+            </p>
+          </div>
 
-          <div className="flex items-center">
-            <FaWallet className="w-5 h-5 mr-1 text-purple-600" />
-            <p className="text-sm text-gray-700">Current balance</p>
+          <div className="flex items-center justify-start gap-2 mt-2">
+            <div className="flex items-center">
+              <Coins className="w-4 h-4 mr-1 text-purple-600" />
+              {/* <p className="text-sm text-gray-700">Loyalty Points: </p> */}
+            </div>
+            <p className="text-base font-light">
+              {LoyaltyPoints} {LoyaltyPoints > 1 ? "points" : "point"}
+            </p>
+            <p onClick={() => setRedeemOpen(true)} className='text-xs underline cursor-pointer font-extralight'>
+              Redeem
+            </p>
           </div>
         </div>
       </div>
@@ -297,6 +347,20 @@ export default function TouristAccount({ params }) {
                   setLoading(false)
                 }}>Request Deletion</Button>
               </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={redeemOpen} onOpenChange={setRedeemOpen}>
+            <DialogContent>
+              <DialogHeader>Redeem your points for {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(convertToUSD(LoyaltyPoints * 0.01, 'EGP'), currency)}</DialogHeader>
+              <DialogFooter>
+                <Button disabled={loading} onClick={() => setRedeemOpen(false)}>Cancel</Button>
+                <Button disabled={loading} className='bg-purple-600 hover:bg-purple-700 disabled:opacity-65' onClick={handleRedeem}>Redeem</Button>
+              </DialogFooter>
+              {error && (
+                  <Callout variant="error" title="Something went wrong">
+                      {error}
+                  </Callout>
+              )}
             </DialogContent>
           </Dialog>
         </div>

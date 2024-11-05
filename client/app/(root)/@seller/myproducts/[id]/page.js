@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { fetcher } from "@/lib/fetch-client";
 import { useRouter } from 'next/navigation';
+import { Checkbox } from "@/components/ui/checkbox"
 
 export default function ProductDetail({ params }) {
   const { id } = params; 
@@ -31,7 +32,8 @@ export default function ProductDetail({ params }) {
           Price: data.Price || '',
           Description: data.Description || '',
           Image: data.Image || '',
-          AvailableQuantity: data.AvailableQuantity || ''
+          AvailableQuantity: data.AvailableQuantity || '',
+          Archived: data.Archived || false
         });
 
         if (data.Seller) {
@@ -149,6 +151,19 @@ export default function ProductDetail({ params }) {
             placeholder="Available Quantity"
             style={styles.input}
           />
+          <div className="flex items-center gap-2">
+              <label
+                  htmlFor="archived"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                  Archived
+              </label>
+              <Checkbox
+                  checked={formData.Archived}
+                  onCheckedChange={(checked) => handleChange({ target: { name: 'Archived', value: checked } })}
+                  id="archived"
+              />
+          </div>
           <button onClick={handleSave} style={styles.saveButton}>Save</button>
         </>
       ) : (
@@ -159,6 +174,8 @@ export default function ProductDetail({ params }) {
           <p>Description: {product.Description}</p>
           <p>Rating: {product.Rating}</p>
           <p>Available Quantity: {product.AvailableQuantity}</p>
+          <p>Total Sales: {product.TotalSales}</p>
+          <p>Archived: {product.Archived ? 'Yes' : 'No'}</p>
           <button onClick={handleEdit} style={styles.editButton}>Edit</button>
           <button onClick={handleDelete} style={styles.deleteButton}>Delete</button>
         </>

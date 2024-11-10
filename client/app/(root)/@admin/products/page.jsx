@@ -25,6 +25,7 @@ import PriceSlider from "@/components/admin/PriceSlider"
 import AddProductBtn from "@/components/admin/AddProductBtn"
 import SortRatingBtn from "@/components/admin/SortRatingBtn"
 import ViewReviewsBtn from "@/components/admin/ViewReviewsBtn"
+import ViewStatisticsBtn from "@/components/admin/ViewStatisticsBtn"
 import ClearFiltersBtn from "@/components/admin/ClearFiltersBtn"
 import ProductEditBtn from "@/components/admin/ProductEditBtn"
 import {
@@ -67,7 +68,7 @@ export default async function DashboardPage({ searchParams })
                     <TabsTrigger value="all">All</TabsTrigger>
                     <TabsTrigger value="my-products">My Products</TabsTrigger>
                 </TabsList>
-                <div className="ml-auto flex items-center gap-4">
+                <div className="flex items-center gap-4 ml-auto">
                     
                    
                     {(query !== '/products' || rating) && <ClearFiltersBtn />}
@@ -110,7 +111,13 @@ export default async function DashboardPage({ searchParams })
                                         Reviews
                                     </TableHead>
                                     <TableHead className="hidden md:table-cell">
+                                        Statistics
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
                                         Created at
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Archived
                                     </TableHead>
                                     <TableHead>
                                         <span className="sr-only">Actions</span>
@@ -122,9 +129,9 @@ export default async function DashboardPage({ searchParams })
                                     <TableRow key={product?._id}>
                                         <TableCell className="hidden sm:table-cell">
                                             <Image 
-                                                src={product?.Image.startsWith('http') || product?.Image.startsWith('https') || product?.Image.startsWith('www') || product?.Image.startsWith('i.') || product?.Image.startsWith('m.') ? product?.Image : `/images/${product?.Image}`}
-                                                width={100}
-                                                height={100}
+                                                src={product?.Image.startsWith('http://') || product?.Image.startsWith('https://') || product?.Image.startsWith('www') || product?.Image.startsWith('i.') || product?.Image.startsWith('m.') ? product?.Image : `/images/${product?.Image}`}
+                                                width={50}
+                                                height={50}
                                                 alt={product?.Name}
                                             />
                                         </TableCell>
@@ -154,8 +161,14 @@ export default async function DashboardPage({ searchParams })
                                         <TableCell className="font-medium">
                                             <ViewReviewsBtn product={product} />
                                         </TableCell>
+                                        <TableCell className="font-medium">
+                                            <ViewStatisticsBtn product={product} />
+                                        </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             {product?.createdAt}
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            {product?.Archived ? 'Yes' : 'No'}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             <ProductEditBtn product={product} />
@@ -188,6 +201,7 @@ export default async function DashboardPage({ searchParams })
                                     {/* <TableHead className="hidden w-[100px] sm:table-cell">
                                         <span className="sr-only">Image</span>
                                     </TableHead> */}
+                                    <TableHead>Image</TableHead>
                                     <TableHead>Name</TableHead>
                                     <TableHead className="hidden md:table-cell">
                                         Owner's Name
@@ -202,7 +216,16 @@ export default async function DashboardPage({ searchParams })
                                         Rating
                                     </TableHead>
                                     <TableHead className="hidden md:table-cell">
+                                        Reviews
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Statistics
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
                                         Created at
+                                    </TableHead>
+                                    <TableHead className="hidden md:table-cell">
+                                        Archived
                                     </TableHead>
                                     <TableHead>
                                         <span className="sr-only">Actions</span>
@@ -212,6 +235,14 @@ export default async function DashboardPage({ searchParams })
                             <TableBody>
                                 {products?.filter(product => product?.Seller?._id === session?.user?.userId).sort((a, b) => rating === 'asc' ? a?.Rating - b?.Rating : rating === 'desc' ? b?.Rating - a?.Rating : a?.createdAt - b?.createdAt).map((product) => product?._id ? (
                                     <TableRow key={product?._id}>
+                                        <TableCell className="hidden sm:table-cell">
+                                            <Image 
+                                                src={product?.Image.startsWith('http://') || product?.Image.startsWith('https://') || product?.Image.startsWith('www') || product?.Image.startsWith('i.') || product?.Image.startsWith('m.') ? product?.Image : `/images/${product?.Image}`}
+                                                width={80}
+                                                height={80}
+                                                alt={product?.Name}
+                                            />
+                                        </TableCell>
                                         <TableCell className="hidden sm:table-cell">
                                             {product?.Name}
                                         </TableCell>
@@ -235,8 +266,17 @@ export default async function DashboardPage({ searchParams })
                                         <TableCell className="font-medium">
                                             {product?.Rating}
                                         </TableCell>
+                                        <TableCell className="font-medium">
+                                            <ViewReviewsBtn product={product} />
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            <ViewStatisticsBtn product={product} />
+                                        </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             {product?.createdAt}
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            {product?.Archived ? 'Yes' : 'No'}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             <ProductEditBtn product={product} />

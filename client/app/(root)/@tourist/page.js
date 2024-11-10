@@ -22,6 +22,12 @@ export default async function ExplorePage() {
   }).catch((e) => console.log(e));
 
   if (!resItinerary?.ok || !resActivity?.ok || !resPlace?.ok) {
+    const activitiesError = await resActivity.json()
+    const placesError = await resPlace.json()
+    const itinerariesError = await resItinerary.json()
+    console.log(activitiesError)
+    console.log(placesError)
+    console.log(itinerariesError)
     return <>error</>;
   }
 

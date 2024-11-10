@@ -28,6 +28,7 @@ import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { useUploadThing } from "@/lib/uploadthing-hook"
 import Image from "next/image"
+import { Checkbox } from "../ui/checkbox"
 
 const productSchema = z.object({
     Name: z.string().min(2, {
@@ -45,6 +46,7 @@ const productSchema = z.object({
     AvailableQuantity: z.number().min(2, {
         message: 'Please enter a valid AvailableQuantity'
     }),
+    Archived: z.boolean()
 })
 
 export default function ProductActionBtns({ product }) 
@@ -65,6 +67,7 @@ export default function ProductActionBtns({ product })
             Price: product?.Price,
             Description: product?.Description,
             AvailableQuantity: product?.AvailableQuantity,
+            Archived: product?.Archived,
         },
     })
 
@@ -119,7 +122,7 @@ export default function ProductActionBtns({ product })
                                     <FormControl>
                                         <Input disabled={loading} className='w-screen max-w-[340px] disabled:opacity-60' placeholder="e.g. John Doe" {...field} />
                                     </FormControl>
-                                    <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                                    <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
                                 </FormItem>
                             )}
                         />
@@ -130,18 +133,18 @@ export default function ProductActionBtns({ product })
                                 <FormItem className='relative'>
                                     <FormLabel>Image</FormLabel>
                                     <FormControl>
-                                        <div className='w-40 h-40 rounded-xl relative'>
+                                        <div className='relative w-40 h-40 rounded-xl'>
                                             <Image 
                                                 src={field.value} 
                                                 alt="Image" 
-                                                className='rounded-xl max-w-full max-h-full'
+                                                className='max-w-full max-h-full rounded-xl'
                                                 width={160}
                                                 height={160} 
                                             />
                                             <input
                                                 type="file"
                                                 accept="image/*"
-                                                className="absolute inset-0 w-full h-full cursor-pointer rounded-xl border-2 border-gray-300 opacity-0 text-gray-500 hover:opacity-100 focus:outline-none"
+                                                className="absolute inset-0 w-full h-full text-gray-500 border-2 border-gray-300 opacity-0 cursor-pointer rounded-xl hover:opacity-100 focus:outline-none"
                                                 onChange={(e) => {
                                                     if (e.target.files && e.target.files[0]) {
                                                         const file = e.target.files[0];
@@ -154,7 +157,7 @@ export default function ProductActionBtns({ product })
                                             />
                                         </div>
                                     </FormControl>
-                                    <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                                    <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
                                 </FormItem>
                             )}
                         />
@@ -167,7 +170,7 @@ export default function ProductActionBtns({ product })
                                     <FormControl>
                                         <Input type="number" disabled={loading} className='w-screen max-w-[340px] disabled:opacity-60' placeholder="" {...field} onChange={(e) => form.setValue("Price", parseFloat(e.target.value.replace('-', '')))} />
                                     </FormControl>
-                                    <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                                    <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
                                 </FormItem>
                             )}
                         />
@@ -181,7 +184,7 @@ export default function ProductActionBtns({ product })
                                     <FormControl>
                                         <Textarea disabled={loading} className='w-screen max-w-[340px] disabled:opacity-60' placeholder="e.g. selling products to tourists" {...field} />
                                     </FormControl>
-                                    <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                                    <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
                                 </FormItem>
                             )}
                         />
@@ -194,7 +197,32 @@ export default function ProductActionBtns({ product })
                                     <FormControl>
                                         <Input type="number" disabled={loading} className='w-screen max-w-[340px] disabled:opacity-60' placeholder="" {...field} onChange={(e) => form.setValue("AvailableQuantity", parseFloat(e.target.value.replace('-', '')))} />
                                     </FormControl>
-                                    <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                                    <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="Archived"
+                            render={({ field }) => (
+                                <FormItem className='relative'>
+                                    {/* <FormLabel>Archived</FormLabel> */}
+                                    <FormControl>
+                                        <div className="flex items-center gap-2">
+                                            <label
+                                                htmlFor="archived"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                Archived
+                                            </label>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                id="archived"
+                                            />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
                                 </FormItem>
                             )}
                         />

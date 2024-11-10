@@ -32,6 +32,11 @@ app.use("/tourists", require("./routes/touristRoutes"));
 app.use("/tourism-governors", require("./routes/tourismGovernorRoutes"));
 app.use("/profile", require("./routes/profileRoutes"));
 app.use("/admins", require("./routes/adminRoutes"));
+app.use("/bookings", require("./routes/bookingRoutes"));
+app.use("/hotels", require("./routes/hotelRoutes"));
+app.use("/reviews", require("./routes/reviewRoutes"));
+app.use("/complaints", require("./routes/complaintRoutes"));
+app.use("/flights", require("./routes/flightRoutes"));
 // app.use("/users", require("./routes/userRoutes"));
 
 mongoose.connection.once("open", () => {

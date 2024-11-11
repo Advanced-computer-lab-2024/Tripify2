@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Allproducts from "@/components/shared/Allproducts";
-import {fetcher} from "@/lib/fetch-client"
+import { fetcher } from "@/lib/fetch-client"
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -22,23 +22,25 @@ export default function Products() {
           "Accept": "application/json",
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-  
+
       let data = await response.json();
-  
+
       // Stringify the fetched data
       const stringifiedData = JSON.stringify(data);
-  
+
       console.log("Stringified Data: ", stringifiedData); // For debugging
-  
-      setProducts(data);
-      setFilteredProducts(data);
-  
+
+      const filteredData = data.filter(product => !product.Archived);
+
+      setProducts(filteredData);
+      setFilteredProducts(filteredData);
+
       // Extract max price from products
-      const prices = data.map((product) => product.Price);
+      const prices = filteredData.map((product) => product.Price);
       const maxPrice = Math.max(...prices);
       setMaxPrice(maxPrice);
       setCurrentMaxPrice(maxPrice);

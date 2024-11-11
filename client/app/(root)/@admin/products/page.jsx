@@ -12,13 +12,13 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-  } from "@/components/ui/table"
-  import {
+} from "@/components/ui/table"
+import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-  } from "@/components/ui/tabs"
+} from "@/components/ui/tabs"
 import { fetcher } from "@/lib/fetch-client"
 import Search from "@/components/admin/Search"
 import PriceSlider from "@/components/admin/PriceSlider"
@@ -33,12 +33,11 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-  } from "@/components/ui/tooltip"
+} from "@/components/ui/tooltip"
 import { getSession } from "@/lib/session"
 import Image from "next/image"
 
-export default async function DashboardPage({ searchParams }) 
-{
+export default async function DashboardPage({ searchParams }) {
     const session = await getSession()
 
     console.log(session.user.userId)
@@ -49,17 +48,17 @@ export default async function DashboardPage({ searchParams })
     const rating = searchParams['rating'] ?? undefined
 
     let query = '/products?'
-    if(search) query += `search=${search}&`
-    if(minPrice) query += `minPrice=${minPrice}&`
-    if(maxPrice) query += `maxPrice=${maxPrice}`
+    if (search) query += `search=${search}&`
+    if (minPrice) query += `minPrice=${minPrice}&`
+    if (maxPrice) query += `maxPrice=${maxPrice}`
 
-    if(query.endsWith("?")) query = '/products'
+    if (query.endsWith("?")) query = '/products'
 
     const productsResponse = await fetcher(query).catch(err => err)
 
     let products = []
 
-    if(productsResponse?.ok) products = await productsResponse.json()
+    if (productsResponse?.ok) products = await productsResponse.json()
 
     return (
         <Tabs defaultValue="all">
@@ -69,8 +68,8 @@ export default async function DashboardPage({ searchParams })
                     <TabsTrigger value="my-products">My Products</TabsTrigger>
                 </TabsList>
                 <div className="flex items-center gap-4 ml-auto">
-                    
-                   
+
+
                     {(query !== '/products' || rating) && <ClearFiltersBtn />}
                     <SortRatingBtn />
                     <PriceSlider products={products} />
@@ -128,7 +127,7 @@ export default async function DashboardPage({ searchParams })
                                 {products?.sort((a, b) => rating === 'asc' ? a?.Rating - b?.Rating : rating === 'desc' ? b?.Rating - a?.Rating : a?.createdAt - b?.createdAt).map((product) => product?._id ? (
                                     <TableRow key={product?._id}>
                                         <TableCell className="hidden sm:table-cell">
-                                            <Image 
+                                            <Image
                                                 src={product?.Image.startsWith('http://') || product?.Image.startsWith('https://') || product?.Image.startsWith('www') || product?.Image.startsWith('i.') || product?.Image.startsWith('m.') ? product?.Image : `/images/${product?.Image}`}
                                                 width={50}
                                                 height={50}
@@ -141,13 +140,13 @@ export default async function DashboardPage({ searchParams })
                                         <TableCell className="font-medium">
                                             {product?.Seller?.UserName}
                                         </TableCell>
-                                        
+
                                         <TableCell>
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger>{product?.Description.slice(0, 10)}...</TooltipTrigger>
                                                     <TooltipContent className='max-w-[420px]'>
-                                                    <p>{product?.Description}</p>
+                                                        <p>{product?.Description}</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -236,7 +235,7 @@ export default async function DashboardPage({ searchParams })
                                 {products?.filter(product => product?.Seller?._id === session?.user?.userId).sort((a, b) => rating === 'asc' ? a?.Rating - b?.Rating : rating === 'desc' ? b?.Rating - a?.Rating : a?.createdAt - b?.createdAt).map((product) => product?._id ? (
                                     <TableRow key={product?._id}>
                                         <TableCell className="hidden sm:table-cell">
-                                            <Image 
+                                            <Image
                                                 src={product?.Image.startsWith('http://') || product?.Image.startsWith('https://') || product?.Image.startsWith('www') || product?.Image.startsWith('i.') || product?.Image.startsWith('m.') ? product?.Image : `/images/${product?.Image}`}
                                                 width={80}
                                                 height={80}
@@ -249,13 +248,13 @@ export default async function DashboardPage({ searchParams })
                                         <TableCell className="font-medium">
                                             {product?.Seller?.UserName}
                                         </TableCell>
-                                        
+
                                         <TableCell>
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger>{product?.Description.slice(0, 10)}...</TooltipTrigger>
                                                     <TooltipContent className='max-w-[420px]'>
-                                                    <p>{product?.Description}</p>
+                                                        <p>{product?.Description}</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>

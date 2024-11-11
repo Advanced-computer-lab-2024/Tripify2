@@ -5,29 +5,29 @@ const Tourist = require('../models/Tourist')
 const Admin = require('../models/Admin')
 const Advertiser = require('../models/Advertiser')
 const Seller = require('../models/Seller')
-const TourGuide = require('../models/Tourguide')    
+const TourGuide = require('../models/Tourguide')
 const TourismGovernor = require('../models/TourismGovernor')
 
 async function login(req, res) {
     const { UserName, Password } = req.body
-    if(!UserName || !Password) return res.status(400).json({'message': 'All Fields Must Be Given!'})
+    if (!UserName || !Password) return res.status(400).json({ 'message': 'All Fields Must Be Given!' })
 
     const foundUser = await User.findOne({ UserName }).lean().exec()
-    if(!foundUser) return res.status(400).json({'message': 'User Not Found!'})
+    if (!foundUser) return res.status(400).json({ 'message': 'User Not Found!' })
 
-    if(foundUser.RequestDelete) return res.status(400).json({'message': 'User Requested To Delete!'})
+    if (foundUser.RequestDelete) return res.status(400).json({ 'message': 'User Requested To Delete!' })
 
     const correctPwd = await bcrypt.compare(Password, foundUser.Password)
-    if(!correctPwd) return res.status(400).json({'message': 'Password Is Wrong!'})
+    if (!correctPwd) return res.status(400).json({ 'message': 'Password Is Wrong!' })
 
 
     let user
-    if(foundUser.Role === 'Tourist') user = await Tourist.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-    else if(foundUser.Role === 'Admin') user = await Admin.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-    else if(foundUser.Role === 'Advertiser') user = await Advertiser.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-    else if(foundUser.Role === 'Seller') user = await Seller.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-    else if(foundUser.Role === 'TourGuide') user = await TourGuide.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-    else if(foundUser.Role === 'TourismGovernor') user = await TourismGovernor.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    if (foundUser.Role === 'Tourist') user = await Tourist.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    else if (foundUser.Role === 'Admin') user = await Admin.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+    else if (foundUser.Role === 'Advertiser') user = await Advertiser.findOne({ UserId: foundUser._id }, "_id Accepted").lean().exec()
+    else if (foundUser.Role === 'Seller') user = await Seller.findOne({ UserId: foundUser._id }, "_id Accepted").lean().exec()
+    else if (foundUser.Role === 'TourGuide') user = await TourGuide.findOne({ UserId: foundUser._id }, "_id Accepted").lean().exec()
+    else if (foundUser.Role === 'TourismGovernor') user = await TourismGovernor.findOne({ UserId: foundUser._id }, "_id").lean().exec()
 
 
     const accessToken = jwt.sign(
@@ -37,9 +37,10 @@ async function login(req, res) {
                 "id": user._id,
                 "email": foundUser.Email,
                 "username": foundUser.UserName,
-                "role": foundUser.Role
+                "role": foundUser.Role,
+                "accepted": user.Accepted
             }
-        }, 
+        },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: '1m' }
     )
@@ -47,7 +48,7 @@ async function login(req, res) {
     const refreshToken = jwt.sign(
         {
             "email": foundUser.Email
-        }, 
+        },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '30d' }
     )
@@ -59,12 +60,12 @@ async function login(req, res) {
     //     sameSite: 'None',
     //     maxAge: 30 * 24 * 60 * 60 * 1000
     // })
-
-    res.status(200).json({ accessToken, refreshToken, user: {...foundUser, userId: foundUser._id, _id: user._id } })
+    console.log({ ...foundUser, userId: foundUser._id, _id: user._id, accepted: user.Accepted })
+    console.log(user)
+    res.status(200).json({ accessToken, refreshToken, user: { ...foundUser, userId: foundUser._id, _id: user._id, accepted: (foundUser.Role === 'Advertiser' || foundUser.Role === 'Seller' || foundUser.Role === 'TourGuide') ? user.Accepted : true } })
 }
 
-async function refresh(req, res)
-{
+async function refresh(req, res) {
     const authHeader = req.headers.authorization || req.headers.Authorization
 
     if (!authHeader?.startsWith('Bearer ')) {
@@ -82,12 +83,12 @@ async function refresh(req, res)
             const foundUser = await User.findOne({ Email: decoded.email }).lean().exec()
 
             let user
-            if(foundUser?.Role === 'Tourist') user = await Tourist.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-            else if(foundUser?.Role === 'Admin') user = await Admin.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-            else if(foundUser?.Role === 'Advertiser') user = await Advertiser.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-            else if(foundUser?.Role === 'Seller') user = await Seller.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-            else if(foundUser?.Role === 'TourGuide') user = await TourGuide.findOne({ UserId: foundUser._id }, "_id").lean().exec()
-            else if(foundUser?.Role === 'TourismGovernor') user = await TourismGovernor.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            if (foundUser?.Role === 'Tourist') user = await Tourist.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            else if (foundUser?.Role === 'Admin') user = await Admin.findOne({ UserId: foundUser._id }, "_id").lean().exec()
+            else if (foundUser?.Role === 'Advertiser') user = await Advertiser.findOne({ UserId: foundUser._id }, "_id Accepted").lean().exec()
+            else if (foundUser?.Role === 'Seller') user = await Seller.findOne({ UserId: foundUser._id }, "_id Accepted").lean().exec()
+            else if (foundUser?.Role === 'TourGuide') user = await TourGuide.findOne({ UserId: foundUser._id }, "_id Accepted").lean().exec()
+            else if (foundUser?.Role === 'TourismGovernor') user = await TourismGovernor.findOne({ UserId: foundUser._id }, "_id").lean().exec()
 
             if (!foundUser) return res.status(401).json({ message: 'Unauthorized' })
 
@@ -98,22 +99,22 @@ async function refresh(req, res)
                         "id": user._id,
                         "email": foundUser.Email,
                         "username": foundUser.UserName,
-                        "role": foundUser.Role
+                        "role": foundUser.Role,
+                        "accepted": user.Accepted
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '1m' }
             )
 
-            res.json({ accessToken, refreshToken, user: {...foundUser, userId: foundUser._id, _id: user._id } })
+            res.json({ accessToken, refreshToken, user: { ...foundUser, userId: foundUser._id, _id: user._id, accepted: (foundUser.Role === 'Advertiser' || foundUser.Role === 'Seller' || foundUser.Role === 'TourGuide') ? user.Accepted : true } })
         }
     )
 }
 
-async function logout(req, res)
-{
+async function logout(req, res) {
     res.clearCookie('jwt')
-    res.json({'message': 'Logged Out Successfully!'})
+    res.json({ 'message': 'Logged Out Successfully!' })
 }
 
 module.exports = {

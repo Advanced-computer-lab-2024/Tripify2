@@ -13,7 +13,7 @@ export default function SharePlace({ place }) {
     }
 
     const handleCopyLink = () => {
-        const dummyLink = session?.data?.user ? `http://localhost:3000/place/${place._id}` : `http://localhost:3000/places-guest/${place._id}`
+        const dummyLink = session?.data?.user ? `http://localhost:3000/places/${place._id}` : `http://localhost:3000/places-guest/${place._id}`
         navigator.clipboard.writeText(dummyLink)
     }
 

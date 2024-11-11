@@ -30,10 +30,11 @@ const ItineraryComponent = () => {
           },
         }).catch((e) => console.log(e));
         const data = await response.json();
-        setTheItineraries(data);
+        const dataFiltered = data.filter(itinerary => !itinerary.Inappropriate)
+        setTheItineraries(dataFiltered);
 
         const maxPriceFromData = Math.max(
-          ...data.map((itinerary) => itinerary.Price)
+          ...dataFiltered.map((itinerary) => itinerary.Price)
         );
         setMaxPrice(maxPriceFromData);
         setFilteredPrice(maxPriceFromData);
@@ -42,7 +43,7 @@ const ItineraryComponent = () => {
         const tagsSet = new Set();
         const languagesSet = new Set();
 
-        data.forEach((itinerary) => {
+        dataFiltered.forEach((itinerary) => {
           itinerary.Category.forEach((category) => {
             categoriesSet.add(category.Category);
           });

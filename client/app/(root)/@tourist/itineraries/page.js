@@ -35,10 +35,11 @@ const ItineraryComponent = () => {
           },
         }).catch((e) => console.log(e));
         const data = await response.json();
-        setTheItineraries(data);
+        const filteredData = data.filter(itinerary => !itinerary.Inappropriate)
+        setTheItineraries(filteredData);
 
         const maxPriceFromData = Math.max(
-          ...data.map((itinerary) => convertPrice(itinerary.Price, currency))
+          ...filteredData.map((itinerary) => convertPrice(itinerary.Price, currency))
         );
         setMaxPrice(maxPriceFromData);
         setFilteredPrice(maxPriceFromData);
@@ -47,7 +48,7 @@ const ItineraryComponent = () => {
         const tagsSet = new Set();
         const languagesSet = new Set();
 
-        data.forEach((itinerary) => {
+        filteredData.forEach((itinerary) => {
           itinerary.Category.forEach((category) => {
             categoriesSet.add(category.Category);
           });
@@ -108,15 +109,15 @@ const ItineraryComponent = () => {
     selectedCategories.length === 0 && selectedTags.length === 0
       ? theItineraries
       : theItineraries.filter((itinerary) => {
-          const categoryMatches = itinerary.Category.some((category) => {
-            return selectedCategories.includes(category.Category);
-          });
-          const tagMatches = itinerary.Tag.some((tag) => {
-            return selectedTags.includes(tag.Tag);
-          });
-
-          return tagMatches || categoryMatches;
+        const categoryMatches = itinerary.Category.some((category) => {
+          return selectedCategories.includes(category.Category);
         });
+        const tagMatches = itinerary.Tag.some((tag) => {
+          return selectedTags.includes(tag.Tag);
+        });
+
+        return tagMatches || categoryMatches;
+      });
 
   const filteredItineraries = itinerariesWithCategoriesAndTags.filter(
     (itinerary) => {

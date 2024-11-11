@@ -57,6 +57,7 @@ export default function ProductDetail({ params }) {
       <p>Seller Name: {sellerName ? sellerName : 'Loading seller...'}</p> {/* Display seller name */}
       <p>Rating: {product.Rating}</p>
       <p>Available Quantity: {product.AvailableQuantity}</p>
+      <p>Total Sales: {product.TotalSales}</p>
     </div>
   );
 }

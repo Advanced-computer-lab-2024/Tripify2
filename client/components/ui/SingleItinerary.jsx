@@ -28,7 +28,7 @@ export default function ItineraryDetails({ itinerary }) {
   }
 
   const handleCopyLink = () => {
-    const dummyLink = session?.data?.user ? `http://localhost:3000/itinerary/${itinerary._id}` : `http://localhost:3000/itineraries-guest/${itinerary._id}`
+    const dummyLink = session?.data?.user ? `http://localhost:3000/itineraries/${itinerary._id}` : `http://localhost:3000/itineraries-guest/${itinerary._id}`
     navigator.clipboard.writeText(dummyLink)
   }
 
@@ -176,7 +176,7 @@ export default function ItineraryDetails({ itinerary }) {
             </div>
             <button
               onClick={handleBook}
-              disabled={itinerary.RemainingBookings === 0}
+              disabled={itinerary.RemainingBookings === 0 || !itinerary.Accesibility}
               className="px-6 py-3 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg disabled:opacity-65 disabled:hover:scale-100 disabled:hover:bg-gray-500 disabled:bg-gray-500 hover:bg-blue-600 hover:scale-105"
             >
               Book Now

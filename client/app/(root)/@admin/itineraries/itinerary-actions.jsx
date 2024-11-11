@@ -9,8 +9,7 @@ import { EyeIcon, Flag, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-export default function ItineraryActions({ itinerary })
-{
+export default function ItineraryActions({ itinerary }) {
     const router = useRouter()
 
     const [view, setView] = useState(false)
@@ -20,8 +19,7 @@ export default function ItineraryActions({ itinerary })
 
     const handleFlagItinerary = async () => {
         setLoading(true)
-        try 
-        {
+        try {
             const response = await fetcher(`/itineraries/flag/${itinerary._id}`, {
                 method: 'PATCH'
             })
@@ -29,15 +27,13 @@ export default function ItineraryActions({ itinerary })
                 setLoading(false)
                 setError('Failed to flag itinerary')
             }
-            else 
-            {
+            else {
                 setFlag(false)
                 setLoading(false)
                 router.refresh()
             }
-        } 
-        catch (error) 
-        {
+        }
+        catch (error) {
             console.error(error)
         }
     }
@@ -50,7 +46,7 @@ export default function ItineraryActions({ itinerary })
                     View
                 </div>
                 {itinerary?.Inappropriate ? (
-                    <div className='flex items-center justify-center gap-1 text-red-700 cursor-pointer'>
+                    <div onClick={() => setFlag(true)} className='flex items-center justify-center gap-1 text-red-700 cursor-pointer'>
                         <Flag size={16} fill='#b91c1c' stroke="#b91c1c" />
                         Flagged
                     </div>

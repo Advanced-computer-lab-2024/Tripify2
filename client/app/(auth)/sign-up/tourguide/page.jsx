@@ -25,6 +25,7 @@ import { useUploadThing } from "@/lib/uploadthing-hook"
 import { Checkbox } from "@/components/ui/CheckBoxInput"
 import { Label } from "@/components/ui/LabelInput"
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog"
+import Link from "next/link"
 
 const tourguideSignUpSchema = z.object({
     UserName: z.string().min(2, {
@@ -76,6 +77,7 @@ export default function Tourguide() {
 
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     const form = useForm({
         resolver: zodResolver(tourguideSignUpSchema),
@@ -117,8 +119,8 @@ export default function Tourguide() {
                     }
                     else {
                         setError(null)
-                        await signIn("credentials", { username: values.UserName, password: values.Password })
-                        router.push('/')
+                        // await signIn("credentials", { username: values.UserName, password: values.Password })
+                        setSuccess(true)
                     }
                 })
 
@@ -297,6 +299,15 @@ export default function Tourguide() {
                         {error && (
                             <Callout className="max-w-[340px]" variant="error" title="Something went wrong">
                                 {error}
+                            </Callout>
+                        )}
+                        {success && (
+                            <Callout className="max-w-[340px]" variant="success" title="Success">
+                                You have successfully signed up as a tour guide!
+                                {" "}
+                                <Link href='/' className='underline'>
+                                    Go to Home Page
+                                </Link>
                             </Callout>
                         )}
                     </form>

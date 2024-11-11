@@ -87,7 +87,7 @@ const getItineraries = async (req, res) => {
   try {
     if (!categories || !tags || categories?.length === 0 || tags?.length === 0) {
       console.log("categories inside")
-      const itineraries = await ItineraryModel.find({ Inappropriate: false | null })
+      const itineraries = await ItineraryModel.find({})
         .populate("Tag")
         .populate("Category")
         .populate({
@@ -271,7 +271,10 @@ const flagItinerary = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const itinerary = await ItineraryModel.findByIdAndUpdate(id, { Inappropriate: true }, { new: true });
+    const itinerary = await ItineraryModel.findById(id)
+    itinerary.Inappropriate = !itinerary.Inappropriate
+    await itinerary.save()
+    // const itinerary = await ItineraryModel.findByIdAndUpdate(id, { Inappropriate: true }, { new: true });
 
     if (!itinerary) return res.status(404).json({ msg: `Cannot find any Itinerary with id ${id}` });
     return res.status(200).json("Itinerary flagged successfully");

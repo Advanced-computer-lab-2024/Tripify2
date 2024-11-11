@@ -48,6 +48,7 @@ const createTourguideProfile = async (req, res) => {
       PreviousWork: PreviousWork ?? "",
       Documents,
       UserId: user._id,
+      Rating: 0,
     });
 
     res.status(201).json({
@@ -131,7 +132,7 @@ const getTourguideProfile = async (req, res) => {
     return res
       .status(200)
       .json({ message: "Tourguides read successfully", tourguide: tourguide });
-    
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

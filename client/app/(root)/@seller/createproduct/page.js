@@ -1,7 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { fetcher } from "@/lib/fetch-client";
-import {useSession} from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useUploadThing } from "@/lib/uploadthing-hook";
+import Image from "next/image";
+import { UploadIcon } from "lucide-react";
 
 export default function AddProduct() {
   const [name, setName] = useState("");
@@ -9,14 +12,22 @@ export default function AddProduct() {
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(0);
-  const [loading, setLoading] = useState(false); 
-  const [error, setError] = useState(null); 
-  const [success, setSuccess] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const { startUpload } = useUploadThing('imageUploader')
+  const inputRef = useRef(null)
+
   const session = useSession();
   const createProduct = async () => {
     setLoading(true);
     setError(null);
     setSuccess(false);
+
+    const imageUploadResult = await startUpload([image])
+
+    const Image = imageUploadResult[0].url
+
     try {
       const response = await fetcher("/products", {
         method: "POST",
@@ -25,11 +36,11 @@ export default function AddProduct() {
         },
         body: JSON.stringify({
           Name: name,
-          Image: image,
+          Image: Image,
           Price: parseFloat(price),
           Description: description,
-          AvailableQuantity:quantity,
-          Seller:session?.data?.user?.userId,
+          AvailableQuantity: quantity,
+          Seller: session?.data?.user?.userId,
         }),
       });
 
@@ -37,7 +48,7 @@ export default function AddProduct() {
         throw new Error("Failed to create product.");
       }
 
-      setSuccess(true); 
+      setSuccess(true);
       setName("");
       setImage("");
       setPrice(0);
@@ -71,13 +82,35 @@ export default function AddProduct() {
         </div>
         <div style={styles.inputGroup}>
           <label style={styles.label}>Image URL:</label>
-          <input
-            type="text"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            required
-            style={styles.input}
-          />
+          {image ? (
+            <div onClick={() => inputRef.current.click()} className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer'>
+              <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+              <input
+                type="file"
+                accept="image/*"
+                ref={inputRef}
+                name="Image"
+                onChange={(e) => {
+                  setImage(e.target.files[0])
+                }}
+                className="z-10 hidden w-full h-full"
+              />
+            </div>
+          ) : (
+            <div onClick={() => inputRef.current.click()} className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer'>
+              <UploadIcon size={24} />
+              <input
+                type="file"
+                accept="image/*"
+                ref={inputRef}
+                name="Image"
+                onChange={(e) => {
+                  setImage(e.target.files[0])
+                }}
+                className="z-10 hidden w-full h-full"
+              />
+            </div>
+          )}
         </div>
         <div style={styles.inputGroup}>
           <label style={styles.label}>Price:</label>
@@ -99,7 +132,7 @@ export default function AddProduct() {
           />
         </div>
 
-          <div style={styles.inputGroup}>
+        <div style={styles.inputGroup}>
           <label style={styles.label}>Available Quantity:</label>
           <input
             type="number"

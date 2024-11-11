@@ -37,7 +37,7 @@ export default function Products() {
       console.log("Stringified Data: ", stringifiedData);
 
       setProducts(data.filter(product => !product.Archived));
-      setFilteredProducts(data);
+      setFilteredProducts(data.filter(product => !product.Archived));
 
       const prices = data.map((product) => convertPrice(product.Price, currency));
       const maxPrice = Math.max(...prices);

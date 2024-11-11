@@ -12,22 +12,21 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-  } from "@/components/ui/table"
-  import {
+} from "@/components/ui/table"
+import {
     Tabs,
     TabsContent,
-  } from "@/components/ui/tabs"
+} from "@/components/ui/tabs"
 import ItineraryActions from './itinerary-actions'
 import { fetcher } from "@/lib/fetch-client"
 import Image from "next/image"
 
-export default async function DashboardPage() 
-{
+export default async function DashboardPage() {
     const itinerariesResponse = await fetcher('/itineraries').catch(err => err)
 
     let itineraries = []
 
-    if(itinerariesResponse?.ok) itineraries = await itinerariesResponse.json()
+    if (itinerariesResponse?.ok) itineraries = await itinerariesResponse.json()
 
     return (
         <Tabs defaultValue="all">

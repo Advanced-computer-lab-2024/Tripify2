@@ -103,7 +103,7 @@ export default function ActivityDetails({ activity }) {
   }
 
   const handleCopyLink = () => {
-    const dummyLink = session?.data?.user ? `http://localhost:3000/activity/${activity._id}` : `http://localhost:3000/activities-guest/${activity._id}`
+    const dummyLink = session?.data?.user ? `http://localhost:3000/activities/${activity._id}` : `http://localhost:3000/activities-guest/${activity._id}`
     navigator.clipboard.writeText(dummyLink)
   }
 

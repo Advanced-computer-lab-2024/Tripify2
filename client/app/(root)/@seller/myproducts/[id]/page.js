@@ -1,24 +1,31 @@
-"use client"; 
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { fetcher } from "@/lib/fetch-client";
 import { useRouter } from 'next/navigation';
 import { Checkbox } from "@/components/ui/checkbox"
+import { useUploadThing } from "@/lib/uploadthing-hook";
+import Image from "next/image";
+import { UploadIcon } from "lucide-react";
 
 export default function ProductDetail({ params }) {
-  const { id } = params; 
+  const { id } = params;
   const [product, setProduct] = useState(null);
-  const [sellerName, setSellerName] = useState(null); 
-  const [isEditing, setIsEditing] = useState(false); 
+  const [sellerName, setSellerName] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     Name: '',
     Price: '',
     Description: '',
     Image: '',
-    AvailableQuantity: ''
+    AvailableQuantity: '',
   });
 
-  const router = useRouter(); 
+  const [image, setImage] = useState(null)
+  const { startUpload } = useUploadThing('imageUploader')
+  const inputRef = useRef(null)
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -33,8 +40,10 @@ export default function ProductDetail({ params }) {
           Description: data.Description || '',
           Image: data.Image || '',
           AvailableQuantity: data.AvailableQuantity || '',
-          Archived: data.Archived || false
+          Archived: data.Archived || false,
         });
+
+        setImage(data.Image ?? null)
 
         if (data.Seller) {
           const sellerResponse = await fetcher(`/sellers/${data.Seller}`);
@@ -64,22 +73,38 @@ export default function ProductDetail({ params }) {
   const handleSave = async () => {
     try {
       console.log("Sending PATCH request with data: ", formData);
-  
+
+      let Image = image
+      console.log(Image)
+      if (image) {
+        const imageUploadResult = await startUpload([image])
+        if (imageUploadResult?.length) {
+          // alert("Failed to upload image")
+          // return
+          Image = imageUploadResult[0].url
+        }
+      }
+
+      console.log(Image)
+
       const response = await fetcher(`/products/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          Image
+        })
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update product");
       }
-  
+
       const updatedProduct = await response.json();
-      setProduct(updatedProduct); 
-      setIsEditing(false); 
+      setProduct(updatedProduct);
+      setIsEditing(false);
     } catch (error) {
       console.error("Error updating product details: ", error);
     }
@@ -97,7 +122,7 @@ export default function ProductDetail({ params }) {
 
       console.log("Product deleted successfully");
 
-      router.push('/myproducts'); 
+      router.push('/myproducts');
     } catch (error) {
       console.error("Error deleting product: ", error);
     }
@@ -111,6 +136,35 @@ export default function ProductDetail({ params }) {
     <div style={styles.container}>
       {isEditing ? (
         <>
+          {image ? (
+            <div onClick={() => inputRef.current.click()} className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer'>
+              <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+              <input
+                type="file"
+                accept="image/*"
+                ref={inputRef}
+                name="Image"
+                onChange={(e) => {
+                  setImage(e.target.files[0])
+                }}
+                className="z-10 hidden w-full h-full"
+              />
+            </div>
+          ) : (
+            <div onClick={() => inputRef.current.click()} className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer'>
+              <UploadIcon size={24} />
+              <input
+                type="file"
+                accept="image/*"
+                ref={inputRef}
+                name="Image"
+                onChange={(e) => {
+                  setImage(e.target.files[0])
+                }}
+                className="z-10 hidden w-full h-full"
+              />
+            </div>
+          )}
           <input
             type="text"
             name="Name"
@@ -152,17 +206,17 @@ export default function ProductDetail({ params }) {
             style={styles.input}
           />
           <div className="flex items-center gap-2">
-              <label
-                  htmlFor="archived"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                  Archived
-              </label>
-              <Checkbox
-                  checked={formData.Archived}
-                  onCheckedChange={(checked) => handleChange({ target: { name: 'Archived', value: checked } })}
-                  id="archived"
-              />
+            <label
+              htmlFor="archived"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Archived
+            </label>
+            <Checkbox
+              checked={formData.Archived}
+              onCheckedChange={(checked) => handleChange({ target: { name: 'Archived', value: checked } })}
+              id="archived"
+            />
           </div>
           <button onClick={handleSave} style={styles.saveButton}>Save</button>
         </>
@@ -214,7 +268,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
-    marginRight: '10px', 
+    marginRight: '10px',
   },
   saveButton: {
     padding: '10px 20px',

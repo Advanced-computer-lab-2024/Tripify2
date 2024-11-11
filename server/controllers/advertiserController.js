@@ -39,8 +39,9 @@ const createAdvertiser = async (req, res) => {
       Website,
       Hotline,
       Document,
+      Rating: 0,
     });
-    
+
     const newCompanyProfile = await CompanyProfile.create({
       Name: CompanyName,
       Description: CompanyDescription,
@@ -63,18 +64,15 @@ const createAdvertiser = async (req, res) => {
 const getAdvertisers = async (req, res) => {
   try {
     const { accepted, application } = req.query;
-    if(accepted) 
-    {
+    if (accepted) {
       const advertisers = await advertiserModel.find({ Accepted: true }).populate("UserId");
       res.status(200).json(advertisers);
     }
-    else if(application)
-    {
+    else if (application) {
       const advertisers = await advertiserModel.find({ Accepted: null }).populate("UserId");
       res.status(200).json(advertisers);
     }
-    else
-    {
+    else {
       const advertisers = await advertiserModel.find().populate("UserId");
       res.status(200).json(advertisers);
     }
@@ -204,18 +202,12 @@ const acceptAdvertiser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const advertiser = await advertiserModel.findById(id);
-    if (advertiser.Accepted)
-      return res
-        .status(400)
-        .json({ message: "Advertiser is already accepted!" });
-    advertiser.Accepted = true;
-    await advertiser.save();
+    await advertiserModel.findByIdAndUpdate(id, { Accepted: true });
     res.status(200).json({ message: "Advertiser accepted successfully!" });
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Error accepting advertiser", error: e.message });
+      .json({ message: "Error accepting advertiser", error: error.message });
   }
 };
 
@@ -223,18 +215,12 @@ const rejectAdvertiser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const advertiser = await advertiserModel.findById(id);
-    if (advertiser.Accepted)
-      return res
-        .status(400)
-        .json({ message: "Advertiser is already accepted!" });
-    advertiser.Accepted = false;
-    await advertiser.save();
+    await advertiserModel.findByIdAndUpdate(id, { Accepted: false });
     res.status(200).json({ message: "Advertiser rejected successfully!" });
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Error rejecting advertiser", error: e.message });
+      .json({ message: "Error rejecting advertiser", error: error.message });
   }
 };
 // const deletAll = async (req, res) => {

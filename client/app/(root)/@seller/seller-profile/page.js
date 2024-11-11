@@ -42,7 +42,7 @@ export default function UserProfile() {
         if (!response.ok) throw new Error("Failed to fetch user profile");
         const data = await response.json();
         setProfile(data);
-        
+
         const sellerResponse = await fetcher(`/sellers/user/${session.user.userId}`);
         if (!sellerResponse.ok) throw new Error("Failed to fetch seller profile");
         const sellerData = await sellerResponse.json();
@@ -80,24 +80,24 @@ export default function UserProfile() {
     setSuccess(false);
 
     try {
-        const usersResponse = await fetcher(`/users`);
-        if (!usersResponse.ok) {
-            throw new Error("Failed to fetch users");
-        }
-        const existingUsers = await usersResponse.json();
+      const usersResponse = await fetcher(`/users`);
+      if (!usersResponse.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const existingUsers = await usersResponse.json();
 
-        const isUsernameTaken = existingUsers.some(user => user.UserName === formData.UserName && user._id !== profile._id);
-        const isEmailTaken = existingUsers.some(user => user.Email === formData.Email && user._id !== profile._id);
+      const isUsernameTaken = existingUsers.some(user => user.UserName === formData.UserName && user._id !== profile._id);
+      const isEmailTaken = existingUsers.some(user => user.Email === formData.Email && user._id !== profile._id);
 
-        if (isUsernameTaken) {
-            setError("Username is already taken.");
-            return;
-        }
+      if (isUsernameTaken) {
+        setError("Username is already taken.");
+        return;
+      }
 
-        if (isEmailTaken) {
-            setError("Email is already taken.");
-            return;
-        }
+      if (isEmailTaken) {
+        setError("Email is already taken.");
+        return;
+      }
 
       //   const userResponse = await fetcher(`/users/${session?.user?.userId}`, {
       //     method: "PATCH",
@@ -109,36 +109,16 @@ export default function UserProfile() {
       //         Email: formData.Email,
       //     }),
       // });
-      
+
       // if (!userResponse.ok) {
       //     throw new Error("Failed to update user profile");
       // }
 
       let Image = ''
 
-      if(image) {
-        const imageUploadResult = await startUpload([image])
-        if(!imageUploadResult.length) {
-          alert("Failed to upload image")
-          return
-        }
-        Image = imageUploadResult[0].url
-      }
-      
-      const sellerResponse = await fetcher(`/sellers/${sellerProfile?._id}`, {
-          method: "PATCH",
-          headers: {
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-              Description: formData.Description,
-              UserName: formData.UserName,
-              Email: formData.Email,
-              Image
-          }),
-      });
+      console.log(image)
 
-      if(oldPassword !== "" && newPassword !== "") {
+      if (oldPassword !== "" && newPassword !== "") {
         const changePasswordRes = await fetcher(`/users/change-password/${session?.user?.userId}`, {
           method: "PATCH",
           headers: {
@@ -151,34 +131,57 @@ export default function UserProfile() {
           throw new Error("Failed to update password");
         }
 
+        console.log(image)
+
         setOldPassword("");
         setNewPassword("");
       }
-      
+
+      if (image) {
+        const imageUploadResult = await startUpload([image])
+        if (imageUploadResult?.length) {
+          // alert("Failed to upload image")
+          // return
+          Image = imageUploadResult[0].url
+        }
+        else Image = image
+        console.log(Image)
+      }
+
+      await fetcher(`/sellers/${sellerProfile?._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Description: formData.Description,
+          UserName: formData.UserName,
+          Email: formData.Email,
+          Image
+        }),
+      });
 
 
+      // const updatedProfile = await userResponse.json();
 
-        // const updatedProfile = await userResponse.json();
-        const updatedSellerProfile = await sellerResponse.json();
+      // setProfile(updatedProfile);
+      // setSellerProfile(updatedSellerProfile.Seller);
 
-        // setProfile(updatedProfile);
-        // setSellerProfile(updatedSellerProfile.Seller);
+      router.refresh()
 
-        router.refresh()
+      setIsEditing(false);
+      setSuccess(true);
 
-        setIsEditing(false);
-        setSuccess(true);
-
-        setTimeout(() => {
-            setSuccess(false);
-        }, 1000);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 1000);
     } catch (error) {
-        console.error("Error updating profile:", error);
-        setError(error.message || "Error updating profile");
+      console.error("Error updating profile:", error);
+      setError(error.message || "Error updating profile");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
 
 
@@ -188,15 +191,15 @@ export default function UserProfile() {
 
   return (
     <>
-    <div style={styles.container}>
-      <h1>My Profile</h1>
+      <div style={styles.container}>
+        <h1>My Profile</h1>
 
-      {isEditing ? (
-        <>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Image:</label>
+        {isEditing ? (
+          <>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Image:</label>
               {image ? (
-                <div onClick={() => inputRef.current.click()} className='relative w-16 h-16 cursor-pointer rounded-full overflow-hidden'>
+                <div onClick={() => inputRef.current.click()} className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer'>
                   <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
                   <input
                     type="file"
@@ -206,95 +209,95 @@ export default function UserProfile() {
                     onChange={(e) => {
                       setImage(e.target.files[0])
                     }}
-                    className="hidden w-full h-full z-10"
+                    className="z-10 hidden w-full h-full"
                   />
                 </div>
               ) : (
-                <div onClick={() => inputRef.current.click()} className='relative flex items-center justify-center cursor-pointer bg-gray-300 w-16 h-16 rounded-full overflow-hidden'>
-                    <UploadIcon size={24} />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={inputRef}
-                      name="Image"
-                      onChange={(e) => {
-                        setImage(e.target.files[0])
-                      }}
-                      className="hidden w-full h-full z-10"
-                    />
+                <div onClick={() => inputRef.current.click()} className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer'>
+                  <UploadIcon size={24} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={inputRef}
+                    name="Image"
+                    onChange={(e) => {
+                      setImage(e.target.files[0])
+                    }}
+                    className="z-10 hidden w-full h-full"
+                  />
                 </div>
               )}
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Username:</label>
-            <input
-              type="text"
-              name="UserName"
-              value={formData.UserName}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Email:</label>
-            <input
-              type="email"
-              name="Email"
-              value={formData.Email}
-              onChange={handleChange}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Description:</label>
-            <textarea
-              name="Description"
-              value={formData.Description}
-              onChange={handleChange}
-              style={styles.textArea}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Old Password:</label>
-            <input
-              type="password"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>New Password:</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-          <button onClick={handleSave} style={styles.saveButton} disabled={loading}>
-            {loading ? "Saving..." : "Save"}
-          </button>
-          {success && <p style={styles.successMessage}>Profile updated successfully!</p>}
-          {error && <p style={styles.errorMessage}>{error}</p>}
-        </>
-      ) : (
-        <>
-          <p><strong>Username:</strong> {profile?.UserName || "N/A"}</p>
-          <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
-          <p><strong>Description:</strong> {sellerProfile?.Description || "N/A"}</p>
+            </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Username:</label>
+              <input
+                type="text"
+                name="UserName"
+                value={formData.UserName}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Email:</label>
+              <input
+                type="email"
+                name="Email"
+                value={formData.Email}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Description:</label>
+              <textarea
+                name="Description"
+                value={formData.Description}
+                onChange={handleChange}
+                style={styles.textArea}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Old Password:</label>
+              <input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>New Password:</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+            <button onClick={handleSave} style={styles.saveButton} disabled={loading}>
+              {loading ? "Saving..." : "Save"}
+            </button>
+            {success && <p style={styles.successMessage}>Profile updated successfully!</p>}
+            {error && <p style={styles.errorMessage}>{error}</p>}
+          </>
+        ) : (
+          <>
+            <p><strong>Username:</strong> {profile?.UserName || "N/A"}</p>
+            <p><strong>Email:</strong> {profile?.Email || "N/A"}</p>
+            <p><strong>Description:</strong> {sellerProfile?.Description || "N/A"}</p>
 
-          <div className='flex gap-2'>
-            <Button onClick={() => setIsEditing(true)}>
-              Edit Profile
-            </Button>
-            <Button variant='destructive' onClick={() => setRequestOpen(true)}>Request Deletion</Button>
-          </div>
-        </>
-      )}
-      
-    </div>
-    <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
+            <div className='flex gap-2'>
+              <Button onClick={() => setIsEditing(true)}>
+                Edit Profile
+              </Button>
+              <Button variant='destructive' onClick={() => setRequestOpen(true)}>Request Deletion</Button>
+            </div>
+          </>
+        )}
+
+      </div>
+      <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
         <DialogContent>
           <DialogHeader>Are you sure you want to request deletion of your account?</DialogHeader>
           <DialogFooter>

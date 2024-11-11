@@ -1,11 +1,12 @@
 import Dashboard from "@/components/ui/dashboard";
-import { GeistSans } from "geist/font/sans"; 
+import { GeistSans } from "geist/font/sans";
 
 import { Poppins } from "next/font/google";
 
 import "../globals.css";
 import { getSession } from "@/lib/session";
 import AuthProvider from "@/providers/SessionProvider";
+import { CurrencyStoreProvider } from "@/providers/CurrencyProvider";
 
 export const metadata = {
   title: "Tripify",
@@ -37,26 +38,28 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${GeistSans.className} ${poppins.variable} antialiased dark:bg-gray-950`}>
-      <AuthProvider>
-        <body>
-          {/* <header>
-            <Dashboard params={{ role: "Advertiser" }} />
-          </header> */}
-          {session?.user?.role === "Tourist"
-            ? tourist
-            : session?.user?.role === "Admin"
-            ? admin
-            : session?.user?.role === "Advertiser"
-            ? advertiser
-            : session?.user?.role === "Seller"
-            ? seller
-            : session?.user?.role === "TourGuide"
-            ? tourGuide
-            : session?.user?.role === "TourismGovernor"
-            ? tourismGovernor
-            : guest}
-        </body>
-      </AuthProvider>
+      <CurrencyStoreProvider>
+        <AuthProvider>
+          <body>
+            {/* <header>
+              <Dashboard params={{ role: "Advertiser" }} />
+            </header> */}
+            {session?.user?.role === "Tourist"
+              ? tourist
+              : session?.user?.role === "Admin"
+                ? admin
+                : session?.user?.role === "Advertiser"
+                  ? advertiser
+                  : session?.user?.role === "Seller"
+                    ? seller
+                    : session?.user?.role === "TourGuide"
+                      ? tourGuide
+                      : session?.user?.role === "TourismGovernor"
+                        ? tourismGovernor
+                        : guest}
+          </body>
+        </AuthProvider>
+      </CurrencyStoreProvider>
     </html>
   );
 }

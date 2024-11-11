@@ -28,7 +28,7 @@ export default function CustomizeVacationPage({ tags, categories, flights, place
   }
 
   const handleSubmit = async () => {
-    router.push(`/vacation-results?origin=${origin}&destination=${destination}&tags=${selectedTags.join(',')}&categories=${selectedCategories.join(',')}&startDate=${startDate}&endDate=${endDate}&places=${selectedPlaces.join(',')}`)
+    router.push(`/vacation-results?origin=${origin}&destination=${destination}&tags=${selectedTags.join('-')}&categories=${selectedCategories.join('-')}&startDate=${startDate}&endDate=${endDate}&places=${selectedPlaces.join('-')}`)
   }
 
   return (

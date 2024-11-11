@@ -18,6 +18,15 @@ const bcrypt = require("bcrypt");
 
 // }
 
+const getAllDeleteRequests = async (req, res) => {
+  try {
+    const users = await userModel.find({ RequestDelete: true });
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to fetch users' });
+  }
+}
+
 const createUser = async (req, res) => {
   const { UserName, Email, Password } = req.body;
 
@@ -128,62 +137,58 @@ const deleteUser = async (req, res) => {
 };
 
 const updatePassword = async (req, res) => {
-	const { oldPassword, newPassword } = req.body
+  const { oldPassword, newPassword } = req.body
 
-	if(!oldPassword || !newPassword) return res.status(400).json({ message: "All Fields Must Be Given!" })
+  if (!oldPassword || !newPassword) return res.status(400).json({ message: "All Fields Must Be Given!" })
 
-	const { id } = req.params
+  const { id } = req.params
 
-	try 
-	{
-		console.log(req._id)
-		console.log(id)
+  try {
+    console.log(req._id)
+    console.log(id)
 
-		if(id !== req._id) return res.status(403).json({ message: "You are not authorized to change this user's password!" })
+    if (id !== req._id) return res.status(403).json({ message: "You are not authorized to change this user's password!" })
 
-		const user = await userModel.findById(id)
+    const user = await userModel.findById(id)
 
-		if(!user) return res.status(404).json({ message: "User not found!" })
+    if (!user) return res.status(404).json({ message: "User not found!" })
 
-		const isPasswordValid = await bcrypt.compare(oldPassword, user.Password)
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.Password)
 
-		if(!isPasswordValid) return res.status(401).json({ message: "Invalid password!" })
+    if (!isPasswordValid) return res.status(401).json({ message: "Invalid password!" })
 
-		const hashedPwd = await bcrypt.hash(newPassword, 10)
+    const hashedPwd = await bcrypt.hash(newPassword, 10)
 
-		user.Password = hashedPwd
+    user.Password = hashedPwd
 
-		await user.save()
+    await user.save()
 
-		res.status(200).json({ message: "Password updated successfully!" })
-	}
-	catch(e)
-	{
-		res.status(500).json({ message: e.message })
-	}
+    res.status(200).json({ message: "Password updated successfully!" })
+  }
+  catch (e) {
+    res.status(500).json({ message: e.message })
+  }
 }
 
 const requestDeleteUser = async (req, res) => {
-	const { id } = req.params
+  const { id } = req.params
 
-	if(id !== req._id) return res.status(403).json({ message: "You are not authorized to delete this user!" })
+  if (id !== req._id) return res.status(403).json({ message: "You are not authorized to delete this user!" })
 
-	try
-	{
-		const user = await userModel.findById(id)
+  try {
+    const user = await userModel.findById(id)
 
-		if(!user) return res.status(404).json({ message: "User not found!" })
+    if (!user) return res.status(404).json({ message: "User not found!" })
 
-		user.RequestDelete = true
+    user.RequestDelete = true
 
-		await user.save()
-		
-		res.status(200).json({ message: "User deletion requested successfully!" })
-	}
-	catch(e)
-	{
-		res.status(500).json({ message: e.message })
-	}
-} 
+    await user.save()
 
-module.exports = { requestDeleteUser, getAllUsers, getUser, updateUser, deleteUser, createUser, updatePassword };
+    res.status(200).json({ message: "User deletion requested successfully!" })
+  }
+  catch (e) {
+    res.status(500).json({ message: e.message })
+  }
+}
+
+module.exports = { getAllDeleteRequests, requestDeleteUser, getAllUsers, getUser, updateUser, deleteUser, createUser, updatePassword };

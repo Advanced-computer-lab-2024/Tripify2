@@ -6,6 +6,7 @@ const activitiesRouter = express.Router();
 const productRouter = express.Router();
 const flightRouter = express.Router();
 const hotelRouter = express.Router();
+const transportationRouter = express.Router();
 
 const {
   createItineraryBooking,
@@ -23,6 +24,8 @@ const {
   getMyFlightBookings,
   createHotelBooking,
   getMyHotelBookings,
+  createTransportationBooking,
+  getMyTransportationBookings
 } = require("../controllers/bookingController");
 
 const bodyParser = require('body-parser');
@@ -53,12 +56,17 @@ flightRouter.get("", verifyTourist, getMyFlightBookings);
 hotelRouter.post("/create-booking/:id", verifyTourist, createHotelBooking);
 hotelRouter.get("", verifyTourist, getMyHotelBookings);
 
+//transportation routes
+transportationRouter.post("/create-booking/:id", verifyTourist, createTransportationBooking);
+transportationRouter.get("", verifyTourist, getMyTransportationBookings);
+
 router.use("/itineraries", itinerariesRouter);
 router.use("/activities", activitiesRouter);
 router.use("/products", productRouter);
 router.use("/flights", flightRouter);
 router.use("/hotels", hotelRouter);
+router.use("/transportations", transportationRouter);
 
-router.post("/callback", bodyParser.raw({type: 'application/json'}), acceptBooking);
+router.post("/callback", bodyParser.raw({ type: 'application/json' }), acceptBooking);
 
 module.exports = router;

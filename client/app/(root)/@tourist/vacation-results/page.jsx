@@ -2,22 +2,29 @@ import VacationResults from './vacation-results'
 import { fetcher } from '@/lib/fetch-client'
 import { getCityName, getCountryFromCoordinates, getCountryName } from '@/lib/utils'
 
-export default async function VacationResultsPage({ searchParams }) 
-{
+export default async function VacationResultsPage({ searchParams }) {
+    console.log(searchParams)
+
     const origin = searchParams['origin']
     const destination = searchParams['destination']
-    const tags = searchParams['tags']?.split(',') || []
-    const categories = searchParams['categories']?.split(',') || []
+    const tags = searchParams['tags']?.split('-') || []
+    const categories = searchParams['categories']?.split('-') || []
     const startDate = searchParams['startDate'] || ''
+
+    console.log(origin)
+    console.log(destination)
+    console.log(tags)
+    console.log(categories)
+    console.log(startDate)
 
     const [flightsData, hotelsData, itinerariesData, activitiesData] = await Promise.all([
         fetcher(`/flights?origin=${origin}&destination=${destination}&startDate=${startDate}`),
         fetcher(`/hotels`),
-        fetcher(`/itineraries?&categories=${categories.join(',')}&tags=${tags.join(',')}`),
-        fetcher(`/activities?&categories=${categories.join(',')}&tags=${tags.join(',')}`)
+        fetcher(`/itineraries?&categories=${categories.join('-')}&tags=${tags.join('-')}`),
+        fetcher(`/activities?&categories=${categories.join('-')}&tags=${tags.join('-')}`)
     ])
-    
-    if(!flightsData?.ok || !hotelsData?.ok || !itinerariesData?.ok || !activitiesData?.ok) {
+
+    if (!flightsData?.ok || !hotelsData?.ok || !itinerariesData?.ok || !activitiesData?.ok) {
         const flightsError = await flightsData.json()
         const hotelsError = await hotelsData.json()
         const itinerariesError = await itinerariesData.json()
@@ -30,7 +37,7 @@ export default async function VacationResultsPage({ searchParams })
     const hotels = await hotelsData.json()
     const itineraries = await itinerariesData.json()
     const activities = await activitiesData.json()
-    
+
     const destinationCity = getCityName(destination)
     const destinationCountry = getCountryName(destinationCity)
 

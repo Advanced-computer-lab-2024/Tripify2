@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router();
-const { getAllUsers, createUser, getUser, updateUser, deleteUser, updatePassword, requestDeleteUser } = require('../controllers/userController')
+const { getAllDeleteRequests, getAllUsers, createUser, getUser, updateUser, deleteUser, updatePassword, requestDeleteUser } = require('../controllers/userController')
 const verifyUser = require('../middleware/verifyJWT')
+const verifyAdmin = require('../middleware/verifyAdminOnly')
 
 router.route('/')
     .get(getAllUsers)
@@ -18,4 +19,7 @@ router.route('/change-password/:id')
 router.route('/request-deletion/:id')
     .post(verifyUser, requestDeleteUser)
 
-module.exports=router;
+router.route('/get-all/delete-requests')
+    .get(verifyAdmin, getAllDeleteRequests)
+
+module.exports = router;

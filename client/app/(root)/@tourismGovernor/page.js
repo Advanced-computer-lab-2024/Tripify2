@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Trash2 } from "lucide-react";
 import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
+import LogoutBtn from "@/components/ui/LogoutBtn";
 
 export default function MyPlaces() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function MyPlaces() {
         const categoryResponse = await fetch('http://localhost:3001/categories');
         const categoryData = await categoryResponse.json();
         setCategoriesButton(categoryData);
-        
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -123,9 +124,9 @@ export default function MyPlaces() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({...newPlace, TourismGovernor: session?.data?.user?.id, Location: newPlace.location}),
+        body: JSON.stringify({ ...newPlace, TourismGovernor: session?.data?.user?.id, Location: newPlace.location }),
       });
-    
+
       const data = await response.json();
       setPlaces([...places, data]); // Update the places list with the new place
       setNewPlace({ Name: '', Description: '', Categories: [], Tags: [] }); // Reset the newPlace state
@@ -163,7 +164,8 @@ export default function MyPlaces() {
         await fetcher(`/places/${id}`, {
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json'},
+            'Content-Type': 'application/json'
+          },
         });
         setPlaces(places.filter(place => place._id !== id)); // Remove deleted place from the list
       } catch (err) {
@@ -175,7 +177,7 @@ export default function MyPlaces() {
   };
 
   console.log(newPlace.location)
-  
+
   const startEdit = (place) => {
     // Redirect to the update page and pass the place data as query params
     router.push(`/${place._id}`);
@@ -195,136 +197,137 @@ export default function MyPlaces() {
 
   return (
     <div style={styles.container}>
-      <nav className='h-16 w-full bg-black flex items-center justify-end px-4'>
+      <nav className='flex items-center justify-end w-full h-16 px-4 bg-black'>
         <Button onClick={() => router.push('/change-password')} variant="outline">Change Password</Button>
+        <LogoutBtn />
       </nav>
-    <h1 className= "text-xl font-bold">My Created Museums and Historical Places</h1>
-  
-    {/* Create Place Section */}
-    <h2 className= "text-xl font-bold">Create a New Place</h2>
-    <input
-      type="text"
-      placeholder="Name"
-      value={newPlace.Name}
-      onChange={(e) => setNewPlace({ ...newPlace, Name: e.target.value })}
-    />
-    <input
-      type="text"
-      placeholder="Description"
-      value={newPlace.Description}
-      onChange={(e) => setNewPlace({ ...newPlace, Description: e.target.value })}
-    />
-    <input
-      type="text"
-      placeholder="Type"
-      value={newPlace.Type}
-      onChange={(e) => setNewPlace({ ...newPlace, Type: e.target.value })}
-    />
-    <input
-      type="text"
-      placeholder="Location"
-      value={newPlace.Location}
-      onChange={(e) => setNewPlace({ ...newPlace, Location: e.target.value })}
-    />
-    <input
-      type="text"
-      placeholder="Opening Hours"
-      value={newPlace.OpeningHours}
-      onChange={(e) => setNewPlace({ ...newPlace, OpeningHours: e.target.value })}
-    />
-    <input
-      type="text"
-      placeholder="Pictures (comma-separated URLs)"
-      value={newPlace.Pictures}
-      onChange={(e) => setNewPlace({ ...newPlace, Pictures: e.target.value.split(',') })}
-    />
-    {/* <input
+      <h1 className="text-xl font-bold">My Created Museums and Historical Places</h1>
+
+      {/* Create Place Section */}
+      <h2 className="text-xl font-bold">Create a New Place</h2>
+      <input
+        type="text"
+        placeholder="Name"
+        value={newPlace.Name}
+        onChange={(e) => setNewPlace({ ...newPlace, Name: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Description"
+        value={newPlace.Description}
+        onChange={(e) => setNewPlace({ ...newPlace, Description: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Type"
+        value={newPlace.Type}
+        onChange={(e) => setNewPlace({ ...newPlace, Type: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Location"
+        value={newPlace.Location}
+        onChange={(e) => setNewPlace({ ...newPlace, Location: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Opening Hours"
+        value={newPlace.OpeningHours}
+        onChange={(e) => setNewPlace({ ...newPlace, OpeningHours: e.target.value })}
+      />
+      <input
+        type="text"
+        placeholder="Pictures (comma-separated URLs)"
+        value={newPlace.Pictures}
+        onChange={(e) => setNewPlace({ ...newPlace, Pictures: e.target.value.split(',') })}
+      />
+      {/* <input
       type="text"
       placeholder="Ticket Prices (JSON format)"
       value={newPlace.TicketPrices}
       onChange={(e) => setNewPlace({ ...newPlace, TicketPrices: JSON.parse(e.target.value) })}
     /> */}
-    <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold mb-4">Ticket Prices</h2>
-      <div className="flex space-x-2">
-        <Input
-          type="text"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          placeholder="Enter ticket type"
-          className="flex-1"
-        />
-        <Input
-          type="number"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="Enter price"
-          className="flex-1"
-        />
-        <Button onClick={handleAddPair}>Add</Button>
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Current Ticket Prices:</h3>
-        <div className="space-y-2">
-          {Object.entries(newPlace.TicketPrices || {}).map(([k, v]) => (
-            <div key={k} className="flex items-center space-x-2">
-              <span className="font-medium w-1/3">{k}:</span>
-              <Input
-                type="number"
-                value={v}
-                onChange={(e) => handleEditValue(k, e.target.value)}
-                className="flex-1"
-              />
-              <Button
-                onClick={() => handleDeletePair(k)}
-                variant="destructive"
-                size="icon"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+      <div className="p-4 space-y-4">
+        <h2 className="mb-4 text-xl font-bold">Ticket Prices</h2>
+        <div className="flex space-x-2">
+          <Input
+            type="text"
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            placeholder="Enter ticket type"
+            className="flex-1"
+          />
+          <Input
+            type="number"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Enter price"
+            className="flex-1"
+          />
+          <Button onClick={handleAddPair}>Add</Button>
+        </div>
+        <div>
+          <h3 className="mb-2 text-lg font-semibold">Current Ticket Prices:</h3>
+          <div className="space-y-2">
+            {Object.entries(newPlace.TicketPrices || {}).map(([k, v]) => (
+              <div key={k} className="flex items-center space-x-2">
+                <span className="w-1/3 font-medium">{k}:</span>
+                <Input
+                  type="number"
+                  value={v}
+                  onChange={(e) => handleEditValue(k, e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={() => handleDeletePair(k)}
+                  variant="destructive"
+                  size="icon"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-    <div className="space-y-4">
-      <h3 className="text-xl font-bold">Location</h3>
-      <LocationPicker onLocationSelect={handleLocationSelect} />
-    </div>
-    {/* Render Category Radio Buttons */}
-<h3 className= "text-xl font-bold">Select Category</h3>
-{categoriesButton.map((category) => (
-  <label key={category._id}>
-    <input
-      type="radio"
-      name="category"
-      value={category._id}
-      checked={newPlace.Categories.includes(category._id)}
-      onChange={(e) => setNewPlace({ ...newPlace, Categories: [e.target.value] })}
-    />
-    {category.Category}
-  </label>
-))}
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold">Location</h3>
+        <LocationPicker onLocationSelect={handleLocationSelect} />
+      </div>
+      {/* Render Category Radio Buttons */}
+      <h3 className="text-xl font-bold">Select Category</h3>
+      {categoriesButton.map((category) => (
+        <label key={category._id}>
+          <input
+            type="radio"
+            name="category"
+            value={category._id}
+            checked={newPlace.Categories.includes(category._id)}
+            onChange={(e) => setNewPlace({ ...newPlace, Categories: [e.target.value] })}
+          />
+          {category.Category}
+        </label>
+      ))}
 
-{/* Render Tag Radio Buttons */}
-<h3 className= "text-xl font-bold">Select Tag</h3>
-{tagsButton.map((tag) => (
-  <label key={tag._id}>
-    <input
-      type="radio"
-      name="tag"
-      value={tag._id}
-      checked={newPlace.Tags.includes(tag._id)}
-      onChange={(e) => setNewPlace({ ...newPlace, Tags: [e.target.value] })}
-    />
-    {tag.Tag}
-  </label>
-))}
+      {/* Render Tag Radio Buttons */}
+      <h3 className="text-xl font-bold">Select Tag</h3>
+      {tagsButton.map((tag) => (
+        <label key={tag._id}>
+          <input
+            type="radio"
+            name="tag"
+            value={tag._id}
+            checked={newPlace.Tags.includes(tag._id)}
+            onChange={(e) => setNewPlace({ ...newPlace, Tags: [e.target.value] })}
+          />
+          {tag.Tag}
+        </label>
+      ))}
 
-    <Button onClick={createPlace}>Create Place</Button>
+      <Button onClick={createPlace}>Create Place</Button>
 
-     {/* Tag Creation Section */}
-     <h2 className= "text-xl font-bold">Create a New Tag</h2>
+      {/* Tag Creation Section */}
+      <h2 className="text-xl font-bold">Create a New Tag</h2>
       <input
         type="text"
         placeholder="New Tag (e.g., Monuments, Museums)"
@@ -332,37 +335,37 @@ export default function MyPlaces() {
         onChange={(e) => setNewTag(e.target.value)}
       />
       <Button onClick={createTag}>Create Tag</Button>
-  
-    <ul style={styles.placeList}>
-      {places?.map((place) => (
-        <li key={place._id} style={styles.placeItem}>
-          {place.Name}
-          {place.Image && (
-            <img
-              src={place.Image}
-              alt={place.Name}
-              style={styles.image}
-            />
-          )}
-          <p>Description: {place.Description}</p>
-          <p>Type: {place.Type}</p>
-          {place.Location && (
-            <div className="mt-4">
-              <h4 className="text-lg font-semibold mb-2">Selected Location:</h4>
-              <LocationViewer location={place.Location} />
-            </div>
-          )}
-          <p>Opening Hours: {place.OpeningHours}</p>
-          <p>Pictures: {place?.Pictures?.join(', ')}</p>
-          <p>Ticket Prices: {JSON.stringify(place.TicketPrices)}</p>
-          <p>Category: {place?.Categories?.join(', ')}</p>
-          <p>Tags: {place?.Tags?.join(', ')}</p>
-          <Button onClick={() => startEdit(place)}>View Place</Button>
-          <Button onClick={() => deletePlace(place._id)}>Delete Place</Button>
-        </li>
-      ))}
-    </ul>
-  </div>
+
+      <ul style={styles.placeList}>
+        {places?.map((place) => (
+          <li key={place._id} style={styles.placeItem}>
+            {place.Name}
+            {place.Image && (
+              <img
+                src={place.Image}
+                alt={place.Name}
+                style={styles.image}
+              />
+            )}
+            <p>Description: {place.Description}</p>
+            <p>Type: {place.Type}</p>
+            {place.Location && (
+              <div className="mt-4">
+                <h4 className="mb-2 text-lg font-semibold">Selected Location:</h4>
+                <LocationViewer location={place.Location} />
+              </div>
+            )}
+            <p>Opening Hours: {place.OpeningHours}</p>
+            <p>Pictures: {place?.Pictures?.join(', ')}</p>
+            <p>Ticket Prices: {JSON.stringify(place.TicketPrices)}</p>
+            <p>Category: {place?.Categories?.join(', ')}</p>
+            <p>Tags: {place?.Tags?.join(', ')}</p>
+            <Button onClick={() => startEdit(place)}>View Place</Button>
+            <Button onClick={() => deletePlace(place._id)}>Delete Place</Button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

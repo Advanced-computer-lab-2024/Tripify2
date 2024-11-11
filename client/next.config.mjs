@@ -16,6 +16,9 @@ const nextConfig = {
             },
             {
                 hostname: 'utfs.io',
+            },
+            {
+                hostname: 'www.mtours.gr'
             }
         ]
     }

@@ -1,12 +1,13 @@
 
 'use client'
+import LogoutBtn from '@/components/ui/LogoutBtn';
 import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
   const router = useRouter();
 
   // Function to handle profile button click
- 
+
 
   // Function to handle products button click
   const handleProductsClick = () => {
@@ -37,6 +38,7 @@ const Dashboard = () => {
         <button style={styles.button} onClick={handlecreateProductClick}>
           Post a Product for Sale
         </button>
+        <LogoutBtn />
       </div>
     </div>
   );

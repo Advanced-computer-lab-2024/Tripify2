@@ -43,16 +43,16 @@ const usdToEur = 0.92;
 const usdToEgp = 50;
 
 export const convertPrice = (price, currency) => {
-  if(currency === 'USD') return price;
-  if(currency === 'EUR') return (price * usdToEur).toFixed(2);
-  if(currency === 'EGP') return (price * usdToEgp).toFixed(2);
+  if (currency === 'USD') return price;
+  if (currency === 'EUR') return (price * usdToEur).toFixed(2);
+  if (currency === 'EGP') return (price * usdToEgp).toFixed(2);
   return price;
 }
 
 export const convertToUSD = (price, currency) => {
-  if(currency === 'USD') return price;
-  if(currency === 'EUR') return (price / usdToEur).toFixed(2);
-  if(currency === 'EGP') return (price / usdToEgp).toFixed(2);
+  if (currency === 'USD') return price;
+  if (currency === 'EUR') return (price / usdToEur).toFixed(2);
+  if (currency === 'EGP') return (price / usdToEgp).toFixed(2);
   return price;
 }
 
@@ -105,6 +105,7 @@ const airportCodeToCity = {
   JNB: "Johannesburg",
   KUL: "Kuala Lumpur",
   GIG: "Rio de Janeiro",
+  RIO: "Rio de Janeiro",
   PHX: "Phoenix",
   BOS: "Boston",
   TLV: "Tel Aviv",
@@ -183,7 +184,7 @@ const cityToCountry = {
   "Brisbane": "Australia",
   "Sydney": "Australia",
   "Auckland": "New Zealand",
-  "Montreal": "Canada",      
+  "Montreal": "Canada",
 }
 
 export function getCountryName(code) {
@@ -193,28 +194,45 @@ export function getCountryName(code) {
 export function getCountryFromCoordinates(latitude, longitude) {
   const reverseGeocode = crg.country_reverse_geocoding();
   try {
-      const result = reverseGeocode.get_country(latitude, longitude);
-      
-      if (result) {
-          return {
-              countryName: result.name,
-              countryCode: result.code,
-              success: true
-          };
-      }
-      
+    const result = reverseGeocode.get_country(latitude, longitude);
+
+    if (result) {
       return {
-          countryName: null,
-          countryCode: null,
-          success: false,
-          error: 'No country found for these coordinates'
+        countryName: result.name,
+        countryCode: result.code,
+        success: true
       };
+    }
+
+    return {
+      countryName: null,
+      countryCode: null,
+      success: false,
+      error: 'No country found for these coordinates'
+    };
   } catch (error) {
-      return {
-          countryName: null,
-          countryCode: null,
-          success: false,
-          error: error.message
-      };
+    return {
+      countryName: null,
+      countryCode: null,
+      success: false,
+      error: error.message
+    };
   }
 }
+
+export const formatCurrency = (amount, currency) => {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return formatter.format(amount);
+};
+
+export const calculateTotalPrice = (pricePerDay, startDate, endDate) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  return days * pricePerDay;
+};

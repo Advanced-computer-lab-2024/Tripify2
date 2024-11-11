@@ -170,7 +170,7 @@ export default function TouristAccount({ params }) {
     })
 
     setLoading(false)
-    
+
     if (!response.ok) {
       const data = await response.json()
       setError(data.message)
@@ -215,7 +215,7 @@ export default function TouristAccount({ params }) {
               {/* <p className="text-sm text-gray-700">Loyalty Points: </p> */}
             </div>
             <p className="text-base font-light">
-              {LoyaltyPoints} {LoyaltyPoints > 1 ? "points" : "point"}
+              {LoyaltyPoints.toFixed(2)} {LoyaltyPoints > 1 ? "points" : "point"}
             </p>
             <p onClick={() => setRedeemOpen(true)} className='text-xs underline cursor-pointer font-extralight'>
               Redeem
@@ -318,11 +318,10 @@ export default function TouristAccount({ params }) {
           <button
             onClick={handleEdit}
             disabled={!hasChanges}
-            className={`px-4 py-2 rounded-md transition duration-200 ${
-              hasChanges
+            className={`px-4 py-2 rounded-md transition duration-200 ${hasChanges
                 ? "bg-purple-600 text-white hover:bg-purple-700"
                 : "bg-gray-300 text-gray-600 cursor-not-allowed"
-            }`}
+              }`}
           >
             Edit
           </button>
@@ -357,9 +356,9 @@ export default function TouristAccount({ params }) {
                 <Button disabled={loading} className='bg-purple-600 hover:bg-purple-700 disabled:opacity-65' onClick={handleRedeem}>Redeem</Button>
               </DialogFooter>
               {error && (
-                  <Callout variant="error" title="Something went wrong">
-                      {error}
-                  </Callout>
+                <Callout variant="error" title="Something went wrong">
+                  {error}
+                </Callout>
               )}
             </DialogContent>
           </Dialog>

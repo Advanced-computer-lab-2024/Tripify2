@@ -8,10 +8,12 @@ import { useRouter } from "next/navigation";
 import React, { useState } from 'react'
 import { CalendarIcon, MapPinIcon, UserIcon, TagIcon, CurrencyDollarIcon, ClockIcon, CheckIcon, StarIcon, ShieldCheckIcon, MailIcon, LinkIcon } from 'lucide-react'
 import { Badge } from './badge'
+import { useSession } from "next-auth/react";
 // import StarRating from "../starRating";
 
 export default function ItineraryDetails({ itinerary }) {
   const router = useRouter()
+  const session = useSession()
 
   const { currency } = useCurrencyStore()
 
@@ -26,13 +28,12 @@ export default function ItineraryDetails({ itinerary }) {
   }
 
   const handleCopyLink = () => {
-    const dummyLink = `http://localhost:3000/itinerary/${itinerary.Id}`
+    const dummyLink = session?.data?.user ? `http://localhost:3000/itinerary/${itinerary._id}` : `http://localhost:3000/itineraries-guest/${itinerary._id}`
     navigator.clipboard.writeText(dummyLink)
   }
 
   const handleBook = async () => {
-    try
-    {
+    try {
       const response = await fetcher(`/bookings/itineraries/create-booking/${itinerary._id}`, {
         method: 'POST',
         headers: {
@@ -44,7 +45,7 @@ export default function ItineraryDetails({ itinerary }) {
         })
       })
 
-      if(!response?.ok) {
+      if (!response?.ok) {
         const data = await response.json()
         console.log(data.msg)
         return
@@ -52,15 +53,14 @@ export default function ItineraryDetails({ itinerary }) {
 
       const data = await response.json()
 
-      if(!data) {
+      if (!data) {
         console.log('Error creating booking')
         return
       }
 
       router.push(data.url)
     }
-    catch (error)
-    {
+    catch (error) {
       console.log(error)
     }
   }
@@ -82,7 +82,7 @@ export default function ItineraryDetails({ itinerary }) {
         </div>
 
         <div className="p-6">
-        <div className="flex justify-end mb-4 space-x-4">
+          <div className="flex justify-end mb-4 space-x-4">
             <button
               onClick={handleShareEmail}
               className="flex items-center px-4 py-2 text-white transition duration-300 bg-blue-500 rounded-lg hover:bg-blue-600"
@@ -159,7 +159,7 @@ export default function ItineraryDetails({ itinerary }) {
                   onChange={(e) => setNumParticipants(parseInt(e.target.value))}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  {[1,2,3,4,5].map(num => (
+                  {[1, 2, 3, 4, 5].map(num => (
                     <option disabled={itinerary.RemainingBookings < num} key={num} value={num}>
                       {num} {num === 1 ? 'Participant' : 'Participants'}
                     </option>

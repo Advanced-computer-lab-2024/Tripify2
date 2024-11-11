@@ -99,18 +99,21 @@ const createActivity = async (req, res) => {
 const getActivity = async (req, res) => {
   const { categories, tags } = req.query;
 
+  console.log(categories, tags);
+
   try {
-    if(!categories || !tags || categories?.length === 0 || tags?.length === 0) {
+    if (!categories || !tags || categories?.length === 0 || tags?.length === 0) {
       const activity = await activityModel
-        .find({ CategoryId: { $in: categories }, Tags: { $in: tags } })
+        .find({})
         .populate("Tags")
         .populate("CategoryId")
         .populate("AdvertiserId");
       res.status(200).json(activity);
     }
     else {
+
       const activity = await activityModel
-        .find({})
+        .find({ CategoryId: { $in: categories.split('-') }, Tags: { $in: tags.split('-') } })
         .populate("Tags")
         .populate("CategoryId")
         .populate("AdvertiserId");

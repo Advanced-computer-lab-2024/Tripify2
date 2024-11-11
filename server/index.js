@@ -37,6 +37,7 @@ app.use("/hotels", require("./routes/hotelRoutes"));
 app.use("/reviews", require("./routes/reviewRoutes"));
 app.use("/complaints", require("./routes/complaintRoutes"));
 app.use("/flights", require("./routes/flightRoutes"));
+app.use("/transportations", require("./routes/transportationRoutes"));
 // app.use("/users", require("./routes/userRoutes"));
 
 mongoose.connection.once("open", () => {

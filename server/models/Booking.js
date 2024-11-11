@@ -99,6 +99,30 @@ const ProductBooking = Booking.discriminator("product", new Schema({
     },
 }))
 
+const TransportationBooking = Booking.discriminator("transportation", new Schema({
+    TransportationId: {
+        type: Schema.Types.ObjectId,
+        ref: "Transportation",
+        required: true,
+    },
+    StartDate: {
+        type: Date,
+        required: true,
+    },
+    EndDate: {
+        type: Date,
+        required: true,
+    },
+    PickupLocation: {
+        type: String,
+        required: true,
+    },
+    DropoffLocation: {
+        type: String,
+        required: true,
+    }
+}));
+
 module.exports = {
     Booking,
     ItineraryBooking,
@@ -106,4 +130,5 @@ module.exports = {
     FlightBooking,
     HotelBooking,
     ProductBooking,
+    TransportationBooking
 }

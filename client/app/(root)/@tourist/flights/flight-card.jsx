@@ -1,5 +1,6 @@
 import { getCityName } from "@/lib/utils";
 import Link from "next/link";
+import FlightPrice from "./flight-price";
 
 export default function FlightCard({ flight }) {
     return (
@@ -15,7 +16,7 @@ export default function FlightCard({ flight }) {
                     <div className="text-sm">
                         <span className="font-medium">{flight.origin}</span> → <span className="font-medium">{flight.destination}</span>
                     </div>
-                    <div className="text-lg font-bold text-green-600">${flight.price.total}</div>
+                    <FlightPrice price={flight.price.total} />
                 </div>
             </div>
         </Link>

@@ -1,4 +1,4 @@
-const { ItineraryBooking, ActivityBooking, ProductBooking, FlightBooking, HotelBooking } = require("../models/Booking.js");
+const { ItineraryBooking, ActivityBooking, ProductBooking, FlightBooking, HotelBooking, TransportationBooking } = require("../models/Booking.js");
 const ItineraryModel = require("../models/Itinerary.js");
 const TouristModel = require("../models/Tourist.js");
 const ActivityModel = require("../models/Activity.js");
@@ -8,6 +8,7 @@ const HotelModel = require("../models/Hotel.js");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
 const { convertPrice, convertToUSD } = require("../config/currencyHelpers.js");
+const Transportation = require("../models/Transportation.js");
 
 // const usdToEur = 0.92;
 // const usdToEgp = 50;
@@ -27,13 +28,11 @@ const { convertPrice, convertToUSD } = require("../config/currencyHelpers.js");
 // }
 
 const getMyItineraryBookings = async (req, res) => {
-    try 
-    {
+    try {
         const bookings = await ItineraryBooking.find({ UserId: req._id, Status: "Confirmed" }).populate('ItineraryId');
         res.status(200).json(bookings);
     }
-    catch (e) 
-    {
+    catch (e) {
         res.status(400).json({ msg: e.message });
     }
 }
@@ -42,8 +41,7 @@ const getSingleItineraryBooking = async (req, res) => {
     const { id } = req.params;
     console.log(id)
 
-    try 
-    {
+    try {
         const booking = await ItineraryBooking.findById(id).populate({
             path: 'ItineraryId',
             populate: [
@@ -72,14 +70,13 @@ const getSingleItineraryBooking = async (req, res) => {
 
         console.log(booking)
 
-        if(booking.UserId.toString() !== req._id.toString()) {
+        if (booking.UserId.toString() !== req._id.toString()) {
             return res.status(400).json({ msg: 'Unauthorized' });
         }
 
         res.status(200).json(booking);
     }
-    catch(e) 
-    {
+    catch (e) {
         res.status(400).json({ msg: e.message });
     }
 }
@@ -97,7 +94,7 @@ const createItineraryBooking = async (req, res) => {
         const walletDeduction = Math.min(walletBalance, totalPrice);
         const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
 
-        if(itinerary.RemainingBookings < Participants) {
+        if (itinerary.RemainingBookings < Participants) {
             return res.status(400).json({ msg: 'Not enough spots left' });
         }
 
@@ -141,11 +138,11 @@ const cancelItineraryBooking = async (req, res) => {
     try {
         const booking = await ItineraryBooking.findById(id);
 
-        if(booking.UserId.toString() !== req._id.toString()) {
+        if (booking.UserId.toString() !== req._id.toString()) {
             return res.status(400).json({ msg: 'Unauthorized' });
         }
 
-        if(booking.Status !== 'Confirmed') {
+        if (booking.Status !== 'Confirmed') {
             return res.status(400).json({ msg: 'Booking not confirmed yet' });
         }
 
@@ -181,14 +178,14 @@ const createActivityBooking = async (req, res) => {
             payment_method_types: ['card'],
             line_items: [
                 {
-                price_data: {
-                    currency: currency.toLowerCase(),
-                    product_data: {
-                        name: activity.Name,
+                    price_data: {
+                        currency: currency.toLowerCase(),
+                        product_data: {
+                            name: activity.Name,
+                        },
+                        unit_amount: Math.round(remainingPrice * 100 / Participants),
                     },
-                    unit_amount: Math.round(remainingPrice * 100 / Participants),
-                },
-                quantity: Participants,
+                    quantity: Participants,
                 },
             ],
             mode: 'payment',
@@ -216,11 +213,11 @@ const cancelActivityBooking = async (req, res) => {
     try {
         const booking = await ActivityBooking.findById(id);
 
-        if(booking.UserId.toString() !== req._id.toString()) {
+        if (booking.UserId.toString() !== req._id.toString()) {
             return res.status(400).json({ msg: 'Unauthorized' });
         }
 
-        if(booking.Status !== 'Confirmed') {
+        if (booking.Status !== 'Confirmed') {
             return res.status(400).json({ msg: 'Booking not confirmed yet' });
         }
 
@@ -234,20 +231,17 @@ const cancelActivityBooking = async (req, res) => {
 }
 
 const getMyActivityBookings = async (req, res) => {
-    try 
-    {
+    try {
         const bookings = await ActivityBooking.find({ UserId: req._id, Status: "Confirmed" }).populate('ActivityId');
         res.status(200).json(bookings);
     }
-    catch (e) 
-    {
+    catch (e) {
         res.status(400).json({ msg: e.message });
     }
 }
 
 const getMyProductBookings = async (req, res) => {
-    try 
-    {
+    try {
         const bookings = await ProductBooking.find({ UserId: req._id, Status: "Confirmed" }).populate({
             path: 'ProductId',
             populate: {
@@ -259,8 +253,7 @@ const getMyProductBookings = async (req, res) => {
         });
         res.status(200).json(bookings);
     }
-    catch (e) 
-    {
+    catch (e) {
         res.status(400).json({ msg: e.message });
     }
 }
@@ -268,8 +261,7 @@ const getMyProductBookings = async (req, res) => {
 const getSingleActivityBooking = async (req, res) => {
     const { id } = req.params;
 
-    try 
-    {
+    try {
         const booking = await ActivityBooking.findById(id).populate({
             path: 'ActivityId',
             populate: [
@@ -296,26 +288,25 @@ const getSingleActivityBooking = async (req, res) => {
             ]
         })
 
-        if(booking.UserId.toString() !== req._id.toString()) {
+        if (booking.UserId.toString() !== req._id.toString()) {
             return res.status(400).json({ msg: 'Unauthorized' });
         }
 
         res.status(200).json(booking);
 
     }
-    catch(e) 
-    {
+    catch (e) {
         res.status(400).json({ msg: e.message });
     }
 
 }
-  
+
 const acceptBooking = async (req, res) => {
     const payload = req.body;
     const sig = req.headers['stripe-signature'];
 
     let event;
-        
+
     try {
         event = stripe.webhooks.constructEvent(payload, sig, process.env.STRIPE_ENDPOINT_SECRET);
     } catch (err) {
@@ -325,11 +316,11 @@ const acceptBooking = async (req, res) => {
 
     console.log(event);
 
-    if(req.body.type === 'checkout.session.completed') {
+    if (req.body.type === 'checkout.session.completed') {
         const session = payload.data.object;
         const metadata = session.metadata;
-        
-        if(metadata.ItineraryId) {
+
+        if (metadata.ItineraryId) {
             const sessionDB = await mongoose.startSession();
             sessionDB.startTransaction();
 
@@ -349,7 +340,7 @@ const acceptBooking = async (req, res) => {
                             }
                         }
                     }
-                ], 
+                ],
                 { new: true }
             )
 
@@ -366,7 +357,7 @@ const acceptBooking = async (req, res) => {
 
             const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
 
-            const totalLoyaltyPointsEarned = totalPaidInUSD * ( tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5 );
+            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
             const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
             const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
             const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
@@ -418,7 +409,7 @@ const acceptBooking = async (req, res) => {
 
             return res.status(200).json({ msg: 'Booking confirmed' });
         }
-        else if(metadata.ActivityId) {
+        else if (metadata.ActivityId) {
             const sessionDB = await mongoose.startSession();
             sessionDB.startTransaction();
 
@@ -436,7 +427,7 @@ const acceptBooking = async (req, res) => {
 
             const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
 
-            const totalLoyaltyPointsEarned = totalPaidInUSD * ( tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5 );
+            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
             const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
             const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
             const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
@@ -455,7 +446,7 @@ const acceptBooking = async (req, res) => {
 
             return res.status(200).json({ msg: 'Booking confirmed' });
         }
-        else if(metadata.ProductId) {
+        else if (metadata.ProductId) {
             const sessionDB = await mongoose.startSession();
             sessionDB.startTransaction();
 
@@ -487,7 +478,7 @@ const acceptBooking = async (req, res) => {
 
             const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
 
-            const totalLoyaltyPointsEarned = totalPaidInUSD * ( tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5 );
+            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
             const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
             const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
             const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
@@ -506,7 +497,7 @@ const acceptBooking = async (req, res) => {
 
             return res.status(200).json({ msg: 'Booking confirmed' });
         }
-        else if(metadata.FlightId) {
+        else if (metadata.FlightId) {
             const sessionDB = await mongoose.startSession();
             sessionDB.startTransaction();
 
@@ -523,7 +514,7 @@ const acceptBooking = async (req, res) => {
 
             const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
 
-            const totalLoyaltyPointsEarned = totalPaidInUSD * ( tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5 );
+            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
             const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
             const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
             const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
@@ -542,7 +533,7 @@ const acceptBooking = async (req, res) => {
 
             return res.status(200).json({ msg: 'Booking confirmed' });
         }
-        else if(metadata.HotelId) {
+        else if (metadata.HotelId) {
             const sessionDB = await mongoose.startSession();
             sessionDB.startTransaction();
 
@@ -559,7 +550,7 @@ const acceptBooking = async (req, res) => {
 
             const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
 
-            const totalLoyaltyPointsEarned = totalPaidInUSD * ( tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5 );
+            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
             const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
             const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
             const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
@@ -572,6 +563,52 @@ const acceptBooking = async (req, res) => {
                     Wallet: "0.00"
                 }
             })
+
+            await sessionDB.commitTransaction();
+            sessionDB.endSession();
+
+            return res.status(200).json({ msg: 'Booking confirmed' });
+        }
+        else if (metadata.TransportationId) {
+            const sessionDB = await mongoose.startSession();
+            sessionDB.startTransaction();
+
+            const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+
+            // Create transportation booking
+            await TransportationBooking.create({
+                UserId: metadata.UserId,
+                Status: 'Confirmed',
+                TotalPaid: session.amount_total,
+                TransportationId: metadata.TransportationId,
+                StartDate: new Date(metadata.startDate),
+                EndDate: new Date(metadata.endDate),
+                PickupLocation: metadata.pickupLocation,
+                DropoffLocation: metadata.dropoffLocation,
+                Currency: session.currency.toUpperCase()
+            });
+
+            // Update transportation availability if needed
+            await Transportation.findByIdAndUpdate(metadata.TransportationId, {
+                availability: false
+            });
+
+            // Calculate and update loyalty points
+            const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
+
+            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
+            const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
+            const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
+            const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
+
+            await TouristModel.findByIdAndUpdate(tourist._id, {
+                $set: {
+                    LoyaltyPoints: newLoayltyPointsEarned,
+                    TotalLoyaltyPoints: newTotalLoayltyPoints,
+                    Badge: newBadge,
+                    Wallet: "0.00"
+                }
+            });
 
             await sessionDB.commitTransaction();
             sessionDB.endSession();
@@ -598,7 +635,7 @@ const createProductBooking = async (req, res) => {
         const walletDeduction = Math.min(walletBalance, totalPrice);
         const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
 
-        if(product.AvailableQuantity < Quantity) {
+        if (product.AvailableQuantity < Quantity) {
             return res.status(400).json({ msg: 'Not enough spots left' });
         }
 
@@ -680,13 +717,11 @@ const createFlightBooking = async (req, res) => {
 }
 
 const getMyFlightBookings = async (req, res) => {
-    try 
-    {
+    try {
         const bookings = await FlightBooking.find({ UserId: req._id, Status: "Confirmed" }).populate('FlightId');
         res.status(200).json(bookings);
     }
-    catch (e) 
-    {
+    catch (e) {
         res.status(400).json({ msg: e.message });
     }
 }
@@ -737,16 +772,72 @@ const createHotelBooking = async (req, res) => {
 }
 
 const getMyHotelBookings = async (req, res) => {
-    try 
-    {
+    try {
         const bookings = await HotelBooking.find({ UserId: req._id, Status: "Confirmed" }).populate('HotelId');
         res.status(200).json(bookings);
     }
-    catch (e) 
-    {
+    catch (e) {
         res.status(400).json({ msg: e.message });
     }
 }
+
+const createTransportationBooking = async (req, res) => {
+    const { id } = req.params;
+    const { currency, startDate, endDate, pickupLocation, dropoffLocation } = req.body;
+
+    try {
+        const transportation = await Transportation.findById(id);
+        const tourist = await TouristModel.findOne({ UserId: req._id }, "Wallet");
+
+        const numberOfDays = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
+        const totalPrice = Number(convertPrice(transportation.pricePerDay * numberOfDays, currency));
+        const walletBalance = convertPrice((Number(tourist.Wallet) || 0), currency);
+        const walletDeduction = Math.min(walletBalance, totalPrice);
+        const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                price_data: {
+                    currency: currency.toLowerCase(),
+                    product_data: {
+                        name: `${transportation.name} - ${transportation.type}`,
+                    },
+                    unit_amount: Math.round(remainingPrice * 100),
+                },
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${process.env.CLIENT_URL}/transportations/${id}`,
+            cancel_url: `${process.env.CLIENT_URL}/transportations/${id}`,
+            metadata: {
+                TransportationId: id,
+                UserId: req._id,
+                startDate,
+                endDate,
+                pickupLocation,
+                dropoffLocation,
+                currency
+            }
+        });
+
+        res.status(200).json({ url: session.url });
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+};
+
+const getMyTransportationBookings = async (req, res) => {
+    try {
+        const bookings = await TransportationBooking.find({
+            UserId: req._id,
+            Status: "Confirmed"
+        }).populate('TransportationId');
+        res.status(200).json(bookings);
+    } catch (e) {
+        res.status(400).json({ msg: e.message });
+    }
+};
 
 module.exports = {
     createItineraryBooking,
@@ -763,5 +854,7 @@ module.exports = {
     createFlightBooking,
     getMyFlightBookings,
     createHotelBooking,
-    getMyHotelBookings
+    getMyHotelBookings,
+    createTransportationBooking,
+    getMyTransportationBookings
 }

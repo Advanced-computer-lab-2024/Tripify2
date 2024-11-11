@@ -1,5 +1,5 @@
-"use client";
 import { fetcher } from "@/lib/fetch-client";
+import SharePlace from "./share-place";
 
 async function getPlace(id) {
   const res = await fetcher(`/places/${id}`, {
@@ -20,20 +20,22 @@ const PlaceDetailsPage = async ({ params }) => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="max-w-4xl mx-auto p-6 rounded-lg">
+      <div className="max-w-4xl p-6 mx-auto rounded-lg">
         <div className="image--container">
           <img
             src={place.Pictures[0]}
             alt={place.Name}
-            className="w-full h-64 object-cover rounded-lg mb-4"
+            className="object-cover w-full h-64 mb-4 rounded-lg"
           />
         </div>
 
-        <div className="details--container space-y-6">
-          <div className="flex justify-between items-center">
+        <SharePlace place={place} />
+
+        <div className="space-y-6 details--container">
+          <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-800">{place.Name}</h1>
             <div className="flex items-center space-x-2">
-              <p className="text-xl text-yellow-500 font-semibold">
+              <p className="text-xl font-semibold text-yellow-500">
                 {place.Type}
               </p>
             </div>
@@ -45,7 +47,7 @@ const PlaceDetailsPage = async ({ params }) => {
 
           <div className="space-y-2">
             <p className="text-lg font-bold text-gray-800">Ticket Prices:</p>
-            <ul className="list-disc ml-5 mb-4">
+            <ul className="mb-4 ml-5 list-disc">
               {Object.entries(place.TicketPrices).map(([type, price]) => (
                 <li key={type}>
                   {type}: ${price}
@@ -55,12 +57,12 @@ const PlaceDetailsPage = async ({ params }) => {
           </div>
         </div>
 
-        <p className="text-lg mb-2">
+        <p className="mb-2 text-lg">
           <strong>Description:</strong> {place.Description}
         </p>
 
-        <p className="text-lg font-semibold mb-2">Tags:</p>
-        <ul className="list-disc ml-5 mb-4">
+        <p className="mb-2 text-lg font-semibold">Tags:</p>
+        <ul className="mb-4 ml-5 list-disc">
           {place.Tags && place.Tags.length > 0 ? (
             place.Tags.map((tag) => (
               <li key={tag._id} className="text-lg">
@@ -73,8 +75,8 @@ const PlaceDetailsPage = async ({ params }) => {
         </ul>
 
         {/* Displaying Categories */}
-        <p className="text-lg font-semibold mb-2">Categories:</p>
-        <ul className="list-disc ml-5 mb-4">
+        <p className="mb-2 text-lg font-semibold">Categories:</p>
+        <ul className="mb-4 ml-5 list-disc">
           {place.Categories && place.Categories.length > 0 ? (
             place.Categories.map((category) => (
               <li key={category._id} className="text-lg">

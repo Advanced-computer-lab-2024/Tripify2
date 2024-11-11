@@ -1,9 +1,10 @@
 import { fetcher } from '@/lib/fetch-client'
 import Link from 'next/link'
+import HotelPrice from './hotel-price'
 
 function HotelCard({ hotel }) {
-  const lowestPrice = hotel.offers.reduce((min, offer) => 
-    parseFloat(offer.price.total) < min ? parseFloat(offer.price.total) : min, 
+  const lowestPrice = hotel.offers.reduce((min, offer) =>
+    parseFloat(offer.price.total) < min ? parseFloat(offer.price.total) : min,
     parseFloat(hotel.offers[0].price.total)
   )
 
@@ -23,9 +24,7 @@ function HotelCard({ hotel }) {
             ))}
           </div>
         </div>
-        <div className="text-lg font-bold text-green-600">
-          From ${lowestPrice.toFixed(2)} {hotel.offers[0].price.currency}
-        </div>
+        <HotelPrice lowestPrice={lowestPrice} />
       </div>
     </Link>
   )

@@ -3,17 +3,20 @@
 import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, ClockIcon, MapPinIcon, TagIcon, DollarSignIcon, PhoneIcon, GlobeIcon, UserIcon } from 'lucide-react'
+import { CalendarIcon, ClockIcon, MapPinIcon, TagIcon, DollarSignIcon, PhoneIcon, GlobeIcon, UserIcon, MailIcon, LinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCurrencyStore } from '@/providers/CurrencyProvider'
 import { useRouter } from 'next/navigation'
 import { convertPrice } from '@/lib/utils'
 import { fetcher } from '@/lib/fetch-client'
+import { useSession } from 'next-auth/react'
 
 export default function ActivityDetails({ activity }) {
   const [numParticipants, setNumParticipants] = useState(1)
   const [error, setError] = useState('');
   const router = useRouter()
+
+  const session = useSession()
 
   const { currency } = useCurrencyStore()
 
@@ -56,13 +59,12 @@ export default function ActivityDetails({ activity }) {
     }
 
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-    
+
     return url;
   }
-  
+
   const handleBook = async () => {
-    try
-    {
+    try {
       const response = await fetcher(`/bookings/activities/create-booking/${activity._id}`, {
         method: 'POST',
         headers: {
@@ -74,7 +76,7 @@ export default function ActivityDetails({ activity }) {
         })
       })
 
-      if(!response?.ok) {
+      if (!response?.ok) {
         const data = await response.json()
         console.log(data.msg)
         return
@@ -82,17 +84,27 @@ export default function ActivityDetails({ activity }) {
 
       const data = await response.json()
 
-      if(!data) {
+      if (!data) {
         console.log('Error creating booking')
         return
       }
 
       router.push(data.url)
     }
-    catch (error)
-    {
+    catch (error) {
       console.log(error)
     }
+  }
+
+  const handleShareEmail = () => {
+    const subject = encodeURIComponent(`Check out this activity: ${activity.Name}`)
+    const body = encodeURIComponent(`I found this amazing activity and thought you might be interested:\n\n${activity.Name}\n\nCheck it out here: ${window.location.href}`)
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
+  }
+
+  const handleCopyLink = () => {
+    const dummyLink = session?.data?.user ? `http://localhost:3000/activity/${activity._id}` : `http://localhost:3000/activities-guest/${activity._id}`
+    navigator.clipboard.writeText(dummyLink)
   }
 
   return (
@@ -108,6 +120,22 @@ export default function ActivityDetails({ activity }) {
         )}
       </div>
 
+      <div className="flex justify-end mb-4 space-x-4">
+        <button
+          onClick={handleShareEmail}
+          className="flex items-center px-4 py-2 text-white transition duration-300 bg-blue-500 rounded-lg hover:bg-blue-600"
+        >
+          <MailIcon className="w-5 h-5 mr-2" />
+          Share via Email
+        </button>
+        <button
+          onClick={handleCopyLink}
+          className="flex items-center px-4 py-2 text-gray-800 transition duration-300 bg-gray-200 rounded-lg hover:bg-gray-300"
+        >
+          <LinkIcon className="w-5 h-5 mr-2" />
+          Copy Link
+        </button>
+      </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -218,7 +246,7 @@ export default function ActivityDetails({ activity }) {
               onChange={(e) => setNumParticipants(parseInt(e.target.value))}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              {[1,2,3,4,5].map(num => (
+              {[1, 2, 3, 4, 5].map(num => (
                 <option disabled={activity.RemainingBookings < num} key={num} value={num}>
                   {num} {num === 1 ? 'Participant' : 'Participants'}
                 </option>

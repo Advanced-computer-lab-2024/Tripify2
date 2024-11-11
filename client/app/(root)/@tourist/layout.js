@@ -8,17 +8,17 @@ export default async function TouristLayout({ children }) {
   const Session = await getSession();
 
   return (
-    <CurrencyStoreProvider>
-        <header>
-          <Dashboard
-            params={{
-              role: "Tourist",
+    <>
+      <header>
+        <Dashboard
+          params={{
+            role: "Tourist",
               /*id: "67001e91b4ba61e78487b585"*/ id: Session?.user?.id,
-            }}
-          />
-        </header>
-        <main>{children}</main>
-        <Footer />
-    </CurrencyStoreProvider>
+          }}
+        />
+      </header>
+      <main>{children}</main>
+      <Footer />
+    </>
   );
 }

@@ -29,9 +29,11 @@ async function getProducts(req, res) {
 
     if (minRating) query.Rating = { $gte: parseFloat(minRating) };
 
+    console.log(query);
+
     const products = await Product.find(query).populate("Seller")
     // .populate("Reviews");
-    return res.json(products);
+    res.status(200).json(products);
   } catch (e) {
     return res
       .status(500)
@@ -72,7 +74,7 @@ async function createProduct(req, res) {
       AvailableQuantity,
     } = req.body;
 
-    if(!Name || !Image || !Price || !Description || !Seller || !AvailableQuantity) return res.status(400).json({ message: "All Fields Must Be Given!" });
+    if (!Name || !Image || !Price || !Description || !Seller || !AvailableQuantity) return res.status(400).json({ message: "All Fields Must Be Given!" });
 
     const seller = await User.findById(Seller, "_id");
     if (!seller || seller._id.toString() !== req._id)
@@ -119,7 +121,7 @@ async function updateProduct(req, res) {
     if (
       user.Role !== 'Admin' &&
       (!deletedProduct ||
-      deletedProduct.Seller.toString() !== req._id.toString())
+        deletedProduct.Seller.toString() !== req._id.toString())
     )
       return res.status(400).json({ message: "Unauthorized Seller!" });
 
@@ -150,7 +152,7 @@ async function deleteProduct(req, res) {
     if (
       user.Role !== 'Admin' &&
       (!deletedProduct ||
-      deletedProduct.Seller.toString() !== req._id.toString())
+        deletedProduct.Seller.toString() !== req._id.toString())
     )
       return res.status(400).json({ message: "Unauthorized Seller!" });
 

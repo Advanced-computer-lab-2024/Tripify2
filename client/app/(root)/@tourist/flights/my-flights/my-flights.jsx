@@ -2,14 +2,14 @@
 import { useState } from 'react'
 
 function FlightCard({ flight }) {
-  const isPastFlight = new Date(flight.FlightId.returnDate) < new Date()
+  const isPastFlight = new Date(flight.FlightId?.returnDate) < new Date()
 
   return (
     <div className={`bg-white shadow-md rounded-lg p-4 ${isPastFlight ? 'opacity-75' : ''}`}>
       <div className="flex items-center justify-between mb-2">
-        <div className="text-lg font-semibold">{flight.FlightId.origin} to {flight.FlightId.destination}</div>
+        <div className="text-lg font-semibold">{flight.FlightId?.origin} to {flight.FlightId?.destination}</div>
         <div className="text-sm text-gray-500">
-          {new Date(flight.FlightId.departureDate).toLocaleDateString()} - {new Date(flight.FlightId.returnDate).toLocaleDateString()}
+          {new Date(flight.FlightId?.departureDate).toLocaleDateString()} - {new Date(flight.FlightId?.returnDate).toLocaleDateString()}
         </div>
       </div>
       <div className="flex items-center justify-between">
@@ -18,7 +18,7 @@ function FlightCard({ flight }) {
             {isPastFlight ? 'Past' : 'Upcoming'}
           </span>
         </div>
-        <div className="text-lg font-bold text-green-600">${flight.FlightId.price?.total}</div>
+        <div className="text-lg font-bold text-green-600">${flight.FlightId?.price?.total}</div>
       </div>
     </div>
   )
@@ -33,11 +33,11 @@ export default function BookedFlightsPage({ flightsData }) {
   const filterFlights = (filterType) => {
     setFilter(filterType)
     const currentDate = new Date()
-    
+
     if (filterType === 'upcoming') {
-      setFlights(flightsData.filter(flight => new Date(flight.FlightId.departureDate) >= currentDate))
+      setFlights(flightsData.filter(flight => new Date(flight.FlightId?.departureDate) >= currentDate))
     } else if (filterType === 'past') {
-      setFlights(flightsData.filter(flight => new Date(flight.FlightId.returnDate) < currentDate))
+      setFlights(flightsData.filter(flight => new Date(flight.FlightId?.returnDate) < currentDate))
     } else {
       setFlights(flightsData)
     }
@@ -61,7 +61,7 @@ export default function BookedFlightsPage({ flightsData }) {
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {flights.map((flight) => (
-          <FlightCard key={flight.FlightId._id} flight={flight} />
+          <FlightCard key={flight.FlightId?._id} flight={flight} />
         ))}
       </div>
       {flights.length === 0 && (

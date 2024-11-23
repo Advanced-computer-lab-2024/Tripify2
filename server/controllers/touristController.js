@@ -96,6 +96,8 @@ const updateTourist = async (req, res) => {
     UpcomingActivities,
     UpcomingItineraries,
     Wishlist,
+    BookmarkedItinerary,
+    BookmarkedActivity,
     /* Wallet, */
   } = req.body;
 
@@ -160,6 +162,10 @@ const updateTourist = async (req, res) => {
       tourist.Wishlist = Wishlist;
     }
 
+    if (BookmarkedItinerary) tourist.BookmarkedItinerary = BookmarkedItinerary;
+
+    if (BookmarkedActivity) tourist.BookmarkedActivity = BookmarkedActivity;
+
     await tourist.save();
 
     res.status(200).json({
@@ -204,29 +210,35 @@ const deleteTourist = async (req, res) => {
 // };
 
 const redeemPoints = async (req, res) => {
+  try {
+    const tourist = await touristModel
+      .findOne({ UserId: req._id })
+      .lean()
+      .exec();
 
-  try 
-  {
-    const tourist = await touristModel.findOne({UserId: req._id}).lean().exec()
-
-    if (!tourist) 
-    {
+    if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    const LoyaltyPoints = tourist.LoyaltyPoints
+    const LoyaltyPoints = tourist.LoyaltyPoints;
 
-    const newWallet = Number(tourist.Wallet) + Number(convertToUSD(LoyaltyPoints * 0.01, 'EGP'))
+    const newWallet =
+      Number(tourist.Wallet) +
+      Number(convertToUSD(LoyaltyPoints * 0.01, "EGP"));
 
-    await touristModel.findOneAndUpdate({UserId: req._id}, { Wallet: newWallet, LoyaltyPoints: 0 }, { new: true }).exec()
+    await touristModel
+      .findOneAndUpdate(
+        { UserId: req._id },
+        { Wallet: newWallet, LoyaltyPoints: 0 },
+        { new: true }
+      )
+      .exec();
 
     res.status(200).json({ message: "Points redeemed successfully" });
-  }
-  catch(error) 
-  {
+  } catch (error) {
     res.status(500).json({ message: "Error redeeming points", error });
   }
-}
+};
 
 module.exports = {
   createTourist,

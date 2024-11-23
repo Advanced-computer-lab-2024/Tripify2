@@ -9,17 +9,25 @@ import {
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { convertPrice } from "@/lib/utils";
 import Link from "next/link";
-import { ArrowRight, Plane } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowRight, Plane } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
+import { fetcher } from "@/lib/fetch-client";
 
 export default function Explore({ params }) {
   const { currency } = useCurrencyStore();
-  const { itineraries, activities, places } = params;
+  const { itineraries, activities, places, bookmarked, touristId } = params;
   const [search, setSearch] = useState("");
   const [currentItineraryIndex, setCurrentItineraryIndex] = useState(0);
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0);
   const [currentPlaceIndex, setCurrentPlaceIndex] = useState(0);
   const [recordsToShow, setRecordsToShow] = useState(2);
+  const [bookmarkedItinerary, setBookmarkedItinerary] = useState(
+    bookmarked.itineraries
+  );
+  const [bookmarkedActivity, setBookmarkedActivity] = useState(
+    bookmarked.activities
+  );
 
   const router = useRouter();
 
@@ -120,6 +128,63 @@ export default function Explore({ params }) {
     return filteredPlaces.slice(start, start + recordsToShow);
   };
 
+  const handleBookmark = (id, type) => {
+    console.log("Before update:", bookmarkedItinerary);
+
+    let updatedState;
+    if (type === "itinerary") {
+      setBookmarkedItinerary((prev) => {
+        if (prev.includes(id))
+          updatedState = prev.filter((elementId) => elementId !== id);
+        else updatedState = [...prev, id];
+        return updatedState;
+      });
+    } else if (type === "activity") {
+      setBookmarkedActivity((prev) => {
+        if (prev.includes(id))
+          updatedState = prev.filter((elementId) => elementId !== id);
+        else updatedState = [...prev, id];
+        return updatedState;
+      });
+    }
+  };
+
+  const sendPatchRequest = async () => {
+    try {
+      // console.log("---------------------");
+      // console.log(`touristId: ${touristId}`);
+      // console.log(`bookmarkedItinerary: ${bookmarkedItinerary}`);
+      // console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
+      // console.log("---------------------");
+
+      const response = await fetcher(`/tourists/${touristId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          BookmarkedItinerary: bookmarkedItinerary,
+          BookmarkedActivity: bookmarkedActivity,
+        }),
+      });
+
+      // console.log("=======================");
+      // const data = await response.json();
+      // console.log(`response: ${JSON.stringify(data)}`);
+      // console.log("=======================");
+
+      if (!response.ok) {
+        console.error("Failed to send PATCH request");
+      }
+    } catch (error) {
+      console.error("Error occurred while sending PATCH request:", error);
+    }
+  };
+
+  useEffect(() => {
+    sendPatchRequest();
+  }, [bookmarkedItinerary, bookmarkedActivity]);
+
   return (
     <div className="mx-20 mt-5 sm:mx-22 md:mx-24 lg:mx-26 xl:mx-30">
       <div className="w-full mb-6 text-white bg-gradient-to-r from-blue-600 to-blue-700">
@@ -128,13 +193,13 @@ export default function Explore({ params }) {
             <Plane className="w-8 h-8" />
             <div>
               <h2 className="text-2xl font-bold">Design Your Dream Getaway</h2>
-              <p className="text-blue-100">Create a personalized vacation package tailored just for you</p>
+              <p className="text-blue-100">
+                Create a personalized vacation package tailored just for you
+              </p>
             </div>
           </div>
-          <Link href='/create-vacation'>
-            <Button 
-              className="flex items-center gap-2 px-6 py-2 font-semibold text-blue-600 transition-colors bg-white rounded-full hover:bg-blue-50"
-            >
+          <Link href="/create-vacation">
+            <Button className="flex items-center gap-2 px-6 py-2 font-semibold text-blue-600 transition-colors bg-white rounded-full hover:bg-blue-50">
               Start Planning
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -167,7 +232,7 @@ export default function Explore({ params }) {
         <h2 className="flex items-center justify-between mb-6 text-2xl font-semibold">
           <span>Itineraries ({filteredItineraries.length})</span>
           <button
-            onClick={() => router.push("/itineraries")}
+            onClick={() => router.push("/itinerary")}
             className="px-2 py-1 text-sm text-white transition duration-200 bg-gray-400 rounded hover:bg-gray-500"
           >
             View All
@@ -176,20 +241,38 @@ export default function Explore({ params }) {
         {filteredItineraries.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
-              {getDisplayedItineraries().map((itinerary) => (
-                <button
-                  key={itinerary._id}
-                  className="text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
-                  onClick={() => router.push(`/itineraries/${itinerary._id}`)}
-                >
-                  <img
-                    src={itinerary.Image}
-                    alt={itinerary.Name}
-                    className="object-cover w-full h-32 mb-2 rounded-md"
-                  />
-                  <h3 className="text-lg font-medium">{itinerary.Name}</h3>
-                </button>
-              ))}
+              {getDisplayedItineraries().map((itinerary) => {
+                const isBookmarked = bookmarkedItinerary.includes(
+                  itinerary._id
+                );
+                return (
+                  <button
+                    key={itinerary._id}
+                    className="relative text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
+                    onClick={() => router.push(`/itinerary/${itinerary._id}`)}
+                  >
+                    <img
+                      src={itinerary.Image}
+                      alt={itinerary.Name}
+                      className="object-cover w-full h-32 mb-2 rounded-md"
+                    />
+                    <h3 className="text-lg font-medium">{itinerary.Name}</h3>
+                    <div
+                      className="absolute top-2 right-2 text-2xl"
+                      onClick={(e) => {
+                        e.stopPropagation(); //prevent parent button click event listener from listening on clicking this child button
+                        handleBookmark(itinerary._id, "itinerary");
+                      }}
+                    >
+                      {isBookmarked ? (
+                        <RiBookmarkFill className="text-yellow-500" />
+                      ) : (
+                        <RiBookmarkLine className="text-gray-500" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
             <div className="flex justify-between my-4">
               <button
@@ -240,21 +323,45 @@ export default function Explore({ params }) {
         {filteredActivities.length > 0 ? (
           <>
             <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
-              {getDisplayedActivities().map((activity) => (
-                <button
-                  key={activity._id}
-                  className="w-full text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
-                  onClick={() => router.push(`/activities/${activity._id}`)}
-                >
-                  <img
-                    src={activity.Image}
-                    alt={activity.Name}
-                    className="object-cover w-full h-32 mb-2 rounded-md"
-                  />
-                  <p className="text-lg font-medium">{activity.Name}</p>
-                  <p className="text-gray-500">From: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(activity.Price, currency)}</p>
-                </button>
-              ))}
+              {getDisplayedActivities().map((activity) => {
+                const isBookmarked = bookmarkedActivity.includes(activity._id);
+                return (
+                  <button
+                    key={activity._id}
+                    className="relative w-full text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
+                    onClick={() => router.push(`/activities/${activity._id}`)}
+                  >
+                    <img
+                      src={activity.Image}
+                      alt={activity.Name}
+                      className="object-cover w-full h-32 mb-2 rounded-md"
+                    />
+                    <p className="text-lg font-medium">{activity.Name}</p>
+                    <p className="text-gray-500">
+                      From:{" "}
+                      {currency === "USD"
+                        ? "$"
+                        : currency === "EUR"
+                        ? "€"
+                        : "EGP"}{" "}
+                      {convertPrice(activity.Price, currency)}
+                    </p>
+                    <div
+                      className="absolute top-2 right-2 text-2xl"
+                      onClick={(e) => {
+                        e.stopPropagation(); //prevent parent button click event listener from listening on clicking this child button
+                        handleBookmark(activity._id, "activity");
+                      }}
+                    >
+                      {isBookmarked ? (
+                        <RiBookmarkFill className="text-yellow-500" />
+                      ) : (
+                        <RiBookmarkLine className="text-gray-500" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
             <div className="flex justify-between my-4">
               <button

@@ -4,9 +4,10 @@ import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 // import StarRating from "../starRating";
 
-const ItineraryComponent = () => {
+export const ItineraryComponent = ({ params }) => {
   const router = useRouter();
 
   const { currency } = useCurrencyStore();
@@ -25,6 +26,14 @@ const ItineraryComponent = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [selectedStartDate, setSelectedStartDate] = useState("");
 
+  const { touristId, bookmarkedItinerariesTourist } = params;
+
+  const [bookmarkedItinerary, setBookmarkedItinerary] = useState(
+    bookmarkedItinerariesTourist
+  );
+
+  console.log(bookmarkedItinerary);
+
   useEffect(() => {
     const fetchItineraries = async () => {
       try {
@@ -35,11 +44,15 @@ const ItineraryComponent = () => {
           },
         }).catch((e) => console.log(e));
         const data = await response.json();
-        const filteredData = data.filter(itinerary => !itinerary.Inappropriate)
+        const filteredData = data.filter(
+          (itinerary) => !itinerary.Inappropriate
+        );
         setTheItineraries(filteredData);
 
         const maxPriceFromData = Math.max(
-          ...filteredData.map((itinerary) => convertPrice(itinerary.Price, currency))
+          ...filteredData.map((itinerary) =>
+            convertPrice(itinerary.Price, currency)
+          )
         );
         setMaxPrice(maxPriceFromData);
         setFilteredPrice(maxPriceFromData);
@@ -105,19 +118,64 @@ const ItineraryComponent = () => {
     );
   };
 
+  const handleBookmark = (id) => {
+    let updatedState;
+    setBookmarkedItinerary((prev) => {
+      if (prev.includes(id))
+        updatedState = prev.filter((itemId) => itemId !== id);
+      else updatedState = [...prev, id];
+      return updatedState;
+    });
+  };
+
+  const sendPatchRequest = async () => {
+    try {
+      // console.log("---------------------");
+      // console.log(`touristId: ${touristId}`);
+      // console.log(`bookmarkedItinerary: ${bookmarkedItinerary}`);
+      // console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
+      // console.log("---------------------");
+
+      const response = await fetcher(`/tourists/${touristId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          BookmarkedItinerary: bookmarkedItinerary,
+        }),
+      });
+
+      console.log("=======================");
+      const data = await response.json();
+      console.log(`response: ${JSON.stringify(data)}`);
+      console.log("=======================");
+
+      if (!response.ok) {
+        console.error("Failed to send PATCH request");
+      }
+    } catch (error) {
+      console.error("Error occurred while sending PATCH request:", error);
+    }
+  };
+
+  useEffect(() => {
+    sendPatchRequest();
+  }, [bookmarkedItinerary]);
+
   const itinerariesWithCategoriesAndTags =
     selectedCategories.length === 0 && selectedTags.length === 0
       ? theItineraries
       : theItineraries.filter((itinerary) => {
-        const categoryMatches = itinerary.Category.some((category) => {
-          return selectedCategories.includes(category.Category);
-        });
-        const tagMatches = itinerary.Tag.some((tag) => {
-          return selectedTags.includes(tag.Tag);
-        });
+          const categoryMatches = itinerary.Category.some((category) => {
+            return selectedCategories.includes(category.Category);
+          });
+          const tagMatches = itinerary.Tag.some((tag) => {
+            return selectedTags.includes(tag.Tag);
+          });
 
-        return tagMatches || categoryMatches;
-      });
+          return tagMatches || categoryMatches;
+        });
 
   const filteredItineraries = itinerariesWithCategoriesAndTags.filter(
     (itinerary) => {
@@ -273,38 +331,59 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
-          {filteredItineraries.map((itinerary) => (
-            <button
-              key={itinerary.ID}
-              className="p-4 overflow-hidden bg-white rounded-lg hover:shadow"
-              onClick={() => router.push(`/itineraries/${itinerary._id}`)}
-            >
-              <img
-                src={itinerary.Image}
-                alt={itinerary.Name}
-                className="object-cover w-full h-48 mb-2 rounded-lg"
-              />
-              <h3 className="mb-2 text-lg font-bold">{itinerary.Name}</h3>
-              <div className="flex justify-center mb-2">
-                {itinerary.Rating}
-                {/* <StarRating rating={itinerary.Rating} /> */}
-              </div>
-              <p className="text-black-600">Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(itinerary.Price, currency)}</p>
-              <p className="text-black-600">Language: {itinerary.Language}</p>
-              <p className="text-black-600">
-                Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}
-              </p>
-              <p className="text-black-600">
-                Categories:{" "}
-                {itinerary.Category.map((category) => category.Category).join(
-                  ", "
-                )}
-              </p>
-              <p className="text-black-600">
-                Start Date: {new Date(itinerary.StartDate).toLocaleDateString()}
-              </p>
-            </button>
-          ))}
+          {filteredItineraries.map((itinerary) => {
+            const isBookmarked = bookmarkedItinerary.includes(itinerary._id);
+            return (
+              <button
+                key={itinerary.ID}
+                className="relative p-4 overflow-hidden bg-white rounded-lg hover:shadow"
+                onClick={() => router.push(`/itinerary/${itinerary._id}`)}
+              >
+                <img
+                  src={itinerary.Image}
+                  alt={itinerary.Name}
+                  className="object-cover w-full h-48 mb-2 rounded-lg"
+                />
+                <h3 className="mb-2 text-lg font-bold">{itinerary.Name}</h3>
+                <div className="flex justify-center mb-2">
+                  {itinerary.Rating}
+                  {/* <StarRating rating={itinerary.Rating} /> */}
+                </div>
+                <p className="text-black-600">
+                  Price:{" "}
+                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+                  {convertPrice(itinerary.Price, currency)}
+                </p>
+                <p className="text-black-600">Language: {itinerary.Language}</p>
+                <p className="text-black-600">
+                  Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}
+                </p>
+                <p className="text-black-600">
+                  Categories:{" "}
+                  {itinerary.Category.map((category) => category.Category).join(
+                    ", "
+                  )}
+                </p>
+                <p className="text-black-600">
+                  Start Date:{" "}
+                  {new Date(itinerary.StartDate).toLocaleDateString()}
+                </p>
+                <div
+                  className="absolute top-2 right-2 text-2xl"
+                  onClick={(e) => {
+                    e.stopPropagation(); //prevent parent button click event listener from listening on clicking this child button
+                    handleBookmark(itinerary._id, "itinerary");
+                  }}
+                >
+                  {isBookmarked ? (
+                    <RiBookmarkFill className="text-yellow-500" />
+                  ) : (
+                    <RiBookmarkLine className="text-gray-500" />
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

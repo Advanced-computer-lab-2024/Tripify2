@@ -19,24 +19,58 @@ export default function Dashboard({ params }) {
     case "Tourist":
       dashboardElements = [
         { name: "Account", link: `/account/${id}` },
-        { name: "Products", link: "/products-tourist", sublinks: [{ name: "All Products", link: "/products-tourist" }, { name: "My Products", link: "/products-tourist/my-products" }] },
+        {
+          name: "Products",
+          link: "/products-tourist",
+          sublinks: [
+            { name: "All Products", link: "/products-tourist" },
+            { name: "My Products", link: "/products-tourist/my-products" },
+          ],
+        },
         { name: "Places", link: "/places" },
-        { name: "Activities", link: "/activities", sublinks: [{ name: "My Activities", link: "/activities/my-activities" }] },
+        {
+          name: "Activities",
+          link: "/activities",
+          sublinks: [
+            { name: "My Activities", link: "/activities/my-activities" },
+          ],
+        },
         {
           name: "Itineraries",
-          link: "/itineraries",
+          link: "/itinerary",
           sublinks: [
-            { name: "All Itineraries", link: "/itineraries" },
-            { name: "My Itineraries", link: "/itineraries/my-itineraries" },
+            { name: "All Itineraries", link: "/itinerary" },
+            { name: "My Itineraries", link: "/itinerary/my-itineraries" },
             {
               name: "Upcoming Itineraries",
-              link: "/itineraries/upcoming-itineraries",
+              link: "/itinerary/upcoming-itineraries",
             },
           ],
         },
-        { name: "Flights", sublinks: [{ name: "All Flights", link: "/flights" }, { name: "My Flights", link: "/flights/my-flights" }] },
-        { name: "Hotels", sublinks: [{ name: "All Hotels", link: "/hotels" }, { name: "My Hotels", link: "/hotels/my-hotels" }] },
-        { name: "Transportation", sublinks: [{ name: "All Transportation", link: "/transportations" }, { name: "My Transportation", link: "/transportations/my-transportation" }] },
+        {
+          name: "Flights",
+          sublinks: [
+            { name: "All Flights", link: "/flights" },
+            { name: "My Flights", link: "/flights/my-flights" },
+          ],
+        },
+        {
+          name: "Hotels",
+          sublinks: [
+            { name: "All Hotels", link: "/hotels" },
+            { name: "My Hotels", link: "/hotels/my-hotels" },
+          ],
+        },
+        {
+          name: "Transportation",
+          sublinks: [
+            { name: "All Transportation", link: "/transportations" },
+            {
+              name: "My Transportation",
+              link: "/transportations/my-transportation",
+            },
+          ],
+        },
         { name: "Explore", link: "/" },
       ];
       break;
@@ -216,8 +250,9 @@ export default function Dashboard({ params }) {
                           handleReroute(element.link);
                         }
                       }}
-                      className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${isActive ? "underline" : ""
-                        }`}
+                      className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${
+                        isActive ? "underline" : ""
+                      }`}
                     >
                       {element.name}
                     </button>
@@ -227,8 +262,9 @@ export default function Dashboard({ params }) {
                           <button
                             key={sublinkIndex}
                             onClick={() => handleReroute(sublink.link)}
-                            className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${pathname === sublink.link ? "underline" : ""
-                              }`}
+                            className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
+                              pathname === sublink.link ? "underline" : ""
+                            }`}
                           >
                             {sublink.name}
                           </button>
@@ -252,8 +288,9 @@ export default function Dashboard({ params }) {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-gray-100 z-20 transform ${sidebarVisible ? "translate-x-0" : "translate-x-full"
-          } transition-transform duration-300 ease-in-out`}
+        className={`fixed top-0 right-0 h-full w-64 bg-gray-100 z-20 transform ${
+          sidebarVisible ? "translate-x-0" : "translate-x-full"
+        } transition-transform duration-300 ease-in-out`}
       >
         <nav className="flex flex-col p-4">
           {dashboardElements.map((element, index) => (
@@ -273,8 +310,9 @@ export default function Dashboard({ params }) {
                     <button
                       key={sublinkIndex}
                       onClick={() => handleReroute(sublink.link)}
-                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${pathname === sublink.link ? "underline" : ""
-                        }`}
+                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
+                        pathname === sublink.link ? "underline" : ""
+                      }`}
                     >
                       {sublink.name}
                     </button>
@@ -283,7 +321,6 @@ export default function Dashboard({ params }) {
               )}
             </div>
           ))}
-
         </nav>
       </div>
     </div>

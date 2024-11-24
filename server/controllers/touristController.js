@@ -98,6 +98,7 @@ const updateTourist = async (req, res) => {
     Wishlist,
     BookmarkedItinerary,
     BookmarkedActivity,
+    Cart,
     /* Wallet, */
   } = req.body;
 
@@ -165,6 +166,8 @@ const updateTourist = async (req, res) => {
     if (BookmarkedItinerary) tourist.BookmarkedItinerary = BookmarkedItinerary;
 
     if (BookmarkedActivity) tourist.BookmarkedActivity = BookmarkedActivity;
+
+    if (Cart) tourist.Cart = Cart;
 
     await tourist.save();
 

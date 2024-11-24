@@ -38,12 +38,13 @@ export default async function ExplorePage() {
 
   const session = await getSession();
 
-  const touristId = session.user.id;
+  const touristId = session?.user?.id;
 
   const resTourist = await fetcher(`/tourists/${touristId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
     },
   }).catch((e) => console.log(e));
 

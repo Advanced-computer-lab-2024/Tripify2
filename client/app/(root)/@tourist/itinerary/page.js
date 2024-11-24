@@ -5,14 +5,11 @@ import ItineraryComponent from "./showPage";
 export default async function AllItineraries() {
   const session = await getSession();
 
-  const touristId = session.user.id;
+  const touristId = session?.user?.id;
 
-  const resTourist = await fetcher(`/tourists/${touristId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).catch((e) => console.log(e));
+  const resTourist = await fetcher(`/tourists/${touristId}`).catch((e) =>
+    console.log(e)
+  );
 
   if (!resTourist?.ok) {
     const touristError = await resTourist.json();

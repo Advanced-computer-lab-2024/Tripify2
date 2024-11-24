@@ -129,20 +129,20 @@ export default function Explore({ params }) {
   };
 
   const handleBookmark = (id, type) => {
-    console.log("Before update:", bookmarkedItinerary);
+    // console.log("Before update:", bookmarkedItinerary);
 
     let updatedState;
     if (type === "itinerary") {
       setBookmarkedItinerary((prev) => {
         if (prev.includes(id))
-          updatedState = prev.filter((elementId) => elementId !== id);
+          updatedState = prev.filter((itemId) => itemId !== id);
         else updatedState = [...prev, id];
         return updatedState;
       });
     } else if (type === "activity") {
       setBookmarkedActivity((prev) => {
         if (prev.includes(id))
-          updatedState = prev.filter((elementId) => elementId !== id);
+          updatedState = prev.filter((itemId) => itemId !== id);
         else updatedState = [...prev, id];
         return updatedState;
       });
@@ -151,16 +151,18 @@ export default function Explore({ params }) {
 
   const sendPatchRequest = async () => {
     try {
-      // console.log("---------------------");
+      console.log("---------------------");
       // console.log(`touristId: ${touristId}`);
-      // console.log(`bookmarkedItinerary: ${bookmarkedItinerary}`);
-      // console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
-      // console.log("---------------------");
+      console.log(`bookmarkedItinerary: ${bookmarkedItinerary}`);
+      console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
+      console.log("---------------------");
 
       const response = await fetcher(`/tourists/${touristId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
         body: JSON.stringify({
           BookmarkedItinerary: bookmarkedItinerary,

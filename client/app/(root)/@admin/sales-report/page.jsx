@@ -18,21 +18,33 @@ import {
     TabsContent,
 } from "@/components/ui/tabs";
 import SalesReportBtn from "@/components/admin/SalesReportBtn";
-/* 
-const salesData = [
-    { type: "Ray Powell", price: 62350, quantity: 1, netProfit: 26810, grossProfit:29491 , date: "April 1, 2020" },
-    { type: "Kathy's: Gelato cart", price: 10450, quantity: 1, netProfit: 4700, grossProfit: 5170, date: "April 6, 2020" },
-    { type: "West Birchmont: Parks", price: 6000, quantity: 1, netProfit: 2500, grossProfit:2750 , date: "April 10, 2020" },
-    { type: "Laredo: Assist Packages", price: 45900, quantity: 1, netProfit: 20000, grossProfit:22000 , date: "April 30, 2020" },
-    { type: "Carl Percy", price: 51000, quantity: 1, netProfit: 17850, grossProfit:19635 , date: "April 15, 2020" },
-    { type: "Penny Rozin", price: 30600, quantity: 1, netProfit: 10200, grossProfit: 11220, date: "April 20, 2020" },
-];
+import { fetcher } from "@/lib/fetch-client"
+import { getSession } from "@/lib/session"
 
-// Calculate totals
-const totalPrice = salesData.reduce((acc, item) => acc + item.price, 0);
-const totalNetProfit = salesData.reduce((acc, item) => acc + item.netProfit, 0);
-const totalGrossProfit = salesData.reduce((acc, item) => acc + item.grossProfit, 0);
- */
+
+let query = '/products?'
+if (query.endsWith("?")) query = '/products'
+let query2 = '/itineraries?'
+if (query2.endsWith("?")) query2 = '/itineraries'
+const productsResponse = await fetcher(query).catch(err => err)
+let products = []
+const session = await getSession()
+
+if (productsResponse?.ok) products = await productsResponse.json()
+
+    const totalSales = products
+    ?.filter(product => product?.Seller?._id === session?.user?.userId)
+    .reduce(
+        (totals, product) => {
+            if (product?._id) {
+                totals.totalSales += product.TotalSales || 0;
+                totals.totalRevenue += product.Price * product.TotalSales || 0;
+                totals.discountedRevenue += product.Price * product.TotalSales * 0.9 || 0;
+            }
+            return totals;
+        },
+        { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 } // Initial totals
+    );
 export default function DashboardPage() {
     return (
         <Tabs defaultValue="all">
@@ -53,12 +65,55 @@ export default function DashboardPage() {
                                 <TableRow>
                                     <TableHead>Type</TableHead>
                                     <TableHead className="hidden md:table-cell">Price</TableHead>
-                                    <TableHead className="hidden md:table-cell">Quantity</TableHead>
-                                    <TableHead className="hidden md:table-cell">Net Profit</TableHead>
+
+                                    <TableHead className="hidden md:table-cell">Total Sales</TableHead>
                                     <TableHead className="hidden md:table-cell">Gross Profit</TableHead>
-                                    <TableHead className="hidden md:table-cell">Date</TableHead>
+                                    <TableHead className="hidden md:table-cell">Net Profit</TableHead>
                                 </TableRow>
                             </TableHeader>
+                            <TableBody>
+                            {products
+            ?.filter(product => product?.Seller?._id === session?.user?.userId)
+            .map(product =>
+                product?._id ? (
+                    <TableRow key={product._id}>
+                        <TableCell className="hidden sm:table-cell">
+                            {product.Name}
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                            ${product.Price}
+                        </TableCell>
+                        <TableCell>
+                            {product.TotalSales}
+                        </TableCell>
+                        <TableCell>
+                            ${product.Price * product.TotalSales}
+                        </TableCell>
+                        <TableCell>
+                            ${product.Price * product.TotalSales * 0.9}
+                        </TableCell>
+                    </TableRow>
+                ) : null
+            )}
+        {/* Total Row */}
+        <TableRow>
+            <TableCell className="hidden sm:table-cell">
+                <strong>Total</strong>
+            </TableCell>
+            <TableCell>-</TableCell> {/* Empty cell for alignment */}
+            <TableCell>
+                <strong>{totalSales.totalSales}</strong>
+            </TableCell>
+            <TableCell>
+                <strong>${totalSales.totalRevenue}</strong>
+            </TableCell>
+            <TableCell>
+                <strong>${totalSales.discountedRevenue}</strong>
+            </TableCell>
+        </TableRow>
+
+
+                        </TableBody>
                            {/*  <TableBody>
                                 {salesData.map((item, index) => (
                                     <TableRow key={index}>

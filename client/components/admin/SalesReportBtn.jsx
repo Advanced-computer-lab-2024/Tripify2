@@ -25,7 +25,7 @@ export default function ViewReviewsBtn({ product })
             Products
              </Button>
              <Button onClick={() => setOpen(true)}>
-            Iteneraries
+            Itineraries
              </Button>
     
         </>

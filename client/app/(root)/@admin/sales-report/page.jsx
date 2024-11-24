@@ -29,7 +29,7 @@ if (query2.endsWith("?")) query2 = '/itineraries'
 const productsResponse = await fetcher(query).catch(err => err)
 let products = []
 const session = await getSession()
-
+let itineraries=[]
 if (productsResponse?.ok) products = await productsResponse.json()
 
     const totalSales = products
@@ -39,7 +39,7 @@ if (productsResponse?.ok) products = await productsResponse.json()
             if (product?._id) {
                 totals.totalSales += product.TotalSales || 0;
                 totals.totalRevenue += product.Price * product.TotalSales || 0;
-                totals.discountedRevenue += product.Price * product.TotalSales * 0.9 || 0;
+                totals.discountedRevenue += product.Price * product.TotalSales * 0.1 || 0;
             }
             return totals;
         },
@@ -73,8 +73,7 @@ export default function DashboardPage() {
                             </TableHeader>
                             <TableBody>
                             {products
-            ?.filter(product => product?.Seller?._id === session?.user?.userId)
-            .map(product =>
+            ?.map(product =>
                 product?._id ? (
                     <TableRow key={product._id}>
                         <TableCell className="hidden sm:table-cell">
@@ -90,7 +89,7 @@ export default function DashboardPage() {
                             ${product.Price * product.TotalSales}
                         </TableCell>
                         <TableCell>
-                            ${product.Price * product.TotalSales * 0.9}
+                            ${product.Price * product.TotalSales * 0.1}
                         </TableCell>
                     </TableRow>
                 ) : null

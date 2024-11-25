@@ -17,7 +17,8 @@ export default function Products() {
   const [maxPrice, setMaxPrice] = useState(100);
   const [currentMaxPrice, setCurrentMaxPrice] = useState(100);
   const [sortOption, setSortOption] = useState("none");
-
+  const [WishList1, setWishList] = useState([]);
+  const { data: session, status } = useSession(); // Get session status and data
   const fetchProducts = async () => {
     try {
       const response = await fetcher("/products", {
@@ -36,7 +37,7 @@ export default function Products() {
 
       const stringifiedData = JSON.stringify(data);
 
-      console.log("Stringified Data: ", stringifiedData);
+      // console.log("Stringified Data: ", stringifiedData);
 
       setProducts(data.filter((product) => !product.Archived));
       setFilteredProducts(data.filter((product) => !product.Archived));
@@ -64,9 +65,14 @@ export default function Products() {
         return <>error</>;
       }
 
+<<<<<<< HEAD
       const tourist = await res.json();
 
       console.log(tourist);
+=======
+      const Tourist = await res.json();
+      setWishList(Tourist.Wishlist);
+      console.log("WENT BACK", Tourist.Wishlist);
     } catch (e) {
       console.error("Error fetching tourist:", e);
     }

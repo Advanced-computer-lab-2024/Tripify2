@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Star, ShoppingBag, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,15 +18,17 @@ import { useRouter } from "next/navigation";
 import { fetcher } from "@/lib/fetch-client";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { convertPrice } from "@/lib/utils";
-
+import { useSession } from "next-auth/react";
 export default function ProductPage({ product }) {
   const { currency } = useCurrencyStore();
 
   const router = useRouter();
-
   const [quantity, setQuantity] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [WishList2, setWishList] = useState([]);
+  const { data: session, status } = useSession();
+  const [getWishList, setGetWishList] = useState(true);
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -35,6 +37,69 @@ export default function ProductPage({ product }) {
     }
   };
 
+  useEffect(() => {
+    if (status === "authenticated" && getWishList) {
+      console.log("GOT");
+      fetchTourist(session?.user?.id);
+      setGetWishList(false);
+    }
+  }, [status, session?.user?.id]);
+
+  useEffect(() => {
+    if (status === "authenticated" && !getWishList) {
+      console.log("Update");
+      UpdateWishList2(session?.user?.id);
+    }
+  }, [WishList2]);
+
+  const fetchTourist = async (userId) => {
+    try {
+      const res = await fetcher(`/tourists/${userId}`).catch((e) =>
+        console.error("Error fetching tourist:", e)
+      );
+
+      if (!res.ok) {
+        const resError = await res.json();
+        console.log(resError);
+        return <>error</>;
+      }
+
+      const Tourist = await res.json();
+      setWishList(Tourist.Wishlist);
+    } catch (e) {
+      console.error("Error fetching tourist:", e);
+    }
+  };
+
+  const UpdateWishList2 = async (userId) => {
+    try {
+      const res = await fetcher(`/tourists/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Wishlist: WishList2 }),
+      });
+
+      if (!res.ok) {
+        const resError = await res.json();
+        console.log(resError);
+        return <>error</>;
+      }
+
+      console.log({ "SINGLE PRODUCT": await res.json() });
+    } catch (e) {
+      console.error("Error fetching tourist:", e);
+    }
+  };
+
+  const toggleWishlist = (productId) => {
+    setWishList((prevWishlist) =>
+      prevWishlist.includes(productId)
+        ? prevWishlist.filter((id) => id !== productId)
+        : [...prevWishlist, productId]
+    );
+  };
   const handlePurchase = async () => {
     setLoading(true);
     // Implement purchase functionality here
@@ -134,6 +199,21 @@ export default function ProductPage({ product }) {
               {loading && <Loader2 size={16} className="animate-spin mr-0.5" />}
               <ShoppingBag className="mr-2" />
               Buy Now
+            </Button>
+          </div>
+          <div className="flex items-center mb-6 space-x-4">
+            <Button
+              variant={WishList2.includes(product._id) ? "solid" : "outline"}
+              className={`transition-all duration-200 ease-in-out ${
+                WishList2.includes(product._id)
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+              onClick={() => toggleWishlist(product._id)}
+            >
+              {WishList2.includes(product._id)
+                ? "♥ Added to Wishlist"
+                : "♡ Add to Wishlist"}
             </Button>
           </div>
           <p className="mb-4 text-sm text-gray-500">

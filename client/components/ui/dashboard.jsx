@@ -29,6 +29,8 @@ export default function Dashboard({ params }) {
               name: "Current Orders",
               link: "/products-tourist/current-products",
             },
+            { name: "My Products", link: "/products-tourist/my-products" },
+            { name: "My Wishlist", link: "/products-tourist/wishlist" },
           ],
         },
         { name: "Places", link: "/places" },

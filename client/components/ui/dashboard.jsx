@@ -25,6 +25,7 @@ export default function Dashboard({ params }) {
           sublinks: [
             { name: "All Products", link: "/products-tourist" },
             { name: "My Products", link: "/products-tourist/my-products" },
+            { name: "My Wishlist", link: "/products-tourist/wishlist" },
           ],
         },
         { name: "Places", link: "/places" },

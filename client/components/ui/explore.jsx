@@ -129,63 +129,61 @@ export default function Explore({ params }) {
   };
 
   const handleBookmark = (id, type) => {
-    // console.log("Before update:", bookmarkedItinerary);
-
-    let updatedState;
+    let updatedBookmarks;
     if (type === "itinerary") {
       setBookmarkedItinerary((prev) => {
-        if (prev.includes(id))
-          updatedState = prev.filter((itemId) => itemId !== id);
-        else updatedState = [...prev, id];
-        return updatedState;
+        updatedBookmarks = prev.includes(id)
+          ? prev.filter((itemId) => itemId !== id)
+          : [...prev, id];
+        debounceSendPatchRequest(updatedBookmarks, "itinerary");
+        return updatedBookmarks;
       });
     } else if (type === "activity") {
       setBookmarkedActivity((prev) => {
-        if (prev.includes(id))
-          updatedState = prev.filter((itemId) => itemId !== id);
-        else updatedState = [...prev, id];
-        return updatedState;
+        updatedBookmarks = prev.includes(id)
+          ? prev.filter((itemId) => itemId !== id)
+          : [...prev, id];
+        debounceSendPatchRequest(updatedBookmarks, "activity");
+        return updatedBookmarks;
       });
     }
   };
 
-  const sendPatchRequest = async () => {
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  const debounceSendPatchRequest = debounce(async (updatedBookmarks, type) => {
     try {
       console.log("---------------------");
       // console.log(`touristId: ${touristId}`);
-      console.log(`bookmarkedItinerary: ${bookmarkedItinerary}`);
-      console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
+      console.log(`Bookmarked Itinerary: ${itineraries}`);
+      console.log(`Bookmarked Activity: ${activities}`);
       console.log("---------------------");
 
-      const response = await fetcher(`/tourists/${touristId}`, {
+      const body =
+        type === "itinerary"
+          ? { BookmarkedItinerary: updatedBookmarks }
+          : { BookmarkedActivity: updatedBookmarks };
+
+      await fetcher(`/tourists/${touristId}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-        },
-        body: JSON.stringify({
-          BookmarkedItinerary: bookmarkedItinerary,
-          BookmarkedActivity: bookmarkedActivity,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
 
       // console.log("=======================");
       // const data = await response.json();
       // console.log(`response: ${JSON.stringify(data)}`);
       // console.log("=======================");
-
-      if (!response.ok) {
-        console.error("Failed to send PATCH request");
-      }
-    } catch (error) {
-      console.error("Error occurred while sending PATCH request:", error);
+    } catch (e) {
+      console.error("Error occurred while updating bookmarks:", e);
     }
-  };
-
-  useEffect(() => {
-    sendPatchRequest();
-  }, [bookmarkedItinerary, bookmarkedActivity]);
+  }, 300);
 
   return (
     <div className="mx-20 mt-5 sm:mx-22 md:mx-24 lg:mx-26 xl:mx-30">

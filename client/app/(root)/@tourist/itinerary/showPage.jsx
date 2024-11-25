@@ -37,12 +37,9 @@ const ItineraryComponent = ({ params }) => {
   useEffect(() => {
     const fetchItineraries = async () => {
       try {
-        const response = await fetcher("/itineraries", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }).catch((e) => console.log(e));
+        const response = await fetcher("/itineraries").catch((e) =>
+          console.log(e)
+        );
         const data = await response.json();
         const filteredData = data.filter(
           (itinerary) => !itinerary.Inappropriate
@@ -119,49 +116,39 @@ const ItineraryComponent = ({ params }) => {
   };
 
   const handleBookmark = (id) => {
-    let updatedState;
     setBookmarkedItinerary((prev) => {
-      if (prev.includes(id))
-        updatedState = prev.filter((itemId) => itemId !== id);
-      else updatedState = [...prev, id];
-      return updatedState;
+      const updatedBookmarkedItineraries = prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id];
+      debounceSendPatchRequest(updatedBookmarkedItineraries);
+      return updatedBookmarkedItineraries;
     });
   };
 
-  const sendPatchRequest = async () => {
-    try {
-      // console.log("---------------------");
-      // console.log(`touristId: ${touristId}`);
-      // console.log(`bookmarkedItinerary: ${bookmarkedItinerary}`);
-      // console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
-      // console.log("---------------------");
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
 
-      const response = await fetcher(`/tourists/${touristId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-        },
-        body: JSON.stringify({
-          BookmarkedItinerary: bookmarkedItinerary,
-        }),
-      });
-
-      // console.log("=======================");
-      // const data = await response.json();
-      // console.log(`response: ${JSON.stringify(data)}`);
-      // console.log("=======================");
-
-      if (!response.ok) console.error("Failed to send PATCH request");
-    } catch (e) {
-      console.error("Error occurred while sending PATCH request:", e);
-    }
-  };
-
-  useEffect(() => {
-    sendPatchRequest();
-  }, [bookmarkedItinerary]);
+  const debounceSendPatchRequest = debounce(
+    async (updatedBookmarkedItineraries) => {
+      try {
+        await fetcher(`/tourists/${touristId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            BookmarkedItinerary: updatedBookmarkedItineraries,
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to update bookmarks:", e);
+      }
+    },
+    300
+  );
 
   const itinerariesWithCategoriesAndTags =
     selectedCategories.length === 0 && selectedTags.length === 0

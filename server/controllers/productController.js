@@ -19,7 +19,7 @@ async function getProducts(req, res) {
     const { search, minPrice, maxPrice, minRating } = req.query;
     let query = {};
 
-    if (search) query.Name = { $regex: search, $options: 'i' }
+    if (search) query.Name = { $regex: search, $options: "i" };
 
     if (minPrice || maxPrice) {
       query.Price = {};
@@ -31,7 +31,7 @@ async function getProducts(req, res) {
 
     console.log(query);
 
-    const products = await Product.find(query).populate("Seller")
+    const products = await Product.find(query).populate("Seller");
     // .populate("Reviews");
     res.status(200).json(products);
   } catch (e) {
@@ -44,15 +44,17 @@ async function getProducts(req, res) {
 async function getProductById(req, res) {
   try {
     const { id } = req.params;
-    console.log(id)
-    const product = await Product.findById(id).populate({
-      path: "Seller",
-    }).populate({
-      path: "Reviews",
-      populate: {
-        path: "UserId",
-      },
-    })
+    console.log(id);
+    const product = await Product.findById(id)
+      .populate({
+        path: "Seller",
+      })
+      .populate({
+        path: "Reviews",
+        populate: {
+          path: "UserId",
+        },
+      });
     return res.json(product);
   } catch (e) {
     return res
@@ -74,7 +76,15 @@ async function createProduct(req, res) {
       AvailableQuantity,
     } = req.body;
 
-    if (!Name || !Image || !Price || !Description || !Seller || !AvailableQuantity) return res.status(400).json({ message: "All Fields Must Be Given!" });
+    if (
+      !Name ||
+      !Image ||
+      !Price ||
+      !Description ||
+      !Seller ||
+      !AvailableQuantity
+    )
+      return res.status(400).json({ message: "All Fields Must Be Given!" });
 
     const seller = await User.findById(Seller, "_id");
     if (!seller || seller._id.toString() !== req._id)
@@ -119,7 +129,7 @@ async function updateProduct(req, res) {
     const user = await User.findById(req._id);
 
     if (
-      user.Role !== 'Admin' &&
+      user.Role !== "Admin" &&
       (!deletedProduct ||
         deletedProduct.Seller.toString() !== req._id.toString())
     )
@@ -150,7 +160,7 @@ async function deleteProduct(req, res) {
     const user = await User.findById(req._id);
 
     if (
-      user.Role !== 'Admin' &&
+      user.Role !== "Admin" &&
       (!deletedProduct ||
         deletedProduct.Seller.toString() !== req._id.toString())
     )

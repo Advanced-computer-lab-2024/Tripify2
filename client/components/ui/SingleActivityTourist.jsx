@@ -28,8 +28,9 @@ import { useRouter } from "next/navigation";
 import { convertPrice } from "@/lib/utils";
 import { fetcher } from "@/lib/fetch-client";
 import { useSession } from "next-auth/react";
+import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 
-export default function ActivityDetails({ activity }) {
+export default function ActivityDetails({ activity, bookmarked }) {
   const [numParticipants, setNumParticipants] = useState(1);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -37,6 +38,10 @@ export default function ActivityDetails({ activity }) {
   const session = useSession();
 
   const { currency } = useCurrencyStore();
+
+  const [bookmarkedActivities, setBookmarkedActivities] = useState(bookmarked);
+
+  const isBookmarked = bookmarkedActivities.includes(activity._id);
 
   if (!activity) {
     return (
@@ -139,6 +144,40 @@ export default function ActivityDetails({ activity }) {
     navigator.clipboard.writeText(dummyLink);
   };
 
+  const handleBookmark = (id) => {
+    let updatedBookmarks;
+    setBookmarkedActivities((prev) => {
+      updatedBookmarks = prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id];
+      debounceSendPatchRequest(updatedBookmarks);
+      return updatedBookmarks;
+    });
+  };
+
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  console.log(session?.data?.user);
+
+  const debounceSendPatchRequest = debounce(async (updatedBookmarks) => {
+    try {
+      //console.log(session?.data?.user);
+      await fetcher(`/tourists/${session?.data?.user?.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ BookmarkedActivity: updatedBookmarks }),
+      });
+    } catch (e) {
+      console.error("Error occurred while updating bookmarks", e);
+    }
+  }, 300);
+
   return (
     <div className="container p-6 mx-auto">
       <h1 className="mb-6 text-3xl font-bold">{Name}</h1>
@@ -155,7 +194,16 @@ export default function ActivityDetails({ activity }) {
           </div>
         )}
       </div>
-
+      <div
+        className="flex justify-start mb-4 space-x-4"
+        onClick={() => handleBookmark(activity._id)}
+      >
+        {isBookmarked ? (
+          <RiBookmarkFill className="text-yellow-500" />
+        ) : (
+          <RiBookmarkLine className="text-gray-500" />
+        )}
+      </div>
       <div className="flex justify-end mb-4 space-x-4">
         <button
           onClick={handleShareEmail}

@@ -24,7 +24,6 @@ export default function Dashboard({ params }) {
           link: "/products-tourist",
           sublinks: [
             { name: "All Products", link: "/products-tourist" },
-            { name: "Past Orders", link: "/products-tourist/my-products" },
             {
               name: "Current Orders",
               link: "/products-tourist/current-products",

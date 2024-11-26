@@ -33,18 +33,20 @@ let itineraries=[]
 if (productsResponse?.ok) products = await productsResponse.json()
 
     const totalSales = products
-    ?.filter(product => product?.Seller?._id === session?.user?.userId)
     .reduce(
         (totals, product) => {
-            if (product?._id) {
-                totals.totalSales += product.TotalSales || 0;
-                totals.totalRevenue += product.Price * product.TotalSales || 0;
-                totals.discountedRevenue += product.Price * product.TotalSales * 0.1 || 0;
-            }
+            const price = product?.Price || 0; // Default to 0 if undefined or null
+            const totalSales = product?.TotalSales || 0; // Default to 0 if undefined or null
+
+            totals.totalSales += totalSales;
+            totals.totalRevenue += price * totalSales;
+            totals.discountedRevenue += price * totalSales * 0.1;
+
             return totals;
         },
         { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 } // Initial totals
     );
+
 export default function DashboardPage() {
     return (
         <Tabs defaultValue="all">

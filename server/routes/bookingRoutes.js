@@ -31,6 +31,7 @@ const {
   getMyCurrentProductBookings,
   cancelOrderProductBooking,
   updateQuantityProductAndStatus,
+  getallItineraryBookings,
 } = require("../controllers/bookingController");
 
 const bodyParser = require("body-parser");
@@ -105,5 +106,7 @@ router.post(
   bodyParser.raw({ type: "application/json" }),
   acceptBooking
 );
+router.route("/itin")
+.get(getallItineraryBookings)
 
 module.exports = router;

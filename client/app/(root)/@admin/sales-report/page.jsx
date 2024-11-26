@@ -72,6 +72,11 @@ export default function DashboardPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
+                            <TableRow>
+            <TableCell className="hidden sm:table-cell">
+                <strong>Products</strong>
+                </TableCell>
+                </TableRow>
                             {products
             ?.map(product =>
                 product?._id ? (
@@ -94,7 +99,6 @@ export default function DashboardPage() {
                     </TableRow>
                 ) : null
             )}
-        {/* Total Row */}
         <TableRow>
             <TableCell className="hidden sm:table-cell">
                 <strong>Total</strong>

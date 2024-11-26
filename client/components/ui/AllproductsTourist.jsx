@@ -107,7 +107,7 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
           currentquantity = newcart[i].quantity;
         }
       }
-      if (!flag){
+      if (flag == false){
         newcart.push({product: productId, quantity: 1})
       }
     if (availablequantity >= currentquantity){
@@ -126,6 +126,7 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
       } catch (error) {
         console.error("Error updating cart:", error);
       }
+      alert("added to cart")
       setCart(newcart)
     }
     else{

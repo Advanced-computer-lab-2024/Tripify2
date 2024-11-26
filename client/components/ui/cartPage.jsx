@@ -1,10 +1,11 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import CartItem from './cartItem'
+import { useRouter } from 'next/navigation'
 
 function cartPage({Cart, touristId}) {
     const [cart, setCart] = useState(Cart)
-    console.log("heloo")
+    const router = useRouter();
     console.log(cart)
     let sum = 0;
     for (let i =0; i<cart.length; i++){
@@ -31,7 +32,7 @@ function cartPage({Cart, touristId}) {
         {items.length!=0? items: <span>Cart is empty</span>}
         <div className='flex flex-row gap-4 items-center p-4 '>
           <div className="bg-slate-200 rounded-md text-sm font-medium h-10 px-4 py-2">Total: {sum}</div>
-          <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium h-10 px-4 py-2">Check Out</button>
+          <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium h-10 px-4 py-2" onClick={()=>{router.push("/checkout")}}>Check Out</button>
         </div>
       </div>
     </div>

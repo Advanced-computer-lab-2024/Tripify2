@@ -29,19 +29,16 @@ const ActivityComponent = ({ params }) => {
     bookmarkedActivitiesTourist
   );
 
-  console.log("-----------------------------");
-  console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
-  console.log("-----------------------------");
+  // console.log("-----------------------------");
+  // console.log(`bookmarkedActivity: ${bookmarkedActivity}`);
+  // console.log("-----------------------------");
 
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await fetcher(`/activities`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }).catch((e) => console.log(e));
+        const response = await fetcher(`/activities`).catch((e) =>
+          console.log(e)
+        );
 
         if (!response.ok) {
           return <>error</>;
@@ -77,6 +74,8 @@ const ActivityComponent = ({ params }) => {
 
     fetchActivities();
   }, []);
+
+  // console.log(activities);
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
@@ -125,38 +124,39 @@ const ActivityComponent = ({ params }) => {
   };
 
   const handleBookmark = (id) => {
-    let updatedState;
     setBookmarkedActivity((prev) => {
-      if (prev.includes(id))
-        updatedState = prev.filter((itemId) => itemId !== id);
-      else updatedState = [...prev, id];
-      return updatedState;
+      const updatedBookmarkedActivities = prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id];
+      debounceSendPatchRequest(updatedBookmarkedActivities);
+      return updatedBookmarkedActivities;
     });
   };
 
-  const sendPatchRequest = async () => {
-    try {
-      const response = await fetcher(`/tourists/${touristId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-        },
-        body: JSON.stringify({
-          BookmarkedActivity: bookmarkedActivity,
-        }),
-      });
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
 
-      if (!response?.ok) console.error("Failed to send PATCH request");
-    } catch (e) {
-      console.error("Error occurred while sending PATCH request:", e);
-    }
-  };
-
-  useEffect(() => {
-    sendPatchRequest();
-  }, [bookmarkedActivity]);
+  const debounceSendPatchRequest = debounce(
+    async (updatedBookmarkedActivities) => {
+      try {
+        await fetcher(`/tourists/${touristId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            BookmarkedActivity: updatedBookmarkedActivities,
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to update bookmarks:", e);
+      }
+    },
+    300
+  );
 
   const activitiesWithCategoriesAndTags =
     selectedCategories.length === 0 && selectedTags.length === 0
@@ -200,6 +200,8 @@ const ActivityComponent = ({ params }) => {
       );
     }
   );
+
+  console.log(activitiesWithCategoriesAndTags);
 
   return (
     <div className="grid h-screen grid-cols-6">

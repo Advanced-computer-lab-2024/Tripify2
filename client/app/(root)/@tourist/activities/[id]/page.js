@@ -1,4 +1,5 @@
-import SingleActivity from "@/components/ui/SingleActivity";
+import SingleActivity from "@/components/ui/SingleActivityTourist";
+import { getSession } from "@/lib/session";
 import { fetcher } from "@/lib/fetch-client";
 
 export default async function DetailsActivity({ params }) {
@@ -15,8 +16,28 @@ export default async function DetailsActivity({ params }) {
     throw new Error("Network response was not ok");
   }
 
+  const session = await getSession();
+
+  const touristId = session?.user?.id;
+
+  const resTourist = await fetcher(`/tourists/${touristId}`).catch((e) =>
+    console.log(e)
+  );
+
+  if (!resTourist?.ok) {
+    const touristError = await resTourist.json();
+    console.log(touristError);
+    return <>error</>;
+  }
+
+  const tourist = await resTourist.json();
+
+  const returnBookmarked = tourist.BookmarkedActivity;
+
   const activity = await activityRes.json();
   const returnActivity = activity.activity;
 
-  return <SingleActivity activity={returnActivity} />;
+  return (
+    <SingleActivity activity={returnActivity} bookmarked={returnBookmarked} />
+  );
 }

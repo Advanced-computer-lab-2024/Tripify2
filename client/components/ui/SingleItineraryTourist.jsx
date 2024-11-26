@@ -21,15 +21,21 @@ import {
 } from "lucide-react";
 import { Badge } from "./badge";
 import { useSession } from "next-auth/react";
+import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 // import StarRating from "../starRating";
 
-export default function ItineraryDetails({ itinerary }) {
+export default function ItineraryDetails({ itinerary, bookmarked }) {
   const router = useRouter();
   const session = useSession();
 
   const { currency } = useCurrencyStore();
 
   const [numParticipants, setNumParticipants] = useState(1);
+
+  const [bookmarkedItineraries, setBookmarkedItineraries] =
+    useState(bookmarked);
+
+  const isBookmarked = bookmarkedItineraries.includes(itinerary._id);
 
   if (!itinerary) return <p>Loading...</p>;
 
@@ -85,6 +91,37 @@ export default function ItineraryDetails({ itinerary }) {
     }
   };
 
+  const handleBookmark = (id) => {
+    let updatedBookmarks;
+    setBookmarkedItineraries((prev) => {
+      updatedBookmarks = prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id];
+      debounceSendPatchRequest(updatedBookmarks);
+      return updatedBookmarks;
+    });
+  };
+
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  const debounceSendPatchRequest = debounce(async (updatedBookmarks) => {
+    try {
+      await fetcher(`/tourists/${session?.data?.user?.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ BookmarkedItinerary: updatedBookmarks }),
+      });
+    } catch (e) {
+      console.error("Error occurred while updating bookmarks", e);
+    }
+  }, 300);
+
   return (
     <div className="max-w-6xl p-6 mx-auto bg-gray-50">
       <div className="overflow-hidden bg-white rounded-lg shadow-lg">
@@ -112,6 +149,16 @@ export default function ItineraryDetails({ itinerary }) {
         </div>
 
         <div className="p-6">
+          <div
+            className="flex justify-start mb-4 space-x-4"
+            onClick={() => handleBookmark(itinerary._id)}
+          >
+            {isBookmarked ? (
+              <RiBookmarkFill className="text-yellow-500" />
+            ) : (
+              <RiBookmarkLine className="text-gray-500" />
+            )}
+          </div>
           <div className="flex justify-end mb-4 space-x-4">
             <button
               onClick={handleShareEmail}

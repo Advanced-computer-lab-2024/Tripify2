@@ -1,4 +1,5 @@
-import SingleItinerary from "@/components/ui/SingleItinerary";
+import SingleItinerary from "@/components/ui/SingleItineraryTourist";
+import { getSession } from "@/lib/session";
 import { fetcher } from "@/lib/fetch-client";
 
 export default async function DetailsItinerary({ params }) {
@@ -15,7 +16,27 @@ export default async function DetailsItinerary({ params }) {
     throw new Error("Network response was not ok");
   }
 
+  const session = await getSession();
+
+  const touristId = session?.user?.id;
+
+  const resTourist = await fetcher(`/tourists/${touristId}`).catch((e) =>
+    console.log(e)
+  );
+
+  if (!resTourist?.ok) {
+    const touristError = await resTourist.json();
+    console.log(touristError);
+    return <>error</>;
+  }
+
+  const tourist = await resTourist.json();
+
+  const returnBookmarked = tourist.BookmarkedItinerary;
+
   const itinerary = await itineraryRes.json();
 
-  return <SingleItinerary itinerary={itinerary} />;
+  return (
+    <SingleItinerary itinerary={itinerary} bookmarked={returnBookmarked} />
+  );
 }

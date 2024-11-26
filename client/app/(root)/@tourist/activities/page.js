@@ -7,13 +7,9 @@ export default async function AllActivities() {
 
   const touristId = session?.user?.id;
 
-  const resTourist = await fetcher(`/tourists/${touristId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-    },
-  }).catch((e) => console.log(e));
+  const resTourist = await fetcher(`/tourists/${touristId}`).catch((e) =>
+    console.log(e)
+  );
 
   if (!resTourist?.ok) {
     const touristError = await resTourist.json();

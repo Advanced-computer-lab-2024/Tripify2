@@ -24,6 +24,10 @@ export default function Dashboard({ params }) {
           link: "/products-tourist",
           sublinks: [
             { name: "All Products", link: "/products-tourist" },
+            {
+              name: "Current Orders",
+              link: "/products-tourist/current-products",
+            },
             { name: "My Products", link: "/products-tourist/my-products" },
             { name: "My Wishlist", link: "/products-tourist/wishlist" },
             { name: "My Cart", link: "/cart" },
@@ -74,6 +78,7 @@ export default function Dashboard({ params }) {
           ],
         },
         { name: "Explore", link: "/" },
+        { name: "Bookmarked", link: "/bookmarked" },
       ];
       break;
     case "Tour Guide":

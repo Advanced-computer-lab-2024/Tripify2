@@ -76,6 +76,7 @@ const TouristSchema = new Schema(
       {
         name: {
           type: String,
+          unique: true,
           required: true,
         },
         type: {

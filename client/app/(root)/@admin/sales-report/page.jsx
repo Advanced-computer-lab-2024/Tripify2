@@ -24,27 +24,78 @@ import { getSession } from "@/lib/session"
 
 let query = '/products?'
 if (query.endsWith("?")) query = '/products'
-let query2 = '/itineraries?'
-if (query2.endsWith("?")) query2 = '/itineraries'
+let query2 = '/bookings/itin?'
+if (query2.endsWith("?")) query2 = '/bookings/itin'
+let query3 = '/bookings/act?'
+if (query3.endsWith("?")) query3 = '/bookings/act'
+
 const productsResponse = await fetcher(query).catch(err => err)
 let products = []
+const itinResponse = await fetcher(query2).catch(err => err)
 const session = await getSession()
-let itineraries=[]
-if (productsResponse?.ok) products = await productsResponse.json()
+const actResponse = await fetcher(query3).catch(err => err)
 
-    const totalSales = products
-    ?.filter(product => product?.Seller?._id === session?.user?.userId)
-    .reduce(
-        (totals, product) => {
-            if (product?._id) {
-                totals.totalSales += product.TotalSales || 0;
-                totals.totalRevenue += product.Price * product.TotalSales || 0;
-                totals.discountedRevenue += product.Price * product.TotalSales * 0.1 || 0;
-            }
-            return totals;
-        },
-        { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 } // Initial totals
-    );
+let itineraries=[]
+let acts=[]
+if (productsResponse?.ok) products = await productsResponse.json()
+    if (itinResponse?.ok) itineraries = await itinResponse.json()
+        if (actResponse?.ok) acts = await actResponse.json()
+
+
+        const totalSales = products.reduce(
+            (totals, product) => {
+                const price = product?.Price || 0; // Default to 0 if undefined or null
+                const totalSales = product?.TotalSales || 0; // Default to 0 if undefined or null
+                
+                // Accessing the associated itinerary data from the product
+
+        
+                // Update the totals with the correct values
+                totals.totalSales += totalSales ;
+                totals.totalRevenue += (price * totalSales) 
+                totals.discountedRevenue += (price * totalSales * 0.1); // Assuming 10% discount on `product`
+        
+                return totals;
+            },
+            { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 } // Initial totals
+        );
+        const totalSales2 = itineraries.reduce(
+            (totals, itin) => {
+
+                
+                // Accessing the associated itinerary data from the product
+                const itinerary = itin?.ItineraryId;
+                const participants = itin?.Participants || 0; // Default to 0 if undefined or null
+                const price2 = itinerary?.Price || 0; // Default to 0 if undefined or null
+        
+                // Update the totals with the correct values
+                totals.totalSales +=   participants;
+                totals.totalRevenue +=  (price2 * participants);
+                totals.discountedRevenue += (price2 * participants * 0.1); // Assuming 10% discount on `product`
+        
+                return totals;
+            },
+            { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 } // Initial totals
+        );
+        const totalSales3 = acts.reduce(
+            (totals, itin) => {
+
+                
+                // Accessing the associated itinerary data from the product
+                const itinerary = itin?.ActivityId;
+                const participants = itin?.Participants || 0; // Default to 0 if undefined or null
+                const price2 = itinerary?.Price || 0; // Default to 0 if undefined or null
+        
+                // Update the totals with the correct values
+                totals.totalSales +=   participants;
+                totals.totalRevenue +=  (price2 * participants);
+                totals.discountedRevenue += (price2 * participants * 0.1); // Assuming 10% discount on `product`
+        
+                return totals;
+            },
+            { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 } // Initial totals
+        );
+        
 export default function DashboardPage() {
     return (
         <Tabs defaultValue="all">
@@ -72,6 +123,11 @@ export default function DashboardPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
+                            <TableRow>
+            <TableCell className="hidden sm:table-cell">
+                <strong>Products</strong>
+                </TableCell>
+                </TableRow>
                             {products
             ?.map(product =>
                 product?._id ? (
@@ -94,23 +150,75 @@ export default function DashboardPage() {
                     </TableRow>
                 ) : null
             )}
-        {/* Total Row */}
+            {/* Bookings */}
+            <TableRow>
+                                    <TableCell className="hidden sm:table-cell">
+                                        <strong>Itineraries</strong>
+                                    </TableCell>
+                                </TableRow>
+                                {itineraries?.map(booking =>
+                                    booking?._id ? (
+                                        <TableRow key={booking._id}>
+                                            <TableCell className="hidden sm:table-cell">
+                                                {booking.ItineraryId?.Name || "Unknown"}
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell">
+                                                ${booking.ItineraryId?.Price || 0}
+                                            </TableCell>
+                                            <TableCell>
+                                                {booking.Participants || 0}
+                                            </TableCell>
+                                            <TableCell>
+                                                ${booking.ItineraryId?.Price * booking.Participants || 0}
+                                            </TableCell>
+                                            <TableCell>
+                                                ${booking.ItineraryId?.Price * booking.Participants * 0.1 || 0}
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : null
+                                )}
+                                            <TableRow>
+                                    <TableCell className="hidden sm:table-cell">
+                                        <strong>Activities</strong>
+                                    </TableCell>
+                                </TableRow>
+                                {acts?.map(booking =>
+                                    booking?._id ? (
+                                        <TableRow key={booking._id}>
+                                            <TableCell className="hidden sm:table-cell">
+                                                {booking.ActivityId?.Name || "Unknown"}
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell">
+                                                ${booking.ActivityId?.Price || 0}
+                                            </TableCell>
+                                            <TableCell>
+                                                {booking.Participants || 0}
+                                            </TableCell>
+                                            <TableCell>
+                                                ${booking.ActivityId?.Price * booking.Participants || 0}
+                                            </TableCell>
+                                            <TableCell>
+                                                ${booking.ActivityId?.Price * booking.Participants * 0.1 || 0}
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : null
+                                )}
         <TableRow>
             <TableCell className="hidden sm:table-cell">
                 <strong>Total</strong>
             </TableCell>
             <TableCell>-</TableCell> {/* Empty cell for alignment */}
             <TableCell>
-                <strong>{totalSales.totalSales}</strong>
+                <strong>{totalSales.totalSales+totalSales2.totalSales+totalSales3.totalSales}</strong>
             </TableCell>
             <TableCell>
-                <strong>${totalSales.totalRevenue}</strong>
+                <strong>${totalSales.totalRevenue+totalSales2.totalRevenue+totalSales3.totalRevenue}</strong>
             </TableCell>
             <TableCell>
-                <strong>${totalSales.discountedRevenue}</strong>
+                <strong>${totalSales.discountedRevenue+totalSales2.totalRevenue+totalSales3.totalRevenue}</strong>
             </TableCell>
         </TableRow>
-
+      
 
                         </TableBody>
                            {/*  <TableBody>

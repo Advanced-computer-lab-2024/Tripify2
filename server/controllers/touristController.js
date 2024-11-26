@@ -120,75 +120,58 @@ const updateTourist = async (req, res) => {
     BookmarkedItinerary,
     BookmarkedActivity,
     Cart,
-    /* Wallet, */
+    Address,
+    // Wallet,
   } = req.body;
 
   try {
     const tourist = await touristModel.findById(id);
 
-    if (!tourist) {
+    if (!tourist)
       return res.status(404).json({
         message: "Tourist not found",
       });
-    }
 
     if (Email || Password) {
       const user = await userModel.findById(tourist.UserId);
 
-      if (!user) {
+      if (!user)
         return res.status(404).json({
           message: "(Tourist) User not found",
         });
-      }
 
-      if (Email) {
-        user.Email = Email;
-      }
+      if (Email) user.Email = Email;
 
-      if (Password) {
-        user.Password = Password;
-      }
+      if (Password) user.Password = Password;
 
       await user.save();
     }
 
-    if (MobileNumber) {
-      tourist.MobileNumber = MobileNumber;
-    }
+    if (MobileNumber) tourist.MobileNumber = MobileNumber;
 
-    if (Nationality) {
-      tourist.Nationality = Nationality;
-    }
+    if (Nationality) tourist.Nationality = Nationality;
 
-    if (DOB) {
-      tourist.DOB = DOB;
-    }
+    if (DOB) tourist.DOB = DOB;
 
-    if (Occupation) {
-      tourist.Occupation = Occupation;
-    }
+    if (Occupation) tourist.Occupation = Occupation;
 
-    if (UpcomingPlaces) {
-      tourist.UpcomingPlaces = UpcomingPlaces;
-    }
+    if (UpcomingPlaces) tourist.UpcomingPlaces = UpcomingPlaces;
 
-    if (UpcomingActivities) {
-      tourist.UpcomingActivities = UpcomingActivities;
-    }
+    if (UpcomingActivities) tourist.UpcomingActivities = UpcomingActivities;
 
-    if (UpcomingItineraries) {
-      tourist.UpcomingItineraries = UpcomingItineraries;
-    }
+    if (UpcomingItineraries) tourist.UpcomingItineraries = UpcomingItineraries;
 
-    if (Wishlist) {
-      tourist.Wishlist = Wishlist;
-    }
+    if (Wishlist) tourist.Wishlist = Wishlist;
 
     if (BookmarkedItinerary) tourist.BookmarkedItinerary = BookmarkedItinerary;
 
     if (BookmarkedActivity) tourist.BookmarkedActivity = BookmarkedActivity;
 
     if (Cart) tourist.Cart = Cart;
+
+    if (Address) tourist.Address = Address;
+
+    // if (Wallet) tourist.Wallet = Wallet;
 
     await tourist.save();
 

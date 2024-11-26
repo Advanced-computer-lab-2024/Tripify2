@@ -6,18 +6,23 @@ import { useState, useEffect } from 'react';
 import { fetcher } from "@/lib/fetch-client";
 import { useSession } from "next-auth/react";
 
-export default function AllproductsTourist({ products, searchQuery, currentMaxPrice, wishlist }) {
+export default function AllproductsTourist({ products, searchQuery, currentMaxPrice, wishlist, cart }) {
   // const session = useSession();
   // const id = session?.data?.user?.id;
   const { currency } = useCurrencyStore();
   const [WishList, setWishlist] = useState(wishlist);
+  const [Cart, setCart] = useState(cart);
   const router = useRouter();
   const { data: session, status } = useSession(); // Get session status and data
   
   // console.log(products);
   useEffect(()=>{
-    setWishlist(wishlist);
+    setCart(wishlist);
   },[wishlist]);
+
+  useEffect(()=>{
+    setCart(cart);
+  },[Cart]);
 
   // useEffect(() => {
   //   if (status === "authenticated"){
@@ -91,6 +96,43 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
     );
   };
 
+  const addToCart = async (productId, availablequantity) => {   
+    let newcart = [].concat(Cart);
+    let flag = false;
+    let currentquantity = 1;
+      for (let i = 0; i<newcart.length; i++){
+        if (productId == newcart[i].product){
+          flag = true;
+          newcart[i].quantity += 1;
+          currentquantity = newcart[i].quantity;
+        }
+      }
+      if (!flag){
+        newcart.push({product: productId, quantity: 1})
+      }
+    if (availablequantity >= currentquantity){
+      try{const touristRes = await fetcher(`/tourists/${session.user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ Cart: newcart }),
+      });
+
+      if (!touristRes.ok) {
+        const errorData = await touristRes.json();
+        throw new Error(errorData.message || "Failed to update cart");
+      }
+
+      const data = await touristRes.json();
+      } catch (error) {
+        console.error("Error updating cart:", error);
+      }
+      setCart(newcart)
+    }
+    else{
+      alert("item out of stock")
+    }
+  };
+
   return (
     <div style={styles.productGrid}>
       {filteredProducts.map((eachproduct) => (
@@ -116,6 +158,9 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
               >
                 ♥
               </span>
+            </button>
+            <button className="mt-2 border rounded-md bg-black text-white p-2 px-4" onClick={() => addToCart(eachproduct._id, eachproduct.AvailableQuantity)}>
+              Add To Cart
             </button>
         </div>
       ))}

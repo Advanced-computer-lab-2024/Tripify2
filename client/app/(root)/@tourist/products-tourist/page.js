@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 
 export default function Products() {
   const { currency } = useCurrencyStore();
-
+  const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,6 +66,7 @@ export default function Products() {
 
       const Tourist = await res.json();
       setWishList(Tourist.Wishlist);
+      setCart(Tourist.Cart)
       console.log("WENT BACK", Tourist.Wishlist);
     } catch (e) {
       console.error("Error fetching tourist:", e);
@@ -158,6 +159,7 @@ export default function Products() {
         searchQuery={searchQuery}
         currentMaxPrice={currentMaxPrice}
         wishlist={WishList1}
+        cart={cart}
       />
     </div>
   );

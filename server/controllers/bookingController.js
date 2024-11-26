@@ -263,6 +263,16 @@ const getMyActivityBookings = async (req, res) => {
     res.status(400).json({ msg: e.message });
   }
 };
+const getallActivityBookings = async (req, res) => {
+    try {
+      const bookings = await ActivityBooking.find({
+        Status: "Confirmed",
+      }).populate("ActivityId");
+      res.status(200).json(bookings);
+    } catch (e) {
+      res.status(400).json({ msg: e.message });
+    }
+  };
 
 const updateQuantityProductAndStatus = async (req, res) => {
   const { orderId } = req.body;
@@ -1344,4 +1354,5 @@ module.exports = {
   cancelOrderProductBooking,
   updateQuantityProductAndStatus,
   getallItineraryBookings,
+  getallActivityBookings,
 };

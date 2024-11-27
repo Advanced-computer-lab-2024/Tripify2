@@ -82,6 +82,27 @@ const getTourist = async (req, res) => {
     res.status(500).json({ message: "Error retrieving tourist", error });
   }
 };
+const getCart = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await touristModel
+      .findById(id)
+      .populate({
+        path: "Cart.product",
+        select: "Name Price Image AvailableQuantity",
+      });
+
+    if (!user || user.Cart.length === 0) {
+      return res.status(404).json("No products found in the cart");
+    }
+
+    res.status(200).json(user.Cart); // Send the populated cart
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("An error occurred while retrieving the cart");
+  }
+};
+
 
 const updateTourist = async (req, res) => {
   const { id } = req.params;
@@ -233,4 +254,5 @@ module.exports = {
   updateTourist,
   deleteTourist,
   redeemPoints,
+  getCart
 };

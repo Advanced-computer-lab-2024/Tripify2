@@ -13,6 +13,7 @@ export default function wishlistProducts() {
   const [products, setProducts] = useState([]);
   const [WishList1, setWishList] = useState([]);
   const { data: session, status } = useSession(); // Get session status and data
+  const [Cart, setCart] = useState([]);
 
   const fetchProducts = async () => {
     try {
@@ -53,6 +54,7 @@ export default function wishlistProducts() {
       }
 
       const Tourist = await res.json();
+      setCart(Tourist.Cart)
       setWishList(Tourist.Wishlist);
       console.log("WENT BACK", Tourist.Wishlist);
     } catch (e) {
@@ -123,6 +125,44 @@ export default function wishlistProducts() {
     WishList1.includes(product._id)
   );
 
+  const addToCart = async (productId, availablequantity) => {   
+    let newcart = [].concat(Cart);
+    let flag = false;
+    let currentquantity = 1;
+      for (let i = 0; i<newcart.length; i++){
+        if (productId == newcart[i].product){
+          flag = true;
+          newcart[i].quantity += 1;
+          currentquantity = newcart[i].quantity;
+        }
+      }
+      if (!flag){
+        newcart.push({product: productId, quantity: 1})
+      }
+    if (availablequantity >= currentquantity){
+      try{const touristRes = await fetcher(`/tourists/${session.user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ Cart: newcart }),
+      });
+
+      if (!touristRes.ok) {
+        const errorData = await touristRes.json();
+        throw new Error(errorData.message || "Failed to update cart");
+      }
+
+      const data = await touristRes.json();
+      } catch (error) {
+        console.error("Error updating cart:", error);
+      }
+      alert("added to cart")
+      setCart(newcart)
+    }
+    else{
+      alert("item out of stock")
+    }
+  };
+
   return (
     <div style={styles.productGrid}>
       {wishlistProducts.map((eachproduct) => (
@@ -152,6 +192,9 @@ export default function wishlistProducts() {
               ♥
             </span>
           </button>
+          <button className="mt-2 border rounded-md bg-black text-white p-2 px-4" onClick={() => addToCart(eachproduct._id, eachproduct.AvailableQuantity)}>
+              Add To Cart
+            </button>
         </div>
       ))}
     </div>

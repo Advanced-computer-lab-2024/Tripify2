@@ -1,26 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { Star, ShoppingBag, User, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useRouter } from "next/navigation";
-import { fetcher } from "@/lib/fetch-client";
-import { useCurrencyStore } from "@/providers/CurrencyProvider";
-import { convertPrice } from "@/lib/utils";
-import { useSession } from "next-auth/react";
-export default function ProductPage({ product }) {
-  const { currency } = useCurrencyStore();
+import { useState , useEffect } from 'react'
+import Image from 'next/image'
+import { Star, ShoppingBag, User, Loader2 } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useRouter } from 'next/navigation'
+import { fetcher } from '@/lib/fetch-client'
+import { useCurrencyStore } from '@/providers/CurrencyProvider'
+import { convertPrice } from '@/lib/utils'
+import { useSession } from 'next-auth/react'
+export default function ProductPage({ product, cart }) {
+  const { currency } = useCurrencyStore()
 
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
@@ -29,6 +23,7 @@ export default function ProductPage({ product }) {
   const [WishList2, setWishList] = useState([]);
   const { data: session, status } = useSession();
   const [getWishList, setGetWishList] = useState(true);
+  const [Cart, setCart] = useState(cart);
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -139,12 +134,45 @@ export default function ProductPage({ product }) {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  const addToCart = async () => {
+      let newcart = [].concat(Cart);
+      let flag = false;
+      console.log(newcart)
+      console.log(newcart.length)
+      for (let i = 0; i<newcart.length; i++){
+        if (product._id == newcart[i].product){
+          flag = true;
+          newcart[i].quantity += quantity;
+        }
+      }
+      if (!flag){
+        newcart.push({product: product._id, quantity: quantity})
+      }
+      try{const touristRes = await fetcher(`/tourists/${session.user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ Cart: newcart }),
+      });
+
+      if (!touristRes.ok) {
+        const errorData = await touristRes.json();
+        throw new Error(errorData.message || "Failed to update cart");
+      }
+
+      const data = await touristRes.json();
+      } catch (error) {
+        console.error("Error updating cart:", error);
+      }
+      alert(`${quantity} ${product.Name} added`)
+      setCart(newcart)
+  }
 
   return (
     <div className="container px-4 py-8 mx-auto">
@@ -199,6 +227,9 @@ export default function ProductPage({ product }) {
               {loading && <Loader2 size={16} className="animate-spin mr-0.5" />}
               <ShoppingBag className="mr-2" />
               Buy Now
+            </Button>
+            <Button className="ml-4" onClick={addToCart}>
+              Add To Cart
             </Button>
           </div>
           <div className="flex items-center mb-6 space-x-4">

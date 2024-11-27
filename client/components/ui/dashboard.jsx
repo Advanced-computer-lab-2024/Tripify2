@@ -30,6 +30,7 @@ export default function Dashboard({ params }) {
             },
             { name: "My Products", link: "/products-tourist/my-products" },
             { name: "My Wishlist", link: "/products-tourist/wishlist" },
+            { name: "My Cart", link: "/cart" },
           ],
         },
         { name: "Places", link: "/places" },

@@ -1,33 +1,31 @@
-'use client'
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-  } from "@/components/ui/dialog"
+import { useRouter } from 'next/navigation'; // Correct import for Next.js 13+
+import { Button } from '@/components/ui/button';
 
-export default function ViewReviewsBtn({ product }) 
-{
-    const [open, setOpen] = useState(false)
+export default function SalesReportBtn() {
+    const router = useRouter(); // Ensure this is in a client component
+
+    const handleRedirect = (path) => {
+        if (typeof window !== 'undefined') {
+            router.push(path); // Only execute on the client side
+        }
+    };
 
     return (
-        <> <Button onClick={() => setOpen(true)}>
-            All
-             </Button>
-             <Button onClick={() => setOpen(true)}>
-            Activities
-             </Button>
-             <Button onClick={() => setOpen(true)}>
-            Products
-             </Button>
-             <Button onClick={() => setOpen(true)}>
-            Itineraries
-             </Button>
-    
-        </>
-    )
+        <div className="flex gap-2">
+                 <Button onClick={() => handleRedirect('/sales-report')}>
+                All
+            </Button>
+            <Button onClick={() => handleRedirect('/sales-report/products')}>
+                Products
+            </Button>
+            <Button onClick={() => handleRedirect('/sales-report/itineraries')}>
+                Itineraries
+            </Button>
+            <Button onClick={() => handleRedirect('/sales-report/activities')}>
+                Activities
+            </Button>
+        </div>
+    );
 }

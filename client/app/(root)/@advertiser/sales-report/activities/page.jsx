@@ -22,7 +22,7 @@ import {
     Tabs,
     TabsContent,
 } from "@/components/ui/tabs";
-import SalesReportBtn from "@/components/admin/SalesReportBtn";
+import SalesReportBtnP from "@/components/shared/SalesReportBtnP";
 import { fetcher } from "@/lib/fetch-client";
 
 export default function DashboardPage() {
@@ -104,7 +104,7 @@ export default function DashboardPage() {
         <Tabs defaultValue="all">
             <div className="flex items-center">
                 <div className="ml-auto flex items-center gap-2">
-                    <SalesReportBtn />
+                    <SalesReportBtnP />
                     <button onClick={toggleSortOrder}>
                         {sortOrder === "desc" ? "Sort: Newest to Oldest" : "Sort: Oldest to Newest"}
                     </button>

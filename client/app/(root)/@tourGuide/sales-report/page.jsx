@@ -22,30 +22,44 @@ import {
     Tabs,
     TabsContent,
 } from "@/components/ui/tabs";
-import SalesReportBtn from "@/components/admin/SalesReportBtn";
+import SalesReportBtnP from "@/components/shared/SalesReportBtnP";
 import { fetcher } from "@/lib/fetch-client";
 
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
-
+    const [itineraries, setItineraries] = useState([]);
     const [acts, setActs] = useState([]);
     const [startDate, setStartDate] = useState(null); // Start date for filtering
     const [endDate, setEndDate] = useState(null); // End date for filtering
 
     useEffect(() => {
         const fetchAndSortData = async () => {
-
+            const query2 = `/bookings/itin?sort=createdAt&order=${sortOrder}`;
             const query3 = `/bookings/act?sort=createdAt&order=${sortOrder}`;
 
             try {
-
+                const itinResponse = await fetcher(query2);
                 const actResponse = await fetcher(query3);
 
+                if (itinResponse?.ok) {
+                    const itinData = await itinResponse.json();
+                    setItineraries(
+                        filterByDateRange(
+                            sortByCreatedAt(itinData, "ItineraryId", sortOrder),
+                            startDate,
+                            endDate
+                        )
+                    );
+                }
 
                 if (actResponse?.ok) {
                     const actData = await actResponse.json();
                     setActs(
-                        filterByDateRange(sortByCreatedAt(actData, "ActivityId", sortOrder), startDate, endDate)
+                        filterByDateRange(
+                            sortByCreatedAt(actData, "ActivityId", sortOrder),
+                            startDate,
+                            endDate
+                        )
                     );
                 }
             } catch (error) {
@@ -56,11 +70,11 @@ export default function DashboardPage() {
         fetchAndSortData();
     }, [sortOrder, startDate, endDate]); // Refetch and filter data when date range or sort order changes
 
-    // Helper function to sort by createdAt for both flat and nested structures
+    // Helper function to sort by createdAt for nested structures
     const sortByCreatedAt = (data, nestedKey, order) => {
         return [...data].sort((a, b) => {
-            const dateA = new Date(nestedKey ? a[nestedKey]?.createdAt : a.createdAt);
-            const dateB = new Date(nestedKey ? b[nestedKey]?.createdAt : b.createdAt);
+            const dateA = new Date(a[nestedKey]?.createdAt || a.createdAt || 0);
+            const dateB = new Date(b[nestedKey]?.createdAt || b.createdAt || 0);
             return order === "asc" ? dateA - dateB : dateB - dateA;
         });
     };
@@ -69,7 +83,10 @@ export default function DashboardPage() {
     const filterByDateRange = (data, start, end) => {
         return data.filter((item) => {
             const createdAt = new Date(
-                item?.ActivityId?.createdAt 
+                item?.ItineraryId?.createdAt ||
+                item?.ActivityId?.createdAt ||
+                item?.createdAt ||
+                0
             );
 
             const normalizedStart = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
@@ -86,7 +103,19 @@ export default function DashboardPage() {
         setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"));
     };
 
-   
+    const totalSales2 = itineraries.reduce(
+        (totals, itin) => {
+            const itinerary = itin?.ItineraryId;
+            const participants = itin?.Participants || 0;
+            const price2 = itinerary?.Price || 0;
+            totals.totalSales += participants;
+            totals.totalRevenue += price2 * participants;
+            totals.discountedRevenue += price2 * participants * 0.1;
+            return totals;
+        },
+        { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
+    );
+
     const totalSales3 = acts.reduce(
         (totals, itin) => {
             const itinerary = itin?.ActivityId;
@@ -104,7 +133,7 @@ export default function DashboardPage() {
         <Tabs defaultValue="all">
             <div className="flex items-center">
                 <div className="ml-auto flex items-center gap-2">
-                    <SalesReportBtn />
+                    <SalesReportBtnP />
                     <button onClick={toggleSortOrder}>
                         {sortOrder === "desc" ? "Sort: Newest to Oldest" : "Sort: Oldest to Newest"}
                     </button>
@@ -133,7 +162,7 @@ export default function DashboardPage() {
                 </div>
             </div>
             <TabsContent value="all">
-                <Card x-chunk="dashboard-06-chunk-0">
+                <Card>
                     <CardHeader>
                         <CardTitle>Sales Report</CardTitle>
                         <CardDescription>View all Revenue Streams.</CardDescription>
@@ -143,43 +172,47 @@ export default function DashboardPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Type</TableHead>
-                                    <TableHead className="hidden md:table-cell">Price</TableHead>
-                                    <TableHead className="hidden md:table-cell">Total Sales</TableHead>
-                                    <TableHead className="hidden md:table-cell">Gross Profit</TableHead>
-                                    <TableHead className="hidden md:table-cell">Net Profit</TableHead>
-                                    <TableHead className="hidden md:table-cell">Created At</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Total Sales</TableHead>
+                                    <TableHead>Gross Profit</TableHead>
+                                    <TableHead>Net Profit</TableHead>
+                                    <TableHead>Created At</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                               
-                                {/* Activities */}
-                                <TableRow>
+                            <TableRow>
+                                    <TableCell className="hidden sm:table-cell">
+                                        <strong>Itineraries</strong>
+                                    </TableCell>
+                                </TableRow>
+                                {/* Render Itineraries */}
+                                {itineraries.map((booking) => (
+                                    <TableRow key={booking._id}>
+                                        <TableCell>{booking.ItineraryId?.Name}</TableCell>
+                                        <TableCell>${booking.ItineraryId?.Price || 0}</TableCell>
+                                        <TableCell>{booking.Participants || 0}</TableCell>
+                                        <TableCell>${booking.ItineraryId?.Price * booking.Participants || 0}</TableCell>
+                                        <TableCell>${booking.ItineraryId?.Price * booking.Participants * 0.1 || 0}</TableCell>
+                                        <TableCell>{new Date(booking.ItineraryId?.createdAt).toLocaleDateString()}</TableCell>
+                                    </TableRow>
+                                ))}
+                                      <TableRow>
                                     <TableCell className="hidden sm:table-cell">
                                         <strong>Activities</strong>
                                     </TableCell>
                                 </TableRow>
-                                {acts?.map((booking) =>
-                                    booking?._id ? (
-                                        <TableRow key={booking._id}>
-                                            <TableCell className="hidden sm:table-cell">
-                                                {booking.ActivityId?.Name}
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell">
-                                                ${booking.ActivityId?.Price || 0}
-                                            </TableCell>
-                                            <TableCell>{booking.Participants || 0}</TableCell>
-                                            <TableCell>
-                                                ${(booking.ActivityId?.Price || 0) * (booking.Participants || 0)}
-                                            </TableCell>
-                                            <TableCell>
-                                                ${(booking.ActivityId?.Price || 0) * (booking.Participants || 0) * 0.1}
-                                            </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                {new Date(booking?.ActivityId?.createdAt).toLocaleDateString()}
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : null
-                                )}
+                                {/* Render Activities */}
+                                {acts.map((booking) => (
+                                    <TableRow key={booking._id}>
+                                        <TableCell>{booking.ActivityId?.Name}</TableCell>
+                                        <TableCell>${booking.ActivityId?.Price || 0}</TableCell>
+                                        <TableCell>{booking.Participants || 0}</TableCell>
+                                        <TableCell>${booking.ActivityId?.Price * booking.Participants || 0}</TableCell>
+                                        <TableCell>${booking.ActivityId?.Price * booking.Participants * 0.1 || 0}</TableCell>
+                                        <TableCell>{new Date(booking.ActivityId?.createdAt).toLocaleDateString()}</TableCell>
+                                    </TableRow>
+                                ))}
+       
                                 {/* Total Row */}
                                 <TableRow>
                                     <TableCell className="hidden sm:table-cell">
@@ -187,13 +220,13 @@ export default function DashboardPage() {
                                     </TableCell>
                                     <TableCell>-</TableCell> {/* Empty cell for alignment */}
                                     <TableCell>
-                                        <strong>{totalSales3.totalSales}</strong>
+                                        <strong>{totalSales2.totalSales + totalSales3.totalSales}</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${ totalSales3.totalRevenue}</strong>
+                                        <strong>${totalSales2.totalRevenue + totalSales3.totalRevenue}</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${ totalSales3.discountedRevenue}</strong>
+                                        <strong>${ totalSales2.discountedRevenue + totalSales3.discountedRevenue}</strong>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

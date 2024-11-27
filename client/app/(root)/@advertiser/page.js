@@ -13,7 +13,9 @@ export default function MyAdvertiser() {
   const handleActivitiesClick = () => {
     router.push("/my-activities");
   };
-
+  const handleReportClick = () => {
+    router.push("/sales-report");
+  };
   return (
     <div>
       <header>
@@ -34,6 +36,12 @@ export default function MyAdvertiser() {
           >
             My Activities
           </button>
+          <button
+            className="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-700"
+            onClick={handleReportClick}
+          >
+View Sales Report          
+</button>
         </div>
       </div>
     </div>

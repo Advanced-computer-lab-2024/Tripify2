@@ -877,12 +877,14 @@ const acceptBooking = async (req, res) => {
         const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
         const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
 
+        
         await TouristModel.findByIdAndUpdate(tourist._id, {
             $set: {
             LoyaltyPoints: newLoayltyPointsEarned,
             TotalLoyaltyPoints: newTotalLoayltyPoints,
             Badge: newBadge,
             Wallet: "0.00",
+            Cart: []
             },
         });
 
@@ -1075,6 +1077,7 @@ const createProductBookingCart = async (req, res) => {
         Quantity,
         Name: product.Name,
         Price: product.Price,
+        UserId: req_id
       });
     }
 

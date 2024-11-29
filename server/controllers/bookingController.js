@@ -904,7 +904,6 @@ const acceptBooking = async (req, res) => {
         }))
 
         const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
-
         const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
         const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
         const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
@@ -1105,7 +1104,6 @@ const createProductBookingCart = async (req, res) => {
         Quantity,
         Name: product.Name,
         Price: product.Price,
-        UserId: req._id
       });
     }
 
@@ -1173,7 +1171,7 @@ const createProductBookingCart = async (req, res) => {
         success_url: `${process.env.CLIENT_URL}/products-tourist`,
         cancel_url: `${process.env.CLIENT_URL}/products-tourist`,
         metadata: {
-          UserId: touristId,
+          UserId: req._id,
           Products: JSON.stringify(productDetails),
           totalPrice,
           currency,

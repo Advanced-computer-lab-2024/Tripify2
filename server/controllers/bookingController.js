@@ -471,7 +471,12 @@ const acceptBooking = async (req, res) => {
                                 else: "$AvailableQuantity"
                             }
                         },
-                        TotalSales: { $add: ["$TotalSales", parseInt(metadata.Quantity)] }
+                        TotalSales: { 
+                            $add: [
+                              { $ifNull: ["$TotalSales", 0] }, 
+                              parseInt(metadata.Quantity)
+                            ]
+                          }
                     }
                 }
             ], { new: true })

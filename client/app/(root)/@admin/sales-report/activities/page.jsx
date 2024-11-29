@@ -35,17 +35,23 @@ export default function DashboardPage() {
     useEffect(() => {
         const fetchAndSortData = async () => {
 
-            const query3 = `/bookings/act?sort=createdAt&order=${sortOrder}`;
+            const query3 = `/activities?sort=createdAt&order=${sortOrder}`;
 
             try {
 
                 const actResponse = await fetcher(query3);
 
-
                 if (actResponse?.ok) {
                     const actData = await actResponse.json();
+                    const itinerariesWithParticipants = await Promise.all(actData.map(async (itin) => {
+                        const participantResponse = await fetcher(`/bookings/act/${itin._id}`);
+                        // console.log(itin._id)
+                        const participants = participantResponse?.ok ? await participantResponse.json() : [];
+                        // console.log(participants)
+                        return { ...itin, participants }; // Merge participants with the itinerary
+                    }));                    
                     setActs(
-                        filterByDateRange(sortByCreatedAt(actData, "ActivityId", sortOrder), startDate, endDate)
+                        filterByDateRange(sortByCreatedAt(itinerariesWithParticipants, "ActivityId", sortOrder), startDate, endDate)
                     );
                 }
             } catch (error) {
@@ -90,8 +96,8 @@ export default function DashboardPage() {
     const totalSales3 = acts.reduce(
         (totals, itin) => {
             const itinerary = itin?.ActivityId;
-            const participants = itin?.Participants || 0;
-            const price2 = itinerary?.Price || 0;
+            const participants = itin?.participants?.Participants || 0;
+            const price2 = itin?.Price || 0;
             totals.totalSales += participants;
             totals.totalRevenue += price2 * participants;
             totals.discountedRevenue += price2 * participants * 0.1;
@@ -162,20 +168,20 @@ export default function DashboardPage() {
                                     booking?._id ? (
                                         <TableRow key={booking._id}>
                                             <TableCell className="hidden sm:table-cell">
-                                                {booking.ActivityId?.Name}
+                                                {booking?.Name}
                                             </TableCell>
                                             <TableCell className="hidden sm:table-cell">
-                                                ${booking.ActivityId?.Price || 0}
+                                                ${booking?.Price || 0}
                                             </TableCell>
-                                            <TableCell>{booking.Participants || 0}</TableCell>
+                                            <TableCell>{booking?.participants?.Participants || 0}</TableCell>
                                             <TableCell>
-                                                ${(booking.ActivityId?.Price || 0) * (booking.Participants || 0)}
+                                                ${(booking?.Price || 0) * (booking?.participants?.Participants || 0)}
                                             </TableCell>
                                             <TableCell>
-                                                ${(booking.ActivityId?.Price || 0) * (booking.Participants || 0) * 0.1}
+                                                ${(booking?.Price || 0) * (booking?.participants?.Participants || 0) * 0.1}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
-                                                {new Date(booking?.ActivityId?.createdAt).toLocaleDateString()}
+                                                {new Date(booking?.createdAt).toLocaleDateString()}
                                             </TableCell>
                                         </TableRow>
                                     ) : null

@@ -224,6 +224,72 @@ const updateItinerary = async (req, res) => {
     res.status(400).json({ msg: "Operation Failed" });
   }
 };
+// const updateItinerary = async (req, res) => {
+//   const { id } = req.params;
+//   const {
+//     Name,
+//     Activities,
+//     Location,
+//     StartDate,
+//     EndDate,
+//     Language,
+//     Price,
+//     DatesAndTimes,
+//     Accesibility,
+//     Pickup,
+//     Dropoff,
+//     Category,
+//     Tag,
+//     Image,
+//     Rating,
+//     RemainingBookings,
+//   } = req.body;
+
+//   try {
+//     // Update the itinerary document
+//     const updatedItinerary = await ItineraryModel.findByIdAndUpdate(
+//       id,
+//       {
+//         Name,
+//         Activities,
+//         Location,
+//         StartDate,
+//         EndDate,
+//         Language,
+//         Price,
+//         DatesAndTimes,
+//         Accesibility,
+//         Pickup,
+//         Dropoff,
+//         Category,
+//         Tag,
+//         Image,
+//         Rating,
+//         RemainingBookings, // Update RemainingBookings field
+//       },
+//       {
+//         new: true, // Return the updated document
+//         runValidators: true, // Ensure validation rules are applied
+//       }
+//     ).populate("Tag").populate("Category").populate("TourGuide");
+
+//     // If the itinerary is not found
+//     if (!updatedItinerary) {
+//       return res.status(404).json({ message: `Cannot find any Itinerary with id ${id}` });
+//     }
+
+//     // Respond with the updated itinerary
+//     return res.status(200).json({
+//       message: "Itinerary updated successfully!",
+//       itinerary: updatedItinerary,
+//     });
+//   } catch (error) {
+//     // Handle errors and respond with a clear message
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
+
+
 const deleteItinerary = async (req, res) => {
   const { id } = req.params;
 

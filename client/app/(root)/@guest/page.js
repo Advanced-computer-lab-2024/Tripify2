@@ -17,7 +17,7 @@ export default function MainPageGuest() {
         <div className="flex space-x-6 gap-3">
           <button
             onClick={() => {
-              router.push("/api/auth/signin");
+              router.push("/sign-in");
             }}
             className="bg-gray-200 text-gray-800 font-bold py-6 px-12 text-2xl shadow-md hover:bg-gray-300 transition duration-300"
           >

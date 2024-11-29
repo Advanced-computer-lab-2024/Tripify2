@@ -1105,7 +1105,7 @@ const createProductBookingCart = async (req, res) => {
         Quantity,
         Name: product.Name,
         Price: product.Price,
-        UserId: req_id
+        UserId: req._id
       });
     }
 

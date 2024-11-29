@@ -14,6 +14,16 @@ import { Button } from "@/components/ui/button";
 import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 import { fetcher } from "@/lib/fetch-client";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 export default function Explore({ params }) {
   const { currency } = useCurrencyStore();
   const { itineraries, activities, places, bookmarked, touristId } = params;
@@ -159,11 +169,11 @@ export default function Explore({ params }) {
 
   const debounceSendPatchRequest = debounce(async (updatedBookmarks, type) => {
     try {
-      console.log("---------------------");
+      //console.log("---------------------");
       // console.log(`touristId: ${touristId}`);
-      console.log(`Bookmarked Itinerary: ${itineraries}`);
-      console.log(`Bookmarked Activity: ${activities}`);
-      console.log("---------------------");
+      //console.log(`Bookmarked Itinerary: ${itineraries}`);
+      //console.log(`Bookmarked Activity: ${activities}`);
+      //console.log("---------------------");
 
       const body =
         type === "itinerary"
@@ -206,7 +216,8 @@ export default function Explore({ params }) {
           </Link>
         </div>
       </div>
-      <div className="relative">
+
+      <div className="relative mb-8">
         <span
           className="absolute text-gray-500 transform -translate-y-1/2 left-2 top-1/2"
           style={{ fontSize: "25px" }}
@@ -228,27 +239,31 @@ export default function Explore({ params }) {
         />
       </div>
 
-      <section className="my-8">
-        <h2 className="flex items-center justify-between mb-6 text-2xl font-semibold">
-          <span>Itineraries ({filteredItineraries.length})</span>
+      <Tabs defaultValue="all">
+        <TabsList className="flex space-x-4 mb-6">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="itineraries">Itineraries</TabsTrigger>
+          <TabsTrigger value="activities">Activities</TabsTrigger>
+          <TabsTrigger value="places">Places</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all">
           <button
+            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
             onClick={() => router.push("/itinerary")}
-            className="px-2 py-1 text-sm text-white transition duration-200 bg-gray-400 rounded hover:bg-gray-500"
           >
-            View All
+            Itineraries ({filteredItineraries.length})
           </button>
-        </h2>
-        {filteredItineraries.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          {filteredItineraries.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
               {getDisplayedItineraries().map((itinerary) => {
                 const isBookmarked = bookmarkedItinerary.includes(
                   itinerary._id
                 );
                 return (
-                  <button
+                  <Card
                     key={itinerary._id}
-                    className="relative text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
+                    className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                     onClick={() => router.push(`/itinerary/${itinerary._id}`)}
                   >
                     <img
@@ -256,79 +271,48 @@ export default function Explore({ params }) {
                       alt={itinerary.Name}
                       className="object-cover w-full h-32 mb-2 rounded-md"
                     />
-                    <h3 className="text-lg font-medium">{itinerary.Name}</h3>
-                    <div
-                      className="absolute top-2 right-2 text-2xl"
-                      onClick={(e) => {
-                        e.stopPropagation(); //prevent parent button click event listener from listening on clicking this child button
-                        handleBookmark(itinerary._id, "itinerary");
-                      }}
-                    >
-                      {isBookmarked ? (
-                        <RiBookmarkFill className="text-yellow-500" />
-                      ) : (
-                        <RiBookmarkLine className="text-gray-500" />
-                      )}
-                    </div>
-                  </button>
+                    <CardHeader>
+                      <CardTitle>{itinerary.Name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div
+                        className="absolute top-2 right-2 text-2xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookmark(itinerary._id, "itinerary");
+                        }}
+                      >
+                        {isBookmarked ? (
+                          <RiBookmarkFill className="text-yellow-500" />
+                        ) : (
+                          <RiBookmarkLine className="text-gray-500" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>
-            <div className="flex justify-between my-4">
-              <button
-                onClick={handleItineraryPrev}
-                disabled={currentItineraryIndex === 0}
-                className={`flex items-center text-gray-600 ${
-                  currentItineraryIndex === 0
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:text-blue-500"
-                }`}
-              >
-                <AiOutlineArrowLeft />
-              </button>
-              <button
-                onClick={handleItineraryNext}
-                disabled={
-                  currentItineraryIndex + 1 >=
-                  Math.ceil(filteredItineraries.length / recordsToShow)
-                }
-                className={`flex items-center text-gray-600 ${
-                  currentItineraryIndex + 1 >=
-                  Math.ceil(filteredItineraries.length / recordsToShow)
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:text-blue-500"
-                }`}
-              >
-                <AiOutlineArrowRight />
-              </button>
-            </div>
-          </>
-        ) : (
-          <p className="text-gray-500">No itineraries available.</p>
-        )}
-      </section>
+          ) : (
+            <p className="text-gray-500">No itineraries available.</p>
+          )}
 
-      <hr />
+          <hr className="my-8 border-gray-300" />
 
-      <section className="my-8">
-        <h2 className="flex items-center justify-between mb-6 text-2xl font-semibold">
-          <span>Activities ({filteredActivities.length})</span>
           <button
+            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
             onClick={() => router.push("/activities")}
-            className="px-2 py-1 text-sm text-white transition duration-200 bg-gray-400 rounded hover:bg-gray-500"
           >
-            View All
+            Activities ({filteredActivities.length})
           </button>
-        </h2>
-        {filteredActivities.length > 0 ? (
-          <>
-            <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          {filteredActivities.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
               {getDisplayedActivities().map((activity) => {
                 const isBookmarked = bookmarkedActivity.includes(activity._id);
                 return (
-                  <button
+                  <Card
                     key={activity._id}
-                    className="relative w-full text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
+                    className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                     onClick={() => router.push(`/activities/${activity._id}`)}
                   >
                     <img
@@ -336,86 +320,55 @@ export default function Explore({ params }) {
                       alt={activity.Name}
                       className="object-cover w-full h-32 mb-2 rounded-md"
                     />
-                    <p className="text-lg font-medium">{activity.Name}</p>
-                    <p className="text-gray-500">
-                      From:{" "}
-                      {currency === "USD"
-                        ? "$"
-                        : currency === "EUR"
-                        ? "€"
-                        : "EGP"}{" "}
-                      {convertPrice(activity.Price, currency)}
-                    </p>
-                    <div
-                      className="absolute top-2 right-2 text-2xl"
-                      onClick={(e) => {
-                        e.stopPropagation(); //prevent parent button click event listener from listening on clicking this child button
-                        handleBookmark(activity._id, "activity");
-                      }}
-                    >
-                      {isBookmarked ? (
-                        <RiBookmarkFill className="text-yellow-500" />
-                      ) : (
-                        <RiBookmarkLine className="text-gray-500" />
-                      )}
-                    </div>
-                  </button>
+                    <CardHeader>
+                      <CardTitle>{activity.Name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-500">
+                        From:{" "}
+                        {currency === "USD"
+                          ? "$"
+                          : currency === "EUR"
+                          ? "€"
+                          : "EGP"}{" "}
+                        {convertPrice(activity.Price, currency)}
+                      </p>
+                      <div
+                        className="absolute top-2 right-2 text-2xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookmark(activity._id, "activity");
+                        }}
+                      >
+                        {isBookmarked ? (
+                          <RiBookmarkFill className="text-yellow-500" />
+                        ) : (
+                          <RiBookmarkLine className="text-gray-500" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>
-            <div className="flex justify-between my-4">
-              <button
-                onClick={handleActivityPrev}
-                disabled={currentActivityIndex === 0}
-                className={`flex items-center text-gray-600 ${
-                  currentActivityIndex === 0
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:text-blue-500"
-                }`}
-              >
-                <AiOutlineArrowLeft />
-              </button>
-              <button
-                onClick={handleActivityNext}
-                disabled={
-                  currentActivityIndex + 1 >=
-                  Math.ceil(filteredActivities.length / recordsToShow)
-                }
-                className={`flex items-center text-gray-600 ${
-                  currentActivityIndex + 1 >=
-                  Math.ceil(filteredActivities.length / recordsToShow)
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:text-blue-500"
-                }`}
-              >
-                <AiOutlineArrowRight />
-              </button>
-            </div>
-          </>
-        ) : (
-          <p className="text-gray-500">No activities available.</p>
-        )}
-      </section>
+          ) : (
+            <p className="text-gray-500">No activities available.</p>
+          )}
 
-      <hr />
+          <hr className="my-8 border-gray-300" />
 
-      <section className="my-8">
-        <h2 className="flex items-center justify-between mb-6 text-2xl font-semibold">
-          <span>Places ({filteredPlaces.length})</span>
           <button
+            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
             onClick={() => router.push("/places")}
-            className="px-2 py-1 text-sm text-white transition duration-200 bg-gray-400 rounded hover:bg-gray-500"
           >
-            View All
+            Places ({filteredPlaces.length})
           </button>
-        </h2>
-        {filteredPlaces.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          {filteredPlaces.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
               {getDisplayedPlaces().map((place) => (
-                <button
+                <Card
                   key={place._id}
-                  className="text-left transition-shadow duration-200 rounded-lg hover:shadow-lg"
+                  className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                   onClick={() => router.push(`/places/${place._id}`)}
                 >
                   <img
@@ -423,43 +376,157 @@ export default function Explore({ params }) {
                     alt={place.Name}
                     className="object-cover w-full h-32 mb-2 rounded-md"
                   />
-                  <h3 className="text-lg font-medium">{place.Name}</h3>
-                </button>
+                  <CardHeader>
+                    <CardTitle>{place.Name}</CardTitle>
+                  </CardHeader>
+                </Card>
               ))}
             </div>
-            <div className="flex justify-between my-4">
-              <button
-                onClick={handlePlacePrev}
-                disabled={currentPlaceIndex === 0}
-                className={`flex items-center text-gray-600 ${
-                  currentPlaceIndex === 0
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:text-blue-500"
-                }`}
-              >
-                <AiOutlineArrowLeft />
-              </button>
-              <button
-                onClick={handlePlaceNext}
-                disabled={
-                  currentPlaceIndex + 1 >=
-                  Math.ceil(filteredPlaces.length / recordsToShow)
-                }
-                className={`flex items-center text-gray-600 ${
-                  currentPlaceIndex + 1 >=
-                  Math.ceil(filteredPlaces.length / recordsToShow)
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:text-blue-500"
-                }`}
-              >
-                <AiOutlineArrowRight />
-              </button>
+          ) : (
+            <p className="text-gray-500">No places available.</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="itineraries">
+          <button
+            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            onClick={() => router.push("/itinerary")}
+          >
+            Itineraries ({filteredItineraries.length})
+          </button>
+          {filteredItineraries.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              {getDisplayedItineraries().map((itinerary) => {
+                const isBookmarked = bookmarkedItinerary.includes(
+                  itinerary._id
+                );
+                return (
+                  <Card
+                    key={itinerary._id}
+                    className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                    onClick={() => router.push(`/itinerary/${itinerary._id}`)}
+                  >
+                    <img
+                      src={itinerary.Image}
+                      alt={itinerary.Name}
+                      className="object-cover w-full h-32 mb-2 rounded-md"
+                    />
+                    <CardHeader>
+                      <CardTitle>{itinerary.Name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div
+                        className="absolute top-2 right-2 text-2xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookmark(itinerary._id, "itinerary");
+                        }}
+                      >
+                        {isBookmarked ? (
+                          <RiBookmarkFill className="text-yellow-500" />
+                        ) : (
+                          <RiBookmarkLine className="text-gray-500" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-          </>
-        ) : (
-          <p className="text-gray-500">No places available.</p>
-        )}
-      </section>
+          ) : (
+            <p className="text-gray-500">No itineraries available.</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="activities">
+          <button
+            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            onClick={() => router.push("/activities")}
+          >
+            Activities ({filteredActivities.length})
+          </button>
+          {filteredActivities.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              {getDisplayedActivities().map((activity) => {
+                const isBookmarked = bookmarkedActivity.includes(activity._id);
+                return (
+                  <Card
+                    key={activity._id}
+                    className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                    onClick={() => router.push(`/activities/${activity._id}`)}
+                  >
+                    <img
+                      src={activity.Image}
+                      alt={activity.Name}
+                      className="object-cover w-full h-32 mb-2 rounded-md"
+                    />
+                    <CardHeader>
+                      <CardTitle>{activity.Name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-500">
+                        From:{" "}
+                        {currency === "USD"
+                          ? "$"
+                          : currency === "EUR"
+                          ? "€"
+                          : "EGP"}{" "}
+                        {convertPrice(activity.Price, currency)}
+                      </p>
+                      <div
+                        className="absolute top-2 right-2 text-2xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookmark(activity._id, "activity");
+                        }}
+                      >
+                        {isBookmarked ? (
+                          <RiBookmarkFill className="text-yellow-500" />
+                        ) : (
+                          <RiBookmarkLine className="text-gray-500" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-500">No activities available.</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="places">
+          <button
+            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            onClick={() => router.push("/places")}
+          >
+            Places ({filteredPlaces.length})
+          </button>
+          {filteredPlaces.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              {getDisplayedPlaces().map((place) => (
+                <Card
+                  key={place._id}
+                  className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                  onClick={() => router.push(`/places/${place._id}`)}
+                >
+                  <img
+                    src={place.Pictures[0]}
+                    alt={place.Name}
+                    className="object-cover w-full h-32 mb-2 rounded-md"
+                  />
+                  <CardHeader>
+                    <CardTitle>{place.Name}</CardTitle>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No places available.</p>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

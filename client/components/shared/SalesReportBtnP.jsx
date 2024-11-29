@@ -17,9 +17,6 @@ export default function SalesReportBtn() {
                  <Button onClick={() => handleRedirect('/sales-report')}>
                 All
             </Button>
-            <Button onClick={() => handleRedirect('/sales-report/products')}>
-                Products
-            </Button>
             <Button onClick={() => handleRedirect('/sales-report/itineraries')}>
                 Itineraries
             </Button>

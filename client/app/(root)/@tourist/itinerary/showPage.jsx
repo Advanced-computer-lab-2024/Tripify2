@@ -5,7 +5,14 @@ import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
-// import StarRating from "../starRating";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const ItineraryComponent = ({ params }) => {
   const router = useRouter();
@@ -196,7 +203,7 @@ const ItineraryComponent = ({ params }) => {
   );
 
   return (
-    <div className="grid h-screen grid-cols-6">
+    <div className="grid h-screen grid-cols-6 gap-4">
       <div className="col-span-1 p-4">
         <h2 className="mb-6 text-lg font-bold text-black">Filter</h2>
 
@@ -265,8 +272,8 @@ const ItineraryComponent = ({ params }) => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="priceRange" className="block mb-2 text-black">
-            Price: {filteredPrice}
+          <label htmlFor="priceRange" className="mb-2 font-bold text-black">
+            Price: <span className="font-normal">{filteredPrice}</span>
           </label>
           <input
             id="priceRange"
@@ -278,9 +285,10 @@ const ItineraryComponent = ({ params }) => {
             onChange={handleRangeChangePrice}
           />
         </div>
+
         <div className="mb-4">
-          <label htmlFor="ratingFilter" className="block mb-2 text-black">
-            Rating: {filteredRating}
+          <label htmlFor="ratingFilter" className="mb-2 font-bold text-black">
+            Rating: <span className="font-normal">{filteredRating}</span>
           </label>
           <input
             id="ratingFilter"
@@ -321,54 +329,67 @@ const ItineraryComponent = ({ params }) => {
           {filteredItineraries.map((itinerary) => {
             const isBookmarked = bookmarkedItinerary.includes(itinerary._id);
             return (
-              <button
-                key={itinerary.ID}
-                className="relative p-4 overflow-hidden bg-white rounded-lg hover:shadow"
+              <Card
+                key={itinerary._id}
+                className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                 onClick={() => router.push(`/itinerary/${itinerary._id}`)}
               >
-                <img
-                  src={itinerary.Image}
-                  alt={itinerary.Name}
-                  className="object-cover w-full h-48 mb-2 rounded-lg"
-                />
-                <h3 className="mb-2 text-lg font-bold">{itinerary.Name}</h3>
-                <div className="flex justify-center mb-2">
-                  {itinerary.Rating}
-                  {/* <StarRating rating={itinerary.Rating} /> */}
-                </div>
-                <p className="text-black-600">
-                  Price:{" "}
-                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
-                  {convertPrice(itinerary.Price, currency)}
-                </p>
-                <p className="text-black-600">Language: {itinerary.Language}</p>
-                <p className="text-black-600">
-                  Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}
-                </p>
-                <p className="text-black-600">
-                  Categories:{" "}
-                  {itinerary.Category.map((category) => category.Category).join(
-                    ", "
-                  )}
-                </p>
-                <p className="text-black-600">
-                  Start Date:{" "}
-                  {new Date(itinerary.StartDate).toLocaleDateString()}
-                </p>
-                <div
-                  className="absolute top-2 right-2 text-2xl"
-                  onClick={(e) => {
-                    e.stopPropagation(); //prevent parent button click event listener from listening on clicking this child button
-                    handleBookmark(itinerary._id);
-                  }}
-                >
-                  {isBookmarked ? (
-                    <RiBookmarkFill className="text-yellow-500" />
-                  ) : (
-                    <RiBookmarkLine className="text-gray-500" />
-                  )}
-                </div>
-              </button>
+                <CardHeader>
+                  <img
+                    src={itinerary.Image}
+                    alt={itinerary.Name}
+                    className="object-cover w-full h-48 mb-2 rounded-lg"
+                  />
+                  <CardTitle className="text-lg font-bold">
+                    {itinerary.Name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <span className="mr-1">{itinerary.Rating}</span>
+                    </div>
+                    <div
+                      className="text-2xl cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation(); //prevent parent click
+                        handleBookmark(itinerary._id);
+                      }}
+                    >
+                      {isBookmarked ? (
+                        <RiBookmarkFill className="text-yellow-500" />
+                      ) : (
+                        <RiBookmarkLine className="text-gray-500" />
+                      )}
+                    </div>
+                  </div>
+                  <CardDescription className="text-sm text-black-600">
+                    <p>
+                      Price:{" "}
+                      {currency === "USD"
+                        ? "$"
+                        : currency === "EUR"
+                        ? "€"
+                        : "EGP"}{" "}
+                      {convertPrice(itinerary.Price, currency)}
+                    </p>
+                    <p>Language: {itinerary.Language}</p>
+                    <p>
+                      Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}
+                    </p>
+                    <p>
+                      Categories:{" "}
+                      {itinerary.Category.map(
+                        (category) => category.Category
+                      ).join(", ")}
+                    </p>
+                    <p>
+                      Start Date:{" "}
+                      {new Date(itinerary.StartDate).toLocaleDateString()}
+                    </p>
+                  </CardDescription>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

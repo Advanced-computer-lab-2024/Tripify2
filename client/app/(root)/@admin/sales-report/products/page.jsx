@@ -28,22 +28,16 @@ import { fetcher } from "@/lib/fetch-client";
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
     const [products, setProducts] = useState([]);
-    const [itineraries, setItineraries] = useState([]);
-    const [acts, setActs] = useState([]);
     const [startDate, setStartDate] = useState(null); // Start date for filtering
     const [endDate, setEndDate] = useState(null); // End date for filtering
 
     useEffect(() => {
         const fetchAndSortData = async () => {
             const query = `/products?sort=createdAt&order=${sortOrder}`;
-            const query2 = `/bookings/itin?sort=createdAt&order=${sortOrder}`;
-            const query3 = `/bookings/act?sort=createdAt&order=${sortOrder}`;
-
+         
             try {
                 const productsResponse = await fetcher(query);
-                const itinResponse = await fetcher(query2);
-                const actResponse = await fetcher(query3);
-
+      
                 if (productsResponse?.ok) {
                     const productsData = await productsResponse.json();
                     setProducts(
@@ -51,19 +45,7 @@ export default function DashboardPage() {
                     );
                 }
 
-                if (itinResponse?.ok) {
-                    const itinData = await itinResponse.json();
-                    setItineraries(
-                        filterByDateRange(sortByCreatedAt(itinData, "ItineraryId", sortOrder), startDate, endDate)
-                    );
-                }
-
-                if (actResponse?.ok) {
-                    const actData = await actResponse.json();
-                    setActs(
-                        filterByDateRange(sortByCreatedAt(actData, "ActivityId", sortOrder), startDate, endDate)
-                    );
-                }
+             
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -85,8 +67,7 @@ export default function DashboardPage() {
     const filterByDateRange = (data, start, end) => {
         return data.filter((item) => {
             const createdAt = new Date(
-                item?.ItineraryId?.createdAt ||
-                item?.ActivityId?.createdAt ||
+
                 item?.createdAt
             );
 
@@ -116,31 +97,7 @@ export default function DashboardPage() {
         { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
     );
 
-    const totalSales2 = itineraries.reduce(
-        (totals, itin) => {
-            const itinerary = itin?.ItineraryId;
-            const participants = itin?.Participants || 0;
-            const price2 = itinerary?.Price || 0;
-            totals.totalSales += participants;
-            totals.totalRevenue += price2 * participants;
-            totals.discountedRevenue += price2 * participants * 0.1;
-            return totals;
-        },
-        { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
-    );
-
-    const totalSales3 = acts.reduce(
-        (totals, itin) => {
-            const itinerary = itin?.ActivityId;
-            const participants = itin?.Participants || 0;
-            const price2 = itinerary?.Price || 0;
-            totals.totalSales += participants;
-            totals.totalRevenue += price2 * participants;
-            totals.discountedRevenue += price2 * participants * 0.1;
-            return totals;
-        },
-        { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
-    );
+   
 
     return (
         <Tabs defaultValue="all">
@@ -214,61 +171,8 @@ export default function DashboardPage() {
                                     ) : null
                                 )}
                                 {/* Itineraries */}
-                                <TableRow>
-                                    <TableCell className="hidden sm:table-cell">
-                                        <strong>Itineraries</strong>
-                                    </TableCell>
-                                </TableRow>
-                                {itineraries?.map((booking) =>
-                                    booking?._id ? (
-                                        <TableRow key={booking._id}>
-                                            <TableCell className="hidden sm:table-cell">
-                                                {booking.ItineraryId?.Name}
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell">
-                                                ${booking.ItineraryId?.Price || 0}
-                                            </TableCell>
-                                            <TableCell>{booking.Participants || 0}</TableCell>
-                                            <TableCell>
-                                                ${(booking.ItineraryId?.Price || 0) * (booking.Participants || 0)}
-                                            </TableCell>
-                                            <TableCell>
-                                                ${(booking.ItineraryId?.Price || 0) * (booking.Participants || 0) * 0.1}
-                                            </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                {new Date(booking?.ItineraryId?.createdAt).toLocaleDateString()}
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : null
-                                )}
-                                {/* Activities */}
-                                <TableRow>
-                                    <TableCell className="hidden sm:table-cell">
-                                        <strong>Activities</strong>
-                                    </TableCell>
-                                </TableRow>
-                                {acts?.map((booking) =>
-                                    booking?._id ? (
-                                        <TableRow key={booking._id}>
-                                            <TableCell className="hidden sm:table-cell">
-                                                {booking.ActivityId?.Name}
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell">
-                                                ${booking.ActivityId?.Price || 0}
-                                            </TableCell>
-                                            <TableCell>{booking.Participants || 0}</TableCell>
-                                            <TableCell>
-                                                ${(booking.ActivityId?.Price || 0) * (booking.Participants || 0)}
-                                            </TableCell>
-                                            <TableCell>
-                                                ${(booking.ActivityId?.Price || 0) * (booking.Participants || 0) * 0.1}
-                                            </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                {new Date(booking?.ActivityId?.createdAt).toLocaleDateString()}
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : null
-                                )}
+                              
+          
                                 {/* Total Row */}
                                 <TableRow>
                                     <TableCell className="hidden sm:table-cell">
@@ -276,13 +180,13 @@ export default function DashboardPage() {
                                     </TableCell>
                                     <TableCell>-</TableCell> {/* Empty cell for alignment */}
                                     <TableCell>
-                                        <strong>{totalSales.totalSales + totalSales2.totalSales + totalSales3.totalSales}</strong>
+                                        <strong>{totalSales.totalSales }</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${totalSales.totalRevenue + totalSales2.totalRevenue + totalSales3.totalRevenue}</strong>
+                                        <strong>${totalSales.totalRevenue}</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${totalSales.discountedRevenue + totalSales2.discountedRevenue + totalSales3.discountedRevenue}</strong>
+                                        <strong>${totalSales.discountedRevenue }</strong>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

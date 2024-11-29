@@ -6,6 +6,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 const ActivityComponent = ({ params }) => {
   const { currency } = useCurrencyStore();
 
@@ -257,8 +265,8 @@ const ActivityComponent = ({ params }) => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="priceRange" className="block mb-2 text-black">
-            Price: {filteredPrice}
+          <label htmlFor="priceRange" className="mb-2 font-bold text-black">
+            Price: <span className="font-normal">{filteredPrice}</span>
           </label>
           <input
             id="priceRange"
@@ -272,8 +280,8 @@ const ActivityComponent = ({ params }) => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="ratingFilter" className="block mb-2 text-black">
-            Rating: {filteredRating}
+          <label htmlFor="ratingFilter" className="mb-2 font-bold text-black">
+            Rating: <span className="font-normal">{filteredRating}</span>
           </label>
           <input
             id="ratingFilter"
@@ -321,52 +329,64 @@ const ActivityComponent = ({ params }) => {
           {filteredActivities.map((activity) => {
             const isBookmarked = bookmarkedActivity.includes(activity._id);
             return (
-              <button
+              <Card
                 key={activity._id}
-                className="relative p-4 transition bg-white rounded-lg shadow hover:shadow-lg"
+                className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                 onClick={() => router.push(`/activities/${activity._id}`)}
               >
-                <img
-                  src={activity.Image}
-                  alt={activity.Name}
-                  className="object-cover w-full h-48 mb-2 rounded-lg"
-                />
-                <h3 className="mb-2 text-lg font-bold">{activity.Name}</h3>
-                <p className="mb-1 text-gray-700">Rating: {activity.Rating}</p>
-                <p className="mb-1 text-gray-700">
-                  Price:{" "}
-                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
-                  {convertPrice(activity.Price, currency)}
-                </p>
-                <p className="mb-1 text-gray-700">
-                  Advertiser: {activity.AdvertiserId._id}
-                </p>
-                <p className="mb-1 text-gray-700">
-                  Categories:{" "}
-                  {activity.CategoryId.map(
-                    (category) => category.Category
-                  ).join(", ")}
-                </p>
-                <p className="mb-1 text-gray-700">
-                  Tags: {activity.Tags.map((tag) => tag.Tag).join(", ")}
-                </p>
-                <p className="mb-1 text-gray-700">
-                  Date: {new Date(activity.Date).toLocaleDateString()}
-                </p>
-                <div
-                  className="absolute top-2 right-2 text-2xl"
-                  onClick={(e) => {
-                    e.stopPropagation(); //prevent parent button click event listener from listening on clicking this child button
-                    handleBookmark(activity._id);
-                  }}
-                >
-                  {isBookmarked ? (
-                    <RiBookmarkFill className="text-yellow-500" />
-                  ) : (
-                    <RiBookmarkLine className="text-gray-500" />
-                  )}
-                </div>
-              </button>
+                <CardHeader>
+                  <img
+                    src={activity.Image}
+                    alt={activity.Name}
+                    className="object-cover w-full h-48 mb-2 rounded-lg"
+                  />
+                  <CardTitle className="text-lg font-bold">
+                    {activity.Name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <span className="mr-1">{activity.Rating}</span>
+                    </div>
+                    <div
+                      className="text-2xl cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation(); // prevent parent click event
+                        handleBookmark(activity._id);
+                      }}
+                    >
+                      {isBookmarked ? (
+                        <RiBookmarkFill className="text-yellow-500" />
+                      ) : (
+                        <RiBookmarkLine className="text-gray-500" />
+                      )}
+                    </div>
+                  </div>
+                  <CardDescription className="text-sm text-black-600">
+                    <p>
+                      Price:{" "}
+                      {currency === "USD"
+                        ? "$"
+                        : currency === "EUR"
+                        ? "€"
+                        : "EGP"}{" "}
+                      {convertPrice(activity.Price, currency)}
+                    </p>
+                    <p>Advertiser: {activity.AdvertiserId._id}</p>
+                    <p>
+                      Categories:{" "}
+                      {activity.CategoryId.map(
+                        (category) => category.Category
+                      ).join(", ")}
+                    </p>
+                    <p>
+                      Tags: {activity.Tags.map((tag) => tag.Tag).join(", ")}
+                    </p>
+                    <p>Date: {new Date(activity.Date).toLocaleDateString()}</p>
+                  </CardDescription>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

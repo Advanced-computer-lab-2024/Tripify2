@@ -4,6 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { FiMenu } from "react-icons/fi";
 import LogoutBtn from "@/components/ui/LogoutBtn";
 
+import localFont from "next/font/local";
+
+const geistMono = localFont({ src: "../../public/fonts/GeistMonoVF.woff" });
+const geistSans = localFont({ src: "../../public/fonts/GeistVF.woff" });
+
 export default function Dashboard({ params }) {
   const { role, id } = params;
   const router = useRouter();
@@ -25,7 +30,7 @@ export default function Dashboard({ params }) {
           sublinks: [
             { name: "All Products", link: "/products-tourist" },
             {
-              name: "Current Orders",
+              name: "My Orders",
               link: "/products-tourist/current-products",
             },
             { name: "My Products", link: "/products-tourist/my-products" },
@@ -38,6 +43,7 @@ export default function Dashboard({ params }) {
           name: "Activities",
           link: "/activities",
           sublinks: [
+            { name: "All Activities", link: "/activities" },
             { name: "My Activities", link: "/activities/my-activities" },
           ],
         },
@@ -226,7 +232,9 @@ export default function Dashboard({ params }) {
   }, [sublinkRef]);
 
   return (
-    <div className="flex items-center justify-between p-4 text-black bg-white border-b border-gray-300">
+    <div
+      className={`${geistSans.className} flex items-center justify-between p-4 text-black bg-white border-b border-gray-300`}
+    >
       <div className="flex-shrink-0">
         <h3 className="text-lg font-bold">Logo</h3>
       </div>

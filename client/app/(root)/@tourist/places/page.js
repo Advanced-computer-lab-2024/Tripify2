@@ -3,6 +3,14 @@ import { fetcher } from "@/lib/fetch-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 async function getPlaces() {
   const res = await fetcher("/places", {
     method: "GET",
@@ -96,9 +104,10 @@ const PlacesPage = () => {
 
   const router = useRouter();
   return (
-    <div className="grid grid-cols-6 h-screen">
+    <div className="grid h-screen grid-cols-6 gap-4">
       <div className="col-span-1 p-4">
-        <h2 className="text-black font-bold text-lg mb-6">Filter</h2>
+        <h2 className="mb-6 text-black font-bold text-lg">Filter</h2>
+
         <div className="mb-4">
           <h3 className="text-black font-bold mb-2">Tags</h3>
           {tags.map((tag) => (
@@ -126,37 +135,45 @@ const PlacesPage = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name or tag"
+            placeholder="Search..."
             className="w-full p-2 border border-gray-300 rounded"
           />
         </div>
 
         <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredPlaces.map((place) => (
-            <button
+            <Card
               key={place._id}
-              className="bg-white shadow rounded-lg p-4 transition hover:shadow-lg"
+              className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
               onClick={() => router.push(`/places/${place._id}`)}
             >
-              {place.Pictures && place.Pictures.length > 0 && (
-                <img
-                  src={place.Pictures[0]}
-                  alt={place.Name}
-                  className="w-full h-48 object-cover mb-2 rounded-lg"
-                />
-              )}
-              <h3 className="font-bold text-lg mb-2">{place.Name}</h3>
+              <CardHeader>
+                {place.Pictures && place.Pictures.length > 0 && (
+                  <img
+                    src={place.Pictures[0]}
+                    alt={place.Name}
+                    className="object-cover w-full h-48 mb-2 rounded-lg"
+                  />
+                )}
+                <CardTitle className="text-lg font-bold">
+                  {place.Name}
+                </CardTitle>
+              </CardHeader>
 
-              <p className="text-gray-700 mb-1">
-                Tags:{" "}
-                {place.Tags.map((tagId) => {
-                  const foundTag = tags.find(
-                    (actualTag) => actualTag._id === tagId
-                  );
-                  return foundTag ? foundTag.Tag : null;
-                }).join(", ")}
-              </p>
-            </button>
+              <CardContent>
+                <CardDescription className="text-sm text-black-600">
+                  <p>
+                    Tags:{" "}
+                    {place.Tags.map((tagId) => {
+                      const foundTag = tags.find(
+                        (actualTag) => actualTag._id === tagId
+                      );
+                      return foundTag ? foundTag.Tag : null;
+                    }).join(", ")}
+                  </p>
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

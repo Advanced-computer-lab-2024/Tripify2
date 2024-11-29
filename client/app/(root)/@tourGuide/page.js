@@ -15,7 +15,9 @@ function LandingPage() {
   const myCreateClick = () => {
     router.push("/createitinerary");
   };
-
+  const myReportClick = () => {
+    router.push("/sales-report");
+  };
   return (
     <div className="p-10">
       <h1 className="mb-4 text-2xl">
@@ -39,6 +41,12 @@ function LandingPage() {
           className="px-4 py-2 text-white bg-blue-500 rounded"
         >
           Create Itinerary
+        </button>
+        <button
+          onClick={myReportClick}
+          className="px-4 py-2 text-white bg-blue-500 rounded"
+        >
+         View Sales Report
         </button>
         <LogoutBtn />
       </div>

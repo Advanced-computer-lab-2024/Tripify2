@@ -133,8 +133,8 @@ const createItineraryBooking = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
-      cancel_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
+      success_url: `${process.env.CLIENT_URL}/itinerary/${id}`,
+      cancel_url: `${process.env.CLIENT_URL}/itinerary/${id}`,
       metadata: {
         ItineraryId: id,
         UserId: req._id,
@@ -637,54 +637,35 @@ const acceptBooking = async (req, res) => {
         ProductId: metadata.ProductId,
         Quantity: metadata.Quantity,
         Currency: session.currency.toUpperCase(),
+        PaymentMethod: 'credit-card'
       });
 
-      await ProductModel.findByIdAndUpdate(
-        metadata.ProductId,
-        [
-          {
-            $set: {
-              AvailableQuantity: {
-                $cond: {
-                  if: {
-                    $gte: ["$AvailableQuantity", parseInt(metadata.Quantity)],
-                  },
-                  then: {
-                    $subtract: [
-                      "$AvailableQuantity",
-                      parseInt(metadata.Quantity),
-                    ],
-                  },
-                  else: "$AvailableQuantity",
-                },
-              },
-              TotalSales: {
-                $add: ["$TotalSales", parseInt(metadata.Quantity)],
-              },
-            },
-          },
-        ],
-        { new: true }
-      );
+            await ProductModel.findByIdAndUpdate(metadata.ProductId, [
+                {
+                    $set: {
+                        AvailableQuantity: {
+                            $cond: {
+                                if: { $gte: ["$AvailableQuantity", parseInt(metadata.Quantity)] },
+                                then: { $subtract: ["$AvailableQuantity", parseInt(metadata.Quantity)] },
+                                else: "$AvailableQuantity"
+                            }
+                        },
+                        TotalSales: { 
+                            $add: [
+                              { $ifNull: ["$TotalSales", 0] }, 
+                              parseInt(metadata.Quantity)
+                            ]
+                          }
+                    }
+                }
+            ], { new: true })
 
-      const totalPaidInUSD = convertToUSD(
-        session.amount_total / 100,
-        session.currency.toUpperCase()
-      );
+            const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
 
-      const totalLoyaltyPointsEarned =
-        totalPaidInUSD *
-        (tourist.Badge === "Gold" ? 1.5 : tourist.Badge === "Silver" ? 1 : 0.5);
-      const newTotalLoayltyPoints =
-        tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
-      const newLoayltyPointsEarned =
-        tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
-      const newBadge =
-        newTotalLoayltyPoints >= 500000
-          ? "Gold"
-          : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
+            const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
+            const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
+            const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -851,6 +832,62 @@ const acceptBooking = async (req, res) => {
 
       return res.status(200).json({ msg: "Booking confirmed" });
     }
+    else if (metadata.Products) {
+        const sessionDB = await mongoose.startSession();
+        sessionDB.startTransaction();
+
+        const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+
+        await ProductBooking.create({
+            UserId: metadata.UserId,
+            Status: 'Confirmed',
+            TotalPaid: session.amount_total,
+            Products: metadata.Products.map(product => ({ ProductId: product.ProductId, Quantity: product.Quantity })),
+            Currency: session.currency.toUpperCase(),
+            PaymentMethod: 'credit-card'
+        });
+
+        await Promise.all(metadata.Products.map(async (product) => {
+            await ProductModel.findByIdAndUpdate(product.ProductId, [
+                {
+                    $set: {
+                        AvailableQuantity: {
+                            $cond: {
+                                if: { $gte: ["$AvailableQuantity", parseInt(product.Quantity)] },
+                                then: { $subtract: ["$AvailableQuantity", parseInt(product.Quantity)] },
+                                else: "$AvailableQuantity"
+                            }
+                        },
+                        TotalSales: { 
+                            $add: [
+                              { $ifNull: ["$TotalSales", 0] }, 
+                              parseInt(product.Quantity)
+                            ]
+                          }
+                    }
+                }
+            ], { new: true })
+        }))
+
+        const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
+
+        const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
+        const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
+        const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
+        const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
+
+        await TouristModel.findByIdAndUpdate(tourist._id, {
+            $set: {
+            LoyaltyPoints: newLoayltyPointsEarned,
+            TotalLoyaltyPoints: newTotalLoayltyPoints,
+            Badge: newBadge,
+            Wallet: "0.00",
+            },
+        });
+
+        await sessionDB.commitTransaction();
+        sessionDB.endSession();
+    }
 
     return res.status(400).json({ msg: "Invalid metadata" });
   }
@@ -867,9 +904,9 @@ const createProductBooking = async (req, res) => {
     const tourist = await TouristModel.findOne({ UserId: req._id }, "Wallet");
 
     const totalPrice = Number(convertPrice(product.Price, currency)) * Quantity;
-    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    const walletDeduction = Math.min(walletBalance, totalPrice);
-    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    // const walletDeduction = Math.min(walletBalance, totalPrice);
+    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
 
     if (product.AvailableQuantity < Quantity) {
       return res.status(400).json({ msg: "Not enough spots left" });
@@ -884,7 +921,7 @@ const createProductBooking = async (req, res) => {
             product_data: {
               name: product.Name,
             },
-            unit_amount: Math.round((remainingPrice * 100) / Quantity),
+            unit_amount: Math.round((totalPrice * 100) / Quantity),
           },
           quantity: Quantity,
         },
@@ -1098,7 +1135,7 @@ const createProductBookingCart = async (req, res) => {
         cancel_url: `${process.env.CLIENT_URL}/products-tourist`,
         metadata: {
           UserId: touristId,
-          Products: JSON.stringify(productDetails),
+          Products: productDetails,
           totalPrice,
           currency,
         },

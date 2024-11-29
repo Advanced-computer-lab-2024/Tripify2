@@ -22,7 +22,7 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
 
   useEffect(()=>{
     setCart(cart);
-  },[Cart]);
+  },[cart]);
 
   // useEffect(() => {
   //   if (status === "authenticated"){
@@ -99,6 +99,8 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
   const addToCart = async (productId, availablequantity) => {   
     let newcart = [].concat(Cart);
     let flag = false;
+    console.log("before")
+    console.log(newcart)
     let currentquantity = 1;
       for (let i = 0; i<newcart.length; i++){
         if (productId == newcart[i].product){
@@ -110,6 +112,8 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
       if (flag == false){
         newcart.push({product: productId, quantity: 1})
       }
+      console.log("after")
+      console.log(newcart)
     if (availablequantity >= currentquantity){
       try{const touristRes = await fetcher(`/tourists/${session.user.id}`, {
         method: "PATCH",
@@ -127,6 +131,8 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
         console.error("Error updating cart:", error);
       }
       alert("added to cart")
+      console.log("add")
+      console.log(newcart)
       setCart(newcart)
     }
     else{

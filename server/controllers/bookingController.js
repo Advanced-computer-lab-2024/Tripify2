@@ -833,6 +833,7 @@ const acceptBooking = async (req, res) => {
       return res.status(200).json({ msg: "Booking confirmed" });
     }
     else if (metadata.Products) {
+        const products = JSON.parse(metadata.Products);
         const sessionDB = await mongoose.startSession();
         sessionDB.startTransaction();
 
@@ -842,12 +843,12 @@ const acceptBooking = async (req, res) => {
             UserId: metadata.UserId,
             Status: 'Confirmed',
             TotalPaid: session.amount_total,
-            Products: metadata.Products.map(product => ({ ProductId: product.ProductId, Quantity: product.Quantity })),
+            Products: products.map(product => ({ ProductId: product.ProductId, Quantity: product.Quantity })),
             Currency: session.currency.toUpperCase(),
             PaymentMethod: 'credit-card'
         });
 
-        await Promise.all(metadata.Products.map(async (product) => {
+        await Promise.all(products.map(async (product) => {
             await ProductModel.findByIdAndUpdate(product.ProductId, [
                 {
                     $set: {
@@ -1033,6 +1034,11 @@ const cancelOrderProductBooking = async (req, res) => {
 const createProductBookingCart = async (req, res) => {
   const { touristId, products, currency, paymentMethod } = req.body;
 
+  console.log(touristId);
+  console.log(products);
+  console.log(currency);
+  console.log(paymentMethod);
+
   try {
     //console.log("hereeeeeeeeeeeeeeeeee");
     //console.log(products);
@@ -1071,6 +1077,8 @@ const createProductBookingCart = async (req, res) => {
         Price: product.Price,
       });
     }
+
+    console.log(productDetails);
 
     //console.log("stops here test 1");
 
@@ -1118,6 +1126,16 @@ const createProductBookingCart = async (req, res) => {
 
     if (paymentMethod === "credit-card") {
       //console.log("inside CARDDDDDDDDDDDDDDDDDDDDD");
+      console.log("testttt", productDetails.map(({ Name, Price, Quantity }) => ({
+        price_data: {
+          currency: currency.toLowerCase(),
+          product_data: {
+            name: Name,
+          },
+          unit_amount: Math.round(Price * 100),
+        },
+        quantity: Quantity,
+      })),);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: productDetails.map(({ Name, Price, Quantity }) => ({
@@ -1135,7 +1153,7 @@ const createProductBookingCart = async (req, res) => {
         cancel_url: `${process.env.CLIENT_URL}/products-tourist`,
         metadata: {
           UserId: touristId,
-          Products: productDetails,
+          Products: JSON.stringify(productDetails.map(p => ({...p, ProductId: p.ProductId.toString()}))),
           totalPrice,
           currency,
         },
@@ -1145,6 +1163,8 @@ const createProductBookingCart = async (req, res) => {
       //STRIPE POSTS successful / cancelled ORDERS TO BOOKINGS
 
       //await booking.save();
+
+      console.log(session.url);
 
       return res.status(200).json({
         msg: "Proceed to payment via credit card",

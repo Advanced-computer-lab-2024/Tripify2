@@ -46,16 +46,15 @@ const getMyItineraryBookings = async (req, res) => {
   }
 };
 const getallItineraryBookings = async (req, res) => {
-    try {
-      const bookings = await ItineraryBooking.find({
-        Status: "Confirmed",
-      }).populate("ItineraryId");
-      res.status(200).json(bookings);
-    } catch (e) {
-      res.status(400).json({ msg: e.message });
-    }
-  };
-  
+  try {
+    const bookings = await ItineraryBooking.find({
+      Status: "Confirmed",
+    }).populate("ItineraryId");
+    res.status(200).json(bookings);
+  } catch (e) {
+    res.status(400).json({ msg: e.message });
+  }
+};
 
 const getSingleItineraryBooking = async (req, res) => {
   const { id } = req.params;
@@ -133,8 +132,8 @@ const createItineraryBooking = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/itinerary/${id}`,
-      cancel_url: `${process.env.CLIENT_URL}/itinerary/${id}`,
+      success_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
+      cancel_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
       metadata: {
         ItineraryId: id,
         UserId: req._id,
@@ -264,15 +263,15 @@ const getMyActivityBookings = async (req, res) => {
   }
 };
 const getallActivityBookings = async (req, res) => {
-    try {
-      const bookings = await ActivityBooking.find({
-        Status: "Confirmed",
-      }).populate("ActivityId");
-      res.status(200).json(bookings);
-    } catch (e) {
-      res.status(400).json({ msg: e.message });
-    }
-  };
+  try {
+    const bookings = await ActivityBooking.find({
+      Status: "Confirmed",
+    }).populate("ActivityId");
+    res.status(200).json(bookings);
+  } catch (e) {
+    res.status(400).json({ msg: e.message });
+  }
+};
 
 const updateQuantityProductAndStatus = async (req, res) => {
   const { orderId } = req.body;
@@ -312,6 +311,21 @@ const updateQuantityProductAndStatus = async (req, res) => {
       orderId,
       {
         Status: "Confirmed",
+      },
+      { new: true }
+    );
+
+    //clear user cart here!
+    const touristId = order?.UserId;
+    if (!touristId)
+      return res
+        .status(404)
+        .json({ message: `Tourist with id ${touristId} not found!` });
+
+    await TouristModel.findByIdAndUpdate(
+      touristId,
+      {
+        Cart: [],
       },
       { new: true }
     );
@@ -637,35 +651,54 @@ const acceptBooking = async (req, res) => {
         ProductId: metadata.ProductId,
         Quantity: metadata.Quantity,
         Currency: session.currency.toUpperCase(),
-        PaymentMethod: 'credit-card'
       });
 
-            await ProductModel.findByIdAndUpdate(metadata.ProductId, [
-                {
-                    $set: {
-                        AvailableQuantity: {
-                            $cond: {
-                                if: { $gte: ["$AvailableQuantity", parseInt(metadata.Quantity)] },
-                                then: { $subtract: ["$AvailableQuantity", parseInt(metadata.Quantity)] },
-                                else: "$AvailableQuantity"
-                            }
-                        },
-                        TotalSales: { 
-                            $add: [
-                              { $ifNull: ["$TotalSales", 0] }, 
-                              parseInt(metadata.Quantity)
-                            ]
-                          }
-                    }
-                }
-            ], { new: true })
+      await ProductModel.findByIdAndUpdate(
+        metadata.ProductId,
+        [
+          {
+            $set: {
+              AvailableQuantity: {
+                $cond: {
+                  if: {
+                    $gte: ["$AvailableQuantity", parseInt(metadata.Quantity)],
+                  },
+                  then: {
+                    $subtract: [
+                      "$AvailableQuantity",
+                      parseInt(metadata.Quantity),
+                    ],
+                  },
+                  else: "$AvailableQuantity",
+                },
+              },
+              TotalSales: {
+                $add: ["$TotalSales", parseInt(metadata.Quantity)],
+              },
+            },
+          },
+        ],
+        { new: true }
+      );
 
-            const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
+      const totalPaidInUSD = convertToUSD(
+        session.amount_total / 100,
+        session.currency.toUpperCase()
+      );
 
-            const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
-            const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
-            const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
-            const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
+      const totalLoyaltyPointsEarned =
+        totalPaidInUSD *
+        (tourist.Badge === "Gold" ? 1.5 : tourist.Badge === "Silver" ? 1 : 0.5);
+      const newTotalLoayltyPoints =
+        tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
+      const newLoayltyPointsEarned =
+        tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
+      const newBadge =
+        newTotalLoayltyPoints >= 500000
+          ? "Gold"
+          : newTotalLoayltyPoints >= 100000
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -907,9 +940,9 @@ const createProductBooking = async (req, res) => {
     const tourist = await TouristModel.findOne({ UserId: req._id }, "Wallet");
 
     const totalPrice = Number(convertPrice(product.Price, currency)) * Quantity;
-    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    // const walletDeduction = Math.min(walletBalance, totalPrice);
-    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    const walletDeduction = Math.min(walletBalance, totalPrice);
+    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
 
     if (product.AvailableQuantity < Quantity) {
       return res.status(400).json({ msg: "Not enough spots left" });
@@ -924,7 +957,7 @@ const createProductBooking = async (req, res) => {
             product_data: {
               name: product.Name,
             },
-            unit_amount: Math.round((totalPrice * 100) / Quantity),
+            unit_amount: Math.round((remainingPrice * 100) / Quantity),
           },
           quantity: Quantity,
         },
@@ -1036,11 +1069,6 @@ const cancelOrderProductBooking = async (req, res) => {
 const createProductBookingCart = async (req, res) => {
   const { touristId, products, currency, paymentMethod } = req.body;
 
-  console.log(touristId);
-  console.log(products);
-  console.log(currency);
-  console.log(paymentMethod);
-
   try {
     //console.log("hereeeeeeeeeeeeeeeeee");
     //console.log(products);
@@ -1081,8 +1109,6 @@ const createProductBookingCart = async (req, res) => {
       });
     }
 
-    console.log(productDetails);
-
     //console.log("stops here test 1");
 
     if (paymentMethod === "wallet") {
@@ -1102,7 +1128,6 @@ const createProductBookingCart = async (req, res) => {
       //console.log("stops here 3");
 
       tourist.Wallet = parseInt(tourist.Wallet) - totalPrice;
-      await tourist.save();
 
       for (const { ProductId, Quantity } of products) {
         const product = await ProductModel.findById(ProductId);
@@ -1122,6 +1147,9 @@ const createProductBookingCart = async (req, res) => {
 
       await booking.save();
 
+      tourist.Cart = [];
+      await tourist.save();
+
       return res
         .status(200)
         .json({ message: "Payment successful via wallet", booking });
@@ -1129,16 +1157,6 @@ const createProductBookingCart = async (req, res) => {
 
     if (paymentMethod === "credit-card") {
       //console.log("inside CARDDDDDDDDDDDDDDDDDDDDD");
-      console.log("testttt", productDetails.map(({ Name, Price, Quantity }) => ({
-        price_data: {
-          currency: currency.toLowerCase(),
-          product_data: {
-            name: Name,
-          },
-          unit_amount: Math.round(Price * 100),
-        },
-        quantity: Quantity,
-      })),);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: productDetails.map(({ Name, Price, Quantity }) => ({
@@ -1156,7 +1174,7 @@ const createProductBookingCart = async (req, res) => {
         cancel_url: `${process.env.CLIENT_URL}/products-tourist`,
         metadata: {
           UserId: touristId,
-          Products: JSON.stringify(productDetails.map(p => ({...p, ProductId: p.ProductId.toString()}))),
+          Products: JSON.stringify(productDetails),
           totalPrice,
           currency,
         },
@@ -1166,8 +1184,6 @@ const createProductBookingCart = async (req, res) => {
       //STRIPE POSTS successful / cancelled ORDERS TO BOOKINGS
 
       //await booking.save();
-
-      console.log(session.url);
 
       return res.status(200).json({
         msg: "Proceed to payment via credit card",

@@ -82,6 +82,27 @@ const getTourist = async (req, res) => {
     res.status(500).json({ message: "Error retrieving tourist", error });
   }
 };
+const getCart = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await touristModel
+      .findById(id)
+      .populate({
+        path: "Cart.product",
+        select: "Name Price Image AvailableQuantity",
+      });
+
+    if (!user || user.Cart.length === 0) {
+      return res.status(404).json("No products found in the cart");
+    }
+
+    res.status(200).json(user.Cart); // Send the populated cart
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("An error occurred while retrieving the cart");
+  }
+};
+
 
 const updateTourist = async (req, res) => {
   const { id } = req.params;
@@ -96,69 +117,61 @@ const updateTourist = async (req, res) => {
     UpcomingActivities,
     UpcomingItineraries,
     Wishlist,
-    /* Wallet, */
+    BookmarkedItinerary,
+    BookmarkedActivity,
+    Cart,
+    Address,
+    // Wallet,
   } = req.body;
 
   try {
     const tourist = await touristModel.findById(id);
 
-    if (!tourist) {
+    if (!tourist)
       return res.status(404).json({
         message: "Tourist not found",
       });
-    }
 
     if (Email || Password) {
       const user = await userModel.findById(tourist.UserId);
 
-      if (!user) {
+      if (!user)
         return res.status(404).json({
           message: "(Tourist) User not found",
         });
-      }
 
-      if (Email) {
-        user.Email = Email;
-      }
+      if (Email) user.Email = Email;
 
-      if (Password) {
-        user.Password = Password;
-      }
+      if (Password) user.Password = Password;
 
       await user.save();
     }
 
-    if (MobileNumber) {
-      tourist.MobileNumber = MobileNumber;
-    }
+    if (MobileNumber) tourist.MobileNumber = MobileNumber;
 
-    if (Nationality) {
-      tourist.Nationality = Nationality;
-    }
+    if (Nationality) tourist.Nationality = Nationality;
 
-    if (DOB) {
-      tourist.DOB = DOB;
-    }
+    if (DOB) tourist.DOB = DOB;
 
-    if (Occupation) {
-      tourist.Occupation = Occupation;
-    }
+    if (Occupation) tourist.Occupation = Occupation;
 
-    if (UpcomingPlaces) {
-      tourist.UpcomingPlaces = UpcomingPlaces;
-    }
+    if (UpcomingPlaces) tourist.UpcomingPlaces = UpcomingPlaces;
 
-    if (UpcomingActivities) {
-      tourist.UpcomingActivities = UpcomingActivities;
-    }
+    if (UpcomingActivities) tourist.UpcomingActivities = UpcomingActivities;
 
-    if (UpcomingItineraries) {
-      tourist.UpcomingItineraries = UpcomingItineraries;
-    }
+    if (UpcomingItineraries) tourist.UpcomingItineraries = UpcomingItineraries;
 
-    if (Wishlist) {
-      tourist.Wishlist = Wishlist;
-    }
+    if (Wishlist) tourist.Wishlist = Wishlist;
+
+    if (BookmarkedItinerary) tourist.BookmarkedItinerary = BookmarkedItinerary;
+
+    if (BookmarkedActivity) tourist.BookmarkedActivity = BookmarkedActivity;
+
+    if (Cart) tourist.Cart = Cart;
+
+    if (Address) tourist.Address = Address;
+
+    // if (Wallet) tourist.Wallet = Wallet;
 
     await tourist.save();
 
@@ -204,29 +217,35 @@ const deleteTourist = async (req, res) => {
 // };
 
 const redeemPoints = async (req, res) => {
+  try {
+    const tourist = await touristModel
+      .findOne({ UserId: req._id })
+      .lean()
+      .exec();
 
-  try 
-  {
-    const tourist = await touristModel.findOne({UserId: req._id}).lean().exec()
-
-    if (!tourist) 
-    {
+    if (!tourist) {
       return res.status(404).json({ message: "Tourist not found" });
     }
 
-    const LoyaltyPoints = tourist.LoyaltyPoints
+    const LoyaltyPoints = tourist.LoyaltyPoints;
 
-    const newWallet = Number(tourist.Wallet) + Number(convertToUSD(LoyaltyPoints * 0.01, 'EGP'))
+    const newWallet =
+      Number(tourist.Wallet) +
+      Number(convertToUSD(LoyaltyPoints * 0.01, "EGP"));
 
-    await touristModel.findOneAndUpdate({UserId: req._id}, { Wallet: newWallet, LoyaltyPoints: 0 }, { new: true }).exec()
+    await touristModel
+      .findOneAndUpdate(
+        { UserId: req._id },
+        { Wallet: newWallet, LoyaltyPoints: 0 },
+        { new: true }
+      )
+      .exec();
 
     res.status(200).json({ message: "Points redeemed successfully" });
-  }
-  catch(error) 
-  {
+  } catch (error) {
     res.status(500).json({ message: "Error redeeming points", error });
   }
-}
+};
 
 module.exports = {
   createTourist,
@@ -235,4 +254,5 @@ module.exports = {
   updateTourist,
   deleteTourist,
   redeemPoints,
+  getCart
 };

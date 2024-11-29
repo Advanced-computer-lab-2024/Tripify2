@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Binoculars, Container, DeleteIcon, FileUser, MessageCircleWarning, Package, ShieldHalf, Tags, TramFront, Users } from "lucide-react";
+import { Binoculars, Container, DeleteIcon, FileUser, MessageCircleWarning, Package, ShieldHalf, Tags, TramFront, Users,Table} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function SideBarLinks() {
@@ -65,6 +65,13 @@ export default function SideBarLinks() {
             >
                 <Binoculars className="w-4 h-4" />
                 Tourism Governors
+            </Link>
+            <Link
+                href="/sales-report"
+                className={cn("flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-black", pathname.includes("/sales-report") ? "bg-muted text-black" : "text-muted-foreground")}
+            >
+                <Table className="w-4 h-4" />
+                Sales Report
             </Link>
             <Link
                 href="/complaints"

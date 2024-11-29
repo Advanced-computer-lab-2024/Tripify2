@@ -1,27 +1,49 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, ClockIcon, MapPinIcon, TagIcon, DollarSignIcon, PhoneIcon, GlobeIcon, UserIcon, MailIcon, LinkIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useCurrencyStore } from '@/providers/CurrencyProvider'
-import { useRouter } from 'next/navigation'
-import { convertPrice } from '@/lib/utils'
-import { fetcher } from '@/lib/fetch-client'
-import { useSession } from 'next-auth/react'
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  CalendarIcon,
+  ClockIcon,
+  MapPinIcon,
+  TagIcon,
+  DollarSignIcon,
+  PhoneIcon,
+  GlobeIcon,
+  UserIcon,
+  MailIcon,
+  LinkIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import { useRouter } from "next/navigation";
+import { convertPrice } from "@/lib/utils";
+import { fetcher } from "@/lib/fetch-client";
+import { useSession } from "next-auth/react";
 
 export default function ActivityDetails({ activity }) {
-  const [numParticipants, setNumParticipants] = useState(1)
-  const [error, setError] = useState('');
-  const router = useRouter()
+  const [numParticipants, setNumParticipants] = useState(1);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const session = useSession()
+  const session = useSession();
 
-  const { currency } = useCurrencyStore()
+  const { currency } = useCurrencyStore();
 
   if (!activity) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   const {
@@ -36,83 +58,97 @@ export default function ActivityDetails({ activity }) {
     Tags = [],
     CategoryId = [],
     AdvertiserId = {},
-  } = activity
+  } = activity;
 
   // Format Date and Time
-  const formattedDate = new Date(theDate).toLocaleDateString() || "Date Not Available"
-  const formattedTime = new Date(theTime).toLocaleTimeString() || "Time Not Available"
+  const formattedDate =
+    new Date(theDate).toLocaleDateString() || "Date Not Available";
+  const formattedTime =
+    new Date(theTime).toLocaleTimeString() || "Time Not Available";
 
   const generateLink = (latitude, longitude) => {
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
 
     if (isNaN(lat) || isNaN(lng)) {
-      setError('Please enter valid coordinates.');
-      setLink('');
+      setError("Please enter valid coordinates.");
+      setLink("");
       return;
     }
 
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-      setError('Coordinates are out of range.');
-      setLink('');
+      setError("Coordinates are out of range.");
+      setLink("");
       return;
     }
 
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
     return url;
-  }
+  };
 
   const handleBook = async () => {
     try {
-      const response = await fetcher(`/bookings/activities/create-booking/${activity._id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          currency,
-          Participants: numParticipants
-        })
-      })
+      const response = await fetcher(
+        `/bookings/activities/create-booking/${activity._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            currency,
+            Participants: numParticipants,
+          }),
+        }
+      );
 
       if (!response?.ok) {
-        const data = await response.json()
-        console.log(data.msg)
-        return
+        const data = await response.json();
+        console.log(data.msg);
+        return;
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!data) {
-        console.log('Error creating booking')
-        return
+        console.log("Error creating booking");
+        return;
       }
 
-      router.push(data.url)
+      router.push(data.url);
+    } catch (error) {
+      console.log(error);
     }
-    catch (error) {
-      console.log(error)
-    }
-  }
+  };
 
   const handleShareEmail = () => {
-    const subject = encodeURIComponent(`Check out this activity: ${activity.Name}`)
-    const body = encodeURIComponent(`I found this amazing activity and thought you might be interested:\n\n${activity.Name}\n\nCheck it out here: ${window.location.href}`)
-    window.location.href = `mailto:?subject=${subject}&body=${body}`
-  }
+    const subject = encodeURIComponent(
+      `Check out this activity: ${activity.Name}`
+    );
+    const body = encodeURIComponent(
+      `I found this amazing activity and thought you might be interested:\n\n${activity.Name}\n\nCheck it out here: ${window.location.href}`
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
 
   const handleCopyLink = () => {
-    const dummyLink = session?.data?.user ? `http://localhost:3000/activities/${activity._id}` : `http://localhost:3000/activities-guest/${activity._id}`
-    navigator.clipboard.writeText(dummyLink)
-  }
+    const dummyLink = session?.data?.user
+      ? `http://localhost:3000/activities/${activity._id}`
+      : `http://localhost:3000/activities-guest/${activity._id}`;
+    navigator.clipboard.writeText(dummyLink);
+  };
 
   return (
     <div className="container p-6 mx-auto">
       <h1 className="mb-6 text-3xl font-bold">{Name}</h1>
       <div className="mb-6">
         {Image ? (
-          <img src={Image} alt={Name} className="object-cover w-full h-64 rounded-lg" />
+          <img
+            src={Image}
+            alt={Name}
+            className="object-cover w-full h-64 rounded-lg"
+          />
         ) : (
           <div className="flex items-center justify-center w-full h-64 bg-gray-300 rounded-lg">
             <p>No Image Available</p>
@@ -153,14 +189,32 @@ export default function ActivityDetails({ activity }) {
               </div>
               <div className="flex items-center">
                 <MapPinIcon className="w-5 h-5 mr-2 text-red-500" />
-                <Link target='_blank' href={generateLink(Location.coordinates[0], Location.coordinates[1])}>
-                  {generateLink(Location.coordinates[0], Location.coordinates[1])}
+                <Link
+                  target="_blank"
+                  href={generateLink(
+                    Location.coordinates[0],
+                    Location.coordinates[1]
+                  )}
+                >
+                  {generateLink(
+                    Location.coordinates[0],
+                    Location.coordinates[1]
+                  )}
                 </Link>
               </div>
               <div className="flex items-center">
                 <DollarSignIcon className="w-5 h-5 mr-2 text-yellow-500" />
-                <span className="mr-1 text-sm font-light line-through">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(Price, currency)}</span>
-                <span className="font-bold">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice((Price * ((100 - SpecialDiscounts) / 100)), currency)}</span>
+                <span className="mr-1 text-sm font-light line-through">
+                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+                  {convertPrice(Price, currency)}
+                </span>
+                <span className="font-bold">
+                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+                  {convertPrice(
+                    Price * ((100 - SpecialDiscounts) / 100),
+                    currency
+                  )}
+                </span>
                 {SpecialDiscounts > 0 && (
                   <Badge variant="secondary" className="ml-2">
                     {SpecialDiscounts}% off
@@ -191,7 +245,9 @@ export default function ActivityDetails({ activity }) {
                       </Badge>
                     ))
                   ) : (
-                    <span className="text-gray-500">No Categories Available</span>
+                    <span className="text-gray-500">
+                      No Categories Available
+                    </span>
                   )}
                 </div>
               </div>
@@ -222,15 +278,23 @@ export default function ActivityDetails({ activity }) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="flex items-center">
               <UserIcon className="w-5 h-5 mr-2 text-blue-500" />
-              <span>Name: {AdvertiserId.UserId.UserName || "Not Available"}</span>
+              <span>
+                Name: {AdvertiserId.UserId.UserName || "Not Available"}
+              </span>
             </div>
             <div className="flex items-center">
               <GlobeIcon className="w-5 h-5 mr-2 text-green-500" />
-              <span>Website: {AdvertiserId.CompanyProfile.Website || "Not Available"}</span>
+              <span>
+                Website:{" "}
+                {AdvertiserId.CompanyProfile.Website || "Not Available"}
+              </span>
             </div>
             <div className="flex items-center">
               <PhoneIcon className="w-5 h-5 mr-2 text-red-500" />
-              <span>Hotline: {AdvertiserId.CompanyProfile.Hotline || "Not Available"}</span>
+              <span>
+                Hotline:{" "}
+                {AdvertiserId.CompanyProfile.Hotline || "Not Available"}
+              </span>
             </div>
           </div>
         </CardContent>
@@ -239,16 +303,25 @@ export default function ActivityDetails({ activity }) {
         <h2 className="mb-4 text-2xl font-semibold">Book Now</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <label htmlFor="participants" className="block mb-1 text-sm font-medium text-gray-700">Number of Participants</label>
+            <label
+              htmlFor="participants"
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
+              Number of Participants
+            </label>
             <select
               id="participants"
               value={numParticipants}
               onChange={(e) => setNumParticipants(parseInt(e.target.value))}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              {[1, 2, 3, 4, 5].map(num => (
-                <option disabled={activity.RemainingBookings < num} key={num} value={num}>
-                  {num} {num === 1 ? 'Participant' : 'Participants'}
+              {[1, 2, 3, 4, 5].map((num) => (
+                <option
+                  disabled={activity.RemainingBookings < num}
+                  key={num}
+                  value={num}
+                >
+                  {num} {num === 1 ? "Participant" : "Participants"}
                 </option>
               ))}
             </select>
@@ -259,7 +332,15 @@ export default function ActivityDetails({ activity }) {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-lg text-gray-700">Total Price</p>
-          <p className="text-3xl font-bold text-blue-600">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice((activity.Price * numParticipants) * ((100 - SpecialDiscounts) / 100), currency)}</p>
+          <p className="text-3xl font-bold text-blue-600">
+            {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+            {convertPrice(
+              activity.Price *
+                numParticipants *
+                ((100 - SpecialDiscounts) / 100),
+              currency
+            )}
+          </p>
         </div>
         <button
           onClick={handleBook}
@@ -270,5 +351,5 @@ export default function ActivityDetails({ activity }) {
         </button>
       </div>
     </div>
-  )
+  );
 }

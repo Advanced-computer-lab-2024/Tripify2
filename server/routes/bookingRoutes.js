@@ -25,28 +25,59 @@ const {
   createHotelBooking,
   getMyHotelBookings,
   createTransportationBooking,
-  getMyTransportationBookings
+  getMyTransportationBookings,
+  createProductBookingCart,
+  deleteAllProductBookings,
+  getMyCurrentProductBookings,
+  cancelOrderProductBooking,
+  updateQuantityProductAndStatus,
+  getallItineraryBookings,
+  getallActivityBookings,
 } = require("../controllers/bookingController");
 
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
 const verifyTourist = require("../middleware/verifyTouristOnly");
 
 //itineraries routes
-itinerariesRouter.post("/create-booking/:id", verifyTourist, createItineraryBooking);
+itinerariesRouter.post(
+  "/create-booking/:id",
+  verifyTourist,
+  createItineraryBooking
+);
 itinerariesRouter.get("", verifyTourist, getMyItineraryBookings);
 itinerariesRouter.get("/:id", verifyTourist, getSingleItineraryBooking);
-itinerariesRouter.post("/cancel-booking/:id", verifyTourist, cancelItineraryBooking);
+itinerariesRouter.post(
+  "/cancel-booking/:id",
+  verifyTourist,
+  cancelItineraryBooking
+);
 
 //activities routes
-activitiesRouter.post("/create-booking/:id", verifyTourist, createActivityBooking);
+activitiesRouter.post(
+  "/create-booking/:id",
+  verifyTourist,
+  createActivityBooking
+);
 activitiesRouter.get("", verifyTourist, getMyActivityBookings);
 activitiesRouter.get("/:id", verifyTourist, getSingleActivityBooking);
-activitiesRouter.post("/cancel-booking/:id", verifyTourist, cancelActivityBooking);
+activitiesRouter.post(
+  "/cancel-booking/:id",
+  verifyTourist,
+  cancelActivityBooking
+);
 
 //product routes
 productRouter.post("/create-booking/:id", verifyTourist, createProductBooking);
-productRouter.get("", verifyTourist, getMyProductBookings);
+productRouter.post("/create-booking", verifyTourist, createProductBookingCart);
+productRouter.get("", /*verifyTourist,*/ getMyProductBookings);
+productRouter.get("/current", /*verifyTourist, */ getMyCurrentProductBookings);
+productRouter.delete("/:id", deleteAllProductBookings);
+productRouter.patch("/", /*verifyTourist, */ cancelOrderProductBooking);
+productRouter.patch(
+  "/updateQuantityAndStatus",
+  /*verifyTourist, */ updateQuantityProductAndStatus
+);
 
 //flight routes
 flightRouter.post("/create-booking/:id", verifyTourist, createFlightBooking);
@@ -57,7 +88,11 @@ hotelRouter.post("/create-booking/:id", verifyTourist, createHotelBooking);
 hotelRouter.get("", verifyTourist, getMyHotelBookings);
 
 //transportation routes
-transportationRouter.post("/create-booking/:id", verifyTourist, createTransportationBooking);
+transportationRouter.post(
+  "/create-booking/:id",
+  verifyTourist,
+  createTransportationBooking
+);
 transportationRouter.get("", verifyTourist, getMyTransportationBookings);
 
 router.use("/itineraries", itinerariesRouter);
@@ -67,6 +102,14 @@ router.use("/flights", flightRouter);
 router.use("/hotels", hotelRouter);
 router.use("/transportations", transportationRouter);
 
-router.post("/callback", bodyParser.raw({ type: 'application/json' }), acceptBooking);
+router.post(
+  "/callback",
+  bodyParser.raw({ type: "application/json" }),
+  acceptBooking
+);
+router.route("/itin")
+.get(getallItineraryBookings)
+router.route("/act")
+.get(getallActivityBookings)
 
 module.exports = router;

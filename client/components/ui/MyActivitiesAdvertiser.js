@@ -6,7 +6,7 @@ import { fetcher } from "@/lib/fetch-client";
 export default function AdvertiserProfile({ Activities }) {
   const AllActivities = Activities.Activities;
   // console.log("ALOOOOO");
-  console.log(Activities);
+  // console.log(Activities);
   const router = useRouter();
 
   const handleCreateClick = () => {

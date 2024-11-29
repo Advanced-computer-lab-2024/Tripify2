@@ -4,9 +4,17 @@ import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-// import StarRating from "../starRating";
+import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 
-const ItineraryComponent = () => {
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+const ItineraryComponent = ({ params }) => {
   const router = useRouter();
 
   const { currency } = useCurrencyStore();
@@ -25,21 +33,30 @@ const ItineraryComponent = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [selectedStartDate, setSelectedStartDate] = useState("");
 
+  const { touristId, bookmarkedItinerariesTourist } = params;
+
+  const [bookmarkedItinerary, setBookmarkedItinerary] = useState(
+    bookmarkedItinerariesTourist
+  );
+
+  //console.log(bookmarkedItinerary);
+
   useEffect(() => {
     const fetchItineraries = async () => {
       try {
-        const response = await fetcher("/itineraries", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }).catch((e) => console.log(e));
+        const response = await fetcher("/itineraries").catch((e) =>
+          console.log(e)
+        );
         const data = await response.json();
-        const filteredData = data.filter(itinerary => !itinerary.Inappropriate)
+        const filteredData = data.filter(
+          (itinerary) => !itinerary.Inappropriate
+        );
         setTheItineraries(filteredData);
 
         const maxPriceFromData = Math.max(
-          ...filteredData.map((itinerary) => convertPrice(itinerary.Price, currency))
+          ...filteredData.map((itinerary) =>
+            convertPrice(itinerary.Price, currency)
+          )
         );
         setMaxPrice(maxPriceFromData);
         setFilteredPrice(maxPriceFromData);
@@ -105,19 +122,54 @@ const ItineraryComponent = () => {
     );
   };
 
+  const handleBookmark = (id) => {
+    setBookmarkedItinerary((prev) => {
+      const updatedBookmarkedItineraries = prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id];
+      debounceSendPatchRequest(updatedBookmarkedItineraries);
+      return updatedBookmarkedItineraries;
+    });
+  };
+
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  const debounceSendPatchRequest = debounce(
+    async (updatedBookmarkedItineraries) => {
+      try {
+        await fetcher(`/tourists/${touristId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            BookmarkedItinerary: updatedBookmarkedItineraries,
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to update bookmarks:", e);
+      }
+    },
+    300
+  );
+
   const itinerariesWithCategoriesAndTags =
     selectedCategories.length === 0 && selectedTags.length === 0
       ? theItineraries
       : theItineraries.filter((itinerary) => {
-        const categoryMatches = itinerary.Category.some((category) => {
-          return selectedCategories.includes(category.Category);
-        });
-        const tagMatches = itinerary.Tag.some((tag) => {
-          return selectedTags.includes(tag.Tag);
-        });
+          const categoryMatches = itinerary.Category.some((category) => {
+            return selectedCategories.includes(category.Category);
+          });
+          const tagMatches = itinerary.Tag.some((tag) => {
+            return selectedTags.includes(tag.Tag);
+          });
 
-        return tagMatches || categoryMatches;
-      });
+          return tagMatches || categoryMatches;
+        });
 
   const filteredItineraries = itinerariesWithCategoriesAndTags.filter(
     (itinerary) => {
@@ -151,7 +203,7 @@ const ItineraryComponent = () => {
   );
 
   return (
-    <div className="grid h-screen grid-cols-6">
+    <div className="grid h-screen grid-cols-6 gap-4">
       <div className="col-span-1 p-4">
         <h2 className="mb-6 text-lg font-bold text-black">Filter</h2>
 
@@ -220,8 +272,8 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="priceRange" className="block mb-2 text-black">
-            Price: {filteredPrice}
+          <label htmlFor="priceRange" className="mb-2 font-bold text-black">
+            Price: <span className="font-normal">{filteredPrice}</span>
           </label>
           <input
             id="priceRange"
@@ -233,9 +285,10 @@ const ItineraryComponent = () => {
             onChange={handleRangeChangePrice}
           />
         </div>
+
         <div className="mb-4">
-          <label htmlFor="ratingFilter" className="block mb-2 text-black">
-            Rating: {filteredRating}
+          <label htmlFor="ratingFilter" className="mb-2 font-bold text-black">
+            Rating: <span className="font-normal">{filteredRating}</span>
           </label>
           <input
             id="ratingFilter"
@@ -273,38 +326,72 @@ const ItineraryComponent = () => {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
-          {filteredItineraries.map((itinerary) => (
-            <button
-              key={itinerary.ID}
-              className="p-4 overflow-hidden bg-white rounded-lg hover:shadow"
-              onClick={() => router.push(`/itineraries/${itinerary._id}`)}
-            >
-              <img
-                src={itinerary.Image}
-                alt={itinerary.Name}
-                className="object-cover w-full h-48 mb-2 rounded-lg"
-              />
-              <h3 className="mb-2 text-lg font-bold">{itinerary.Name}</h3>
-              <div className="flex justify-center mb-2">
-                {itinerary.Rating}
-                {/* <StarRating rating={itinerary.Rating} /> */}
-              </div>
-              <p className="text-black-600">Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'} {convertPrice(itinerary.Price, currency)}</p>
-              <p className="text-black-600">Language: {itinerary.Language}</p>
-              <p className="text-black-600">
-                Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}
-              </p>
-              <p className="text-black-600">
-                Categories:{" "}
-                {itinerary.Category.map((category) => category.Category).join(
-                  ", "
-                )}
-              </p>
-              <p className="text-black-600">
-                Start Date: {new Date(itinerary.StartDate).toLocaleDateString()}
-              </p>
-            </button>
-          ))}
+          {filteredItineraries.map((itinerary) => {
+            const isBookmarked = bookmarkedItinerary.includes(itinerary._id);
+            return (
+              <Card
+                key={itinerary._id}
+                className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                onClick={() => router.push(`/itinerary/${itinerary._id}`)}
+              >
+                <CardHeader>
+                  <img
+                    src={itinerary.Image}
+                    alt={itinerary.Name}
+                    className="object-cover w-full h-48 mb-2 rounded-lg"
+                  />
+                  <CardTitle className="text-lg font-bold">
+                    {itinerary.Name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <span className="mr-1">{itinerary.Rating}</span>
+                    </div>
+                    <div
+                      className="text-2xl cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation(); //prevent parent click
+                        handleBookmark(itinerary._id);
+                      }}
+                    >
+                      {isBookmarked ? (
+                        <RiBookmarkFill className="text-yellow-500" />
+                      ) : (
+                        <RiBookmarkLine className="text-gray-500" />
+                      )}
+                    </div>
+                  </div>
+                  <CardDescription className="text-sm text-black-600">
+                    <p>
+                      Price:{" "}
+                      {currency === "USD"
+                        ? "$"
+                        : currency === "EUR"
+                        ? "€"
+                        : "EGP"}{" "}
+                      {convertPrice(itinerary.Price, currency)}
+                    </p>
+                    <p>Language: {itinerary.Language}</p>
+                    <p>
+                      Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}
+                    </p>
+                    <p>
+                      Categories:{" "}
+                      {itinerary.Category.map(
+                        (category) => category.Category
+                      ).join(", ")}
+                    </p>
+                    <p>
+                      Start Date:{" "}
+                      {new Date(itinerary.StartDate).toLocaleDateString()}
+                    </p>
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>

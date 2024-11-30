@@ -7,8 +7,12 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
 
 export default function CurrentProducts({ productBookings, touristId }) {
+  const { currency } = useCurrencyStore();
+
   const [bookings, setBookings] = useState(productBookings);
 
   const router = useRouter();
@@ -141,8 +145,16 @@ export default function CurrentProducts({ productBookings, touristId }) {
                     Quantity: {product.Quantity}
                   </p>
                   <p className="mb-4 text-sm text-gray-500">
-                    Price: $
-                    {(product.ProductId.Price * product.Quantity).toFixed(2)}
+                    Price:{" "}
+                    {currency === "USD"
+                      ? "$"
+                      : currency === "EUR"
+                      ? "€"
+                      : "EGP"}{" "}
+                    {convertPrice(
+                      (product.ProductId.Price * product.Quantity).toFixed(2),
+                      currency
+                    )}
                   </p>
                   <Button
                     className="w-full mb-4"

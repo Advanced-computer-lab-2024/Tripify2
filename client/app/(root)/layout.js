@@ -10,7 +10,8 @@ import { CurrencyStoreProvider } from "@/providers/CurrencyProvider";
 
 export const metadata = {
   title: "Tripify",
-  description: "Tripify is a travel companion app that helps you plan your trips and book accommodations with ease.",
+  description:
+    "Tripify is a travel companion app that helps you plan your trips and book accommodations with ease.",
 };
 
 const poppins = Poppins({
@@ -37,27 +38,28 @@ export default async function RootLayout({
   const session = await getSession();
 
   return (
-    <html lang="en" className={`${GeistSans.className} ${poppins.variable} antialiased dark:bg-gray-950`}>
+    <html
+      lang="en"
+      className={`${GeistSans.className} ${poppins.variable} antialiased dark:bg-gray-950`}
+    >
       <CurrencyStoreProvider>
         <AuthProvider>
-          <body>
-            {/* <header>
+          {/* <header>
               <Dashboard params={{ role: "Advertiser" }} />
             </header> */}
-            {session?.user?.role === "Tourist"
-              ? tourist
-              : session?.user?.role === "Admin"
-                ? admin
-                : session?.user?.role === "Advertiser"
-                  ? advertiser
-                  : session?.user?.role === "Seller"
-                    ? seller
-                    : session?.user?.role === "TourGuide"
-                      ? tourGuide
-                      : session?.user?.role === "TourismGovernor"
-                        ? tourismGovernor
-                        : guest}
-          </body>
+          {session?.user?.role === "Tourist"
+            ? tourist
+            : session?.user?.role === "Admin"
+            ? admin
+            : session?.user?.role === "Advertiser"
+            ? advertiser
+            : session?.user?.role === "Seller"
+            ? seller
+            : session?.user?.role === "TourGuide"
+            ? tourGuide
+            : session?.user?.role === "TourismGovernor"
+            ? tourismGovernor
+            : guest}
         </AuthProvider>
       </CurrencyStoreProvider>
     </html>

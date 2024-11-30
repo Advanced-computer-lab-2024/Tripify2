@@ -1,42 +1,88 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import CartItem from './cartItem'
-import { useRouter } from 'next/navigation'
+"use client";
+import React, { useEffect, useState } from "react";
+import CartItem from "./cartItem";
+import { useRouter } from "next/navigation";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-function cartPage({Cart, touristId}) {
-    const [cart, setCart] = useState(Cart)
-    const router = useRouter();
-    console.log(cart)
-    let sum = 0;
-    for (let i =0; i<cart.length; i++){
-      sum += cart[i].product.Price * cart[i].quantity;
-    }
-    console.log(sum)
+function cartPage({ Cart, touristId }) {
+  const { currency } = useCurrencyStore();
 
-    useEffect(() => {
-      setCart(cart);
-    }, [cart]);
+  const [cart, setCart] = useState(Cart);
+  const router = useRouter();
+  //console.log(cart);
+  let sum = 0;
+  for (let i = 0; i < cart.length; i++) {
+    sum += cart[i].product.Price * cart[i].quantity;
+  }
+  //console.log(sum);
 
-    const items  = cart.map(item => <CartItem product={item.product} quantity={item.quantity} cart={cart} setCart={setCart} touristId={touristId}/>)
+  useEffect(() => {
+    setCart(cart);
+  }, [cart]);
+
+  const items = cart.map((item) => (
+    <CartItem
+      key={item.product._id}
+      product={item.product}
+      quantity={item.quantity}
+      cart={cart}
+      setCart={setCart}
+      touristId={touristId}
+    />
+  ));
+
   return (
-    <div className='p-6 px-14'>
-      <h1 className='text-2xl font-bold'>My Cart</h1>
-      <div className='flex flex-col items-center p-4 py-2'>
-      <ul className='flex flex-row justify-center items-center gap-20 p-2 px-4 shadow-md w-2/3 rounded'>
-        <li>image</li>
-        <li>name</li>
-        <li>price</li>
-        <li>quantity</li>
-        <li>total</li>
-      </ul>
-        {items.length!=0? items: <span>Cart is empty</span>}
-        <div className='flex flex-row gap-4 items-center p-4 '>
-          <div className="bg-slate-200 rounded-md text-sm font-medium h-10 px-4 py-2">Total: {sum}</div>
-          <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium h-10 px-4 py-2" onClick={()=>{router.push("/checkout")}}>Check Out</button>
-        </div>
-      </div>
+    <div className="p-6 px-14">
+      <h1 className="text-2xl font-bold">My Cart</h1>
+      {items.length ? (
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="pl-4 text-left">Product</TableHead>
+                <TableHead className="text-center">Price</TableHead>
+                <TableHead className="text-center">Quantity</TableHead>
+                <TableHead className="text-center">Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>{items}</TableBody>
+          </Table>
+          <div className="total-price text-right mb-6">
+            <h2 className="font-semibold text-xl text-gray-800 mb-2">
+              Total Price
+            </h2>
+            <div className="flex justify-end items-center space-x-1">
+              <span className="text-2xl font-bold text-gray-900">
+                {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+                {convertPrice(sum.toFixed(2), currency)}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              router.push("/checkout");
+            }}
+            className={
+              "w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 mt-8"
+            }
+          >
+            Checkout
+          </button>
+        </>
+      ) : (
+        <p className="text-gray-600 text-center">Cart is empty</p>
+      )}
     </div>
-  )
+  );
 }
 
-export default cartPage
+export default cartPage;

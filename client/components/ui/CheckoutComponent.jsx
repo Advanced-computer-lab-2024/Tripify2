@@ -5,10 +5,19 @@ import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 import { fetcher } from "@/lib/fetch-client";
-import { DollarSignIcon } from "lucide-react";
+import { CreditCardIcon, WalletIcon, DollarSignIcon } from "lucide-react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const CheckoutComponent = ({ params }) => {
   const { touristId, cart, products, address, wallet } = params;
@@ -180,55 +189,51 @@ const CheckoutComponent = ({ params }) => {
   };
 
   return (
-    <div className="checkout-container">
-      <h1 className="text-xl font-bold mb-4">Checkout</h1>
+    <div className="checkout-container max-w-6xl mx-auto bg-white rounded-lg">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Checkout</h1>
 
       {productsInCart.length > 0 ? (
-        <div className="products-list">
-          {productsInCart.map((product, index) => (
-            <div
-              key={index}
-              className="product-item flex mb-4 p-4 border-b border-gray-300"
-            >
-              <div className="product-image w-32 h-32 mr-4">
-                <img
-                  src={product.Image}
-                  alt={product.Name}
-                  className="w-full h-full object-cover rounded-md"
-                />
-              </div>
-
-              <div className="product-details flex flex-col justify-between">
-                <div>
-                  <h2 className="font-semibold text-lg">{product.Name}</h2>
-                  <div className="price-info flex items-center">
-                    <DollarSignIcon className="w-5 h-5 mr-2 text-yellow-500" />
-                    <span className="mr-1 text-sm font-light">
-                      {currency === "USD"
-                        ? "$"
-                        : currency === "EUR"
-                        ? "€"
-                        : "EGP"}{" "}
-                      {convertPrice(
-                        (product.Price * product.quantity).toFixed(2),
-                        currency
-                      )}
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-sm text-gray-600 mt-2">
-                  Quantity: {product.quantity}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Table className="w-full mb-6">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="pl-4 text-left">Product</TableHead>
+              <TableHead className="text-center">Quantity</TableHead>
+              <TableHead className="text-center">Price</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {productsInCart.map((product) => (
+              //console.log(product);
+              <TableRow key={product?._id} className="hover:bg-gray-100">
+                <TableCell className="flex items-center space-x-4">
+                  <img
+                    src={product.Image}
+                    alt={product.Name}
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+                  <span className="font-semibold text-gray-700">
+                    {product.Name}
+                  </span>
+                </TableCell>
+                <TableCell className="text-center">
+                  {product.quantity}
+                </TableCell>
+                <TableCell className="text-center">
+                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+                  {convertPrice(
+                    (product.Price * product.quantity).toFixed(2),
+                    currency
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       ) : (
-        <p>No products in the cart.</p>
+        <p className="text-gray-600 text-center">No products in the cart.</p>
       )}
 
-      <div className="block w-full">
+      <div className="block w-full mb-3">
         <span className="block font-medium text-gray-700">Saved Addresses</span>
         <div className="flex items-center mt-1">
           <div className="relative w-full">
@@ -249,7 +254,7 @@ const CheckoutComponent = ({ params }) => {
                   addresses.map((address) => (
                     <li
                       key={address.name}
-                      className="flex items-center justify-between p-2 text-gray-700 cursor-pointer hover:bg-gray-100"
+                      className="flex items-center justify-between p-2 text-gray-700 cursor-pointer hover:bg-gray-100 z-50"
                       onClick={() => handleAddressSelect(address)}
                     >
                       <span
@@ -343,69 +348,71 @@ const CheckoutComponent = ({ params }) => {
         </div>
       )}
 
-      <div className="total-price mb-4">
-        <h2 className="font-semibold text-lg">Total Price</h2>
-        <div className="flex items-center">
-          <DollarSignIcon className="w-5 h-5 mr-2 text-yellow-500" />
-          <span className="text-lg font-bold">
+      <div className="total-price text-right mb-6">
+        <h2 className="font-semibold text-xl text-gray-800 mb-2">
+          Total Price
+        </h2>
+        <div className="flex justify-end items-center space-x-1">
+          <span className="text-2xl font-bold text-gray-900">
             {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
             {convertPrice(totalPrice.toFixed(2), currency)}
           </span>
         </div>
       </div>
 
-      <div className="payment-methods flex space-x-4 mt-4">
+      <div className="payment-methods flex justify-center space-x-4 mt-6">
         <button
           onClick={() => setPaymentMethod("cash-on-delivery")}
-          className={`p-3 rounded-md w-32 text-center ${
+          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${
             paymentMethod === "cash-on-delivery"
               ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
-          Cash on Delivery
+          <DollarSignIcon className="w-6 h-6" />
+          <span>Cash</span>
         </button>
 
         <button
           onClick={() => setPaymentMethod("wallet")}
-          className={`p-3 rounded-md w-32 text-center ${
+          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${
             paymentMethod === "wallet"
               ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
-          Wallet
+          <WalletIcon className="w-6 h-6" />
+          <span>Wallet</span>
         </button>
 
         <button
           onClick={() => setPaymentMethod("credit-card")}
-          className={`p-3 rounded-md w-32 text-center ${
+          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${
             paymentMethod === "credit-card"
               ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
-          Credit Card
+          <CreditCardIcon className="w-6 h-6" />
+          <span>Card</span>
         </button>
       </div>
-
-      <div className="buy-button">
-        <button
-          onClick={handleBuy}
-          disabled={!paymentMethod || !willBeUsedAddress}
-          className={`w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 ${
-            !paymentMethod || !willBeUsedAddress
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-        >
-          Buy
-        </button>
-
-        {messageAboveButton && (
-          <p className="text-red-500 text-sm mt-2">{messageAboveButton}</p>
-        )}
-      </div>
+      <button
+        onClick={handleBuy}
+        disabled={!paymentMethod || !willBeUsedAddress}
+        className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 mt-8 ${
+          !paymentMethod || !willBeUsedAddress
+            ? "opacity-50 cursor-not-allowed"
+            : ""
+        }`}
+      >
+        Buy
+      </button>
+      {messageAboveButton && (
+        <p className="text-red-500 text-center text-sm mt-2">
+          {messageAboveButton}
+        </p>
+      )}
     </div>
   );
 };

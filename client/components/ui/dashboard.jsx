@@ -2,6 +2,8 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { FiMenu } from "react-icons/fi";
+import { Plane } from "lucide-react";
+import Link from "next/link";
 import LogoutBtn from "@/components/ui/LogoutBtn";
 
 import localFont from "next/font/local";
@@ -235,9 +237,10 @@ export default function Dashboard({ params }) {
     <div
       className={`${geistSans.className} flex items-center justify-between p-4 text-black bg-white border-b border-gray-300`}
     >
-      <div className="flex-shrink-0">
-        <h3 className="text-lg font-bold">Logo</h3>
-      </div>
+      <Link href="/" className="flex items-center gap-2 font-semibold">
+        <Plane className="h-6 w-6" />
+        <span className="">Tripify</span>
+      </Link>
 
       <div className="flex items-center space-x-4">
         {showHamburger ? (

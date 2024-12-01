@@ -3,6 +3,15 @@ import { fetcher } from "@/lib/fetch-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 async function getPlaces() {
   const res = await fetcher("/places", {
     method: "GET",
@@ -133,30 +142,45 @@ const PlacesPage = () => {
 
         <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredPlaces.map((place) => (
-            <button
+            <Card
               key={place._id}
-              className="bg-white shadow rounded-lg p-4 transition hover:shadow-lg"
+              className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
               onClick={() => router.push(`/places-guest/${place._id}`)}
             >
-              {place.Pictures && place.Pictures.length > 0 && (
-                <img
-                  src={place.Pictures[0]}
-                  alt={place.Name}
-                  className="w-full h-48 object-cover mb-2 rounded-lg"
-                />
-              )}
-              <h3 className="font-bold text-lg mb-2">{place.Name}</h3>
+              <CardHeader>
+                {place.Pictures && place.Pictures.length > 0 && (
+                  <img
+                    src={place.Pictures[0]}
+                    alt={place.Name}
+                    className="object-cover w-full h-48 mb-2 rounded-lg"
+                  />
+                )}
+                <CardTitle className="text-lg font-bold">
+                  {place.Name}
+                </CardTitle>
+              </CardHeader>
 
-              <p className="text-gray-700 mb-1">
-                Tags:{" "}
-                {place.Tags.map((tagId) => {
-                  const foundTag = tags.find(
-                    (actualTag) => actualTag._id === tagId
-                  );
-                  return foundTag ? foundTag.Tag : null;
-                }).join(", ")}
-              </p>
-            </button>
+              <CardContent>
+                <CardDescription className="text-sm text-black-600">
+                  <p>
+                    {place.Tags.map((tagId) => {
+                      const foundTag = tags.find(
+                        (actualTag) => actualTag._id === tagId
+                      );
+                      return foundTag ? (
+                        <Badge
+                          key={foundTag._id}
+                          variant="neutral"
+                          className="text-white bg-blue-500 mr-2"
+                        >
+                          {foundTag.Tag}
+                        </Badge>
+                      ) : null;
+                    })}
+                  </p>
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

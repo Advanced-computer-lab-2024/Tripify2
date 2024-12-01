@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Heart } from "lucide-react";
-import { Star, ShoppingBag, User, Loader2 } from "lucide-react";
+import { Star, ShoppingBag, Loader2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -151,8 +150,8 @@ export default function ProductPage({ product, cart }) {
   const addToCart = async () => {
     let newcart = [].concat(Cart);
     let flag = false;
-    console.log(newcart);
-    console.log(newcart.length);
+    //console.log(newcart);
+    //console.log(newcart.length);
     for (let i = 0; i < newcart.length; i++) {
       if (product._id == newcart[i].product) {
         flag = true;

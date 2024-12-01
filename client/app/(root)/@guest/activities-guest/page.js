@@ -3,7 +3,21 @@ import { fetcher } from "@/lib/fetch-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 const ItineraryComponent = () => {
+  const { currency } = useCurrencyStore();
+
   const router = useRouter();
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState("");
@@ -206,13 +220,18 @@ const ItineraryComponent = () => {
 
         <div className="mb-4">
           <label htmlFor="priceRange" className="block mb-2 text-black">
-            Price: {filteredPrice}
+            <span className="font-bold">Price: </span>
+            <span className="ml-2">
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {filteredPrice}
+            </span>
           </label>
           <input
             id="priceRange"
             type="range"
             className="w-full range"
             min="0"
+            step="0.01"
             max={maxPrice}
             value={filteredPrice}
             onChange={handleRangeChangePrice}
@@ -221,7 +240,8 @@ const ItineraryComponent = () => {
 
         <div className="mb-4">
           <label htmlFor="ratingFilter" className="block mb-2 text-black">
-            Rating: {filteredRating}
+            <span className="font-bold mr-2">Rating: </span>
+            {filteredRating}
           </label>
           <input
             id="ratingFilter"
@@ -237,66 +257,97 @@ const ItineraryComponent = () => {
       </div>
 
       <div className="col-span-5 p-4 overflow-auto">
-        <h2 className="text-black font-bold text-2xl mb-4">Activities</h2>
+        <h2 className="mb-4 text-2xl font-bold text-black">Activities</h2>
 
-        <div className="mb-4">
+        <div className="mb-4 flex items-center space-x-4">
           <input
             type="text"
             value={search}
             onChange={handleSearchChange}
             placeholder="Search..."
-            className="w-full p-2 border border-gray-300 rounded"
+            className="flex-1 p-2 border border-gray-300 rounded"
           />
-        </div>
 
-        <div className="mb-4">
           <button
             onClick={handleSortRating}
-            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600 mr-4"
+            className="p-2 text-black bg-blue-500 rounded hover:bg-blue-600"
           >
-            Sort by Rating {sortOrderRating === "desc" ? "↑" : "↓"}
+            Rating {sortOrderRating === "desc" ? "↑" : "↓"}
           </button>
           <button
             onClick={handleSortPrice}
-            className="bg-blue-500 text-black p-2 rounded hover:bg-blue-600"
+            className="p-2 text-black bg-blue-500 rounded hover:bg-blue-600"
           >
-            Sort by Price {sortOrderPrice === "desc" ? "↑" : "↓"}
+            Price {sortOrderPrice === "desc" ? "↑" : "↓"}
           </button>
         </div>
 
-        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
           {filteredActivities.map((activity) => (
-            <button
+            <Card
               key={activity._id}
-              className="bg-white shadow rounded-lg p-4 transition hover:shadow-lg"
+              className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
               onClick={() => {
                 router.push(`/activities-guest/${activity._id}`);
               }}
             >
-              <img
-                src={activity.Image}
-                alt={activity.Name}
-                className="w-full h-48 object-cover mb-2 rounded-lg"
-              />
-              <h3 className="font-bold text-lg mb-2">{activity.Name}</h3>
-              <p className="text-gray-700 mb-1">Rating: {activity.Rating}</p>
-              <p className="text-gray-700 mb-1">Price: ${activity.Price}</p>
-              <p className="text-gray-700 mb-1">
-                Advertiser: {activity.AdvertiserId._id}
-              </p>
-              <p className="text-gray-700 mb-1">
-                Categories:{" "}
-                {activity.CategoryId.map((category) => category.Category).join(
-                  ", "
-                )}
-              </p>
-              <p className="text-gray-700 mb-1">
-                Tags: {activity.Tags.map((tag) => tag.Tag).join(", ")}
-              </p>
-              <p className="text-gray-700 mb-1">
-                Date: {new Date(activity.Date).toLocaleDateString()}
-              </p>
-            </button>
+              <CardHeader>
+                <img
+                  src={activity.Image}
+                  alt={activity.Name}
+                  className="object-cover w-full h-48 mb-2 rounded-lg"
+                />
+                <CardTitle className="text-lg font-bold">
+                  {activity.Name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center">
+                    <span className="mr-1">{activity.Rating}</span>
+                  </div>
+                </div>
+                <CardDescription className="text-sm text-black-600">
+                  <p>
+                    Price:{" "}
+                    {currency === "USD"
+                      ? "$"
+                      : currency === "EUR"
+                      ? "€"
+                      : "EGP"}{" "}
+                    {convertPrice(activity.Price, currency)}
+                  </p>
+                  <p>Advertiser: {activity.AdvertiserId._id}</p>
+
+                  <p>Date: {new Date(activity.Date).toLocaleDateString()}</p>
+
+                  <p>
+                    Tags:{" "}
+                    {activity.Tags.map((tag) => (
+                      <Badge
+                        key={tag._id}
+                        variant="neutral"
+                        className={`text-white bg-blue-500 mr-2`}
+                      >
+                        {tag.Tag}
+                      </Badge>
+                    ))}
+                  </p>
+                  <p>
+                    Categories:{" "}
+                    {activity.CategoryId.map((category) => (
+                      <Badge
+                        key={category._id}
+                        variant="neutral"
+                        className={`text-white bg-blue-500 mr-2`}
+                      >
+                        {category.Category}
+                      </Badge>
+                    ))}
+                  </p>
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

@@ -1,5 +1,5 @@
 'use client';
-
+import Dashboard from "@/components/ui/dashboard";
 import { useState, useEffect } from "react";
 import ReactDatePicker from "react-datepicker"; // Import react-datepicker
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
@@ -115,7 +115,11 @@ export default function DashboardPage() {
     );
 
     return (
+        
         <Tabs defaultValue="all">
+            <header>
+             <Dashboard params={{ role: "Advertiser" }} />
+            </header>
             <div className="flex items-center">
                 <div className="ml-auto flex items-center gap-2">
                     <SalesReportBtnP />

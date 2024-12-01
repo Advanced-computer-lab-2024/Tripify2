@@ -15,6 +15,7 @@ import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
 import { RiDeleteBin5Line } from "@remixicon/react";
 
+
 export default function TouristAccount({ params }) {
   const { touristInfo } = params;
   const router = useRouter();

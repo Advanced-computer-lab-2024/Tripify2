@@ -101,7 +101,7 @@ export default function Dashboard({ params }) {
       dashboardElements = [
         { name: "My Profile", link: "/profile" },
         { name: "My Activities", link: "/my-activities" },
-        // { name: "Statistics", link: "/statistics" },
+        { name: "Sales Report", link: "/sales-report" },
         // { name: "Billing", link: "/billing" },
       ];
       break;

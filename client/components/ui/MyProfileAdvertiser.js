@@ -18,17 +18,17 @@ export default function AdvertiserProfile({ advertiser }) {
   console.log("iddd", id);
   const router = useRouter();
 
-  const [image, setImage] = useState(advertiser.advertiser?.Image ?? null)
-  console.log(advertiser)
-  const { startUpload } = useUploadThing('imageUploader')
-  const inputRef = useRef(null)
+  const [image, setImage] = useState(advertiser.advertiser?.Image ?? null);
+  console.log(advertiser);
+  const { startUpload } = useUploadThing("imageUploader");
+  const inputRef = useRef(null);
   const [requestOpen, setRequestOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isProfileCreateMode, setIsProfileCreateMode] = useState(false);
   const [isProfileEditMode, setIsProfileEditMode] = useState(false);
-  console.log(advertiser.advertiser)
+  console.log(advertiser.advertiser);
   const [formData, setFormData] = useState({
     UserName: advertiser.advertiser.UserId?.UserName || "",
     Email: advertiser.advertiser.UserId?.Email || "",
@@ -50,7 +50,7 @@ export default function AdvertiserProfile({ advertiser }) {
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
+  const [selectedDoc, setSelectedDoc] = useState(null);
   const handleEditClick = () => {
     setIsEditMode(true);
     setIsProfileCreateMode(false);
@@ -84,33 +84,36 @@ export default function AdvertiserProfile({ advertiser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       console.log(session?.data?.user?.id);
-      if(oldPassword !== "" && newPassword !== "") {
-        const changePasswordRes = await fetcher(`/users/change-password/${session?.data?.user?.userId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ oldPassword, newPassword }),
-        })
+      if (oldPassword !== "" && newPassword !== "") {
+        const changePasswordRes = await fetcher(
+          `/users/change-password/${session?.data?.user?.userId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ oldPassword, newPassword }),
+          }
+        );
 
         if (!changePasswordRes.ok) {
-          alert("Failed to change password")
-          return
+          alert("Failed to change password");
+          return;
         }
       }
 
-      let Image = ''
+      let Image = "";
 
-      if(image) {
-        const imageUploadResult = await startUpload([image])
-        if(!imageUploadResult.length) {
-          alert("Failed to upload image")
-          return
+      if (image) {
+        const imageUploadResult = await startUpload([image]);
+        if (!imageUploadResult.length) {
+          alert("Failed to upload image");
+          return;
         }
-        Image = imageUploadResult[0].url
+        Image = imageUploadResult[0].url;
       }
 
       const response = await fetcher(
@@ -120,15 +123,15 @@ export default function AdvertiserProfile({ advertiser }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({...formData, Image}),
+          body: JSON.stringify({ ...formData, Image }),
         }
       );
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log("Advertiser updated successfully:", result);
         setIsEditMode(false);
-        router.refresh(); 
+        router.refresh();
       } else {
         alert("Error updating advertiser");
         console.error("Error updating advertiser");
@@ -137,10 +140,10 @@ export default function AdvertiserProfile({ advertiser }) {
       console.error("Failed to update advertiser:", error);
     }
   };
-  
+
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (isProfileCreateMode) {
       try {
         const response = await fetcher(`/profile`, {
@@ -150,14 +153,14 @@ export default function AdvertiserProfile({ advertiser }) {
           },
           body: JSON.stringify({ ...profileformData, AdvertiserId: id }),
         });
-  
+
         if (response.ok) {
           const result = await response.json();
           console.log("Profile created successfully:", result);
           setIsProfileCreateMode(false);
-          router.refresh(); 
-          const errorData = await response.json(); 
-          console.log(errorData); 
+          router.refresh();
+          const errorData = await response.json();
+          console.log(errorData);
           alert(errorData.message || "An error occurred");
         }
       } catch (error) {
@@ -165,18 +168,21 @@ export default function AdvertiserProfile({ advertiser }) {
       }
     } else if (isProfileEditMode) {
       try {
-        if(oldPassword !== "" && newPassword !== "") {
-          const changePasswordRes = await fetcher(`/users/change-password/${session?.data?.user?.userId}`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ oldPassword, newPassword }),
-          })
+        if (oldPassword !== "" && newPassword !== "") {
+          const changePasswordRes = await fetcher(
+            `/users/change-password/${session?.data?.user?.userId}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ oldPassword, newPassword }),
+            }
+          );
 
           if (!changePasswordRes.ok) {
-            alert("Failed to change password")
-            return
+            alert("Failed to change password");
+            return;
           }
         }
 
@@ -190,15 +196,15 @@ export default function AdvertiserProfile({ advertiser }) {
             id: formData.CompanyProfile._id,
           }),
         });
-  
+
         if (response.ok) {
           const result = await response.json();
           console.log("Profile updated successfully:", result);
           setIsProfileEditMode(false);
-          router.refresh(); 
+          router.refresh();
         } else {
-          const errorData = await response.json(); 
-          console.log(errorData); 
+          const errorData = await response.json();
+          console.log(errorData);
           alert(errorData.message || "An error occurred");
         }
       } catch (error) {
@@ -206,7 +212,6 @@ export default function AdvertiserProfile({ advertiser }) {
       }
     }
   };
-  
 
   return (
     <div>
@@ -214,10 +219,24 @@ export default function AdvertiserProfile({ advertiser }) {
         <Dashboard params={{ role: "Advertiser" }} />
       </header>
 
-      <div className="p-6 max-w-3xl mx-auto">
-        <div className="bg-white shadow rounded-lg p-6 mb-6">
-          <h1 className="text-2xl font-bold mb-4">Advertiser Profile</h1>
+      <div className="flex flex-col items-center p-4 my-10">
+        {/* User Image and Name at the Top */}
+        <div className="flex flex-col items-center mb-8">
+          <img
+            src={image}
+            alt="User Avatar"
+            className="w-24 h-24 rounded-full mb-4"
+          />
+          <h1 className="text-2xl font-bold text-purple-600">
+            {formData.UserName}
+          </h1>
+        </div>
 
+        {/* Information Section */}
+        <div className="w-full p-4 mt-8 bg-white border border-gray-300 rounded-md shadow-md">
+          <h2 className="top-[-15px] left-[10%] transform -translate-x-0 bg-white px-2 text-lg font-semibold text-gray-700 mb-5">
+            Information
+          </h2>
           {isEditMode ? (
             <form onSubmit={handleSubmit}>
               <div>
@@ -236,32 +255,41 @@ export default function AdvertiserProfile({ advertiser }) {
                 <label>
                   <strong>Image:</strong>
                   {image ? (
-                    <div className='relative w-16 h-16 cursor-pointer rounded-full overflow-hidden'>
-                      <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+                    <div className="relative w-16 h-16 cursor-pointer rounded-full overflow-hidden">
+                      <Image
+                        width={64}
+                        height={64}
+                        src={
+                          typeof image === "string"
+                            ? image
+                            : URL.createObjectURL(image)
+                        }
+                        alt="advertiser image"
+                      />
                       <input
                         type="file"
                         accept="image/*"
                         ref={inputRef}
                         name="Image"
                         onChange={(e) => {
-                          setImage(e.target.files[0])
+                          setImage(e.target.files[0]);
                         }}
                         className="hidden w-full h-full"
                       />
                     </div>
                   ) : (
-                    <div className='relative flex items-center justify-center cursor-pointer bg-gray-300 w-16 h-16 rounded-full overflow-hidden'>
-                        <UploadIcon size={24} />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          ref={inputRef}
-                          name="Image"
-                          onChange={(e) => {
-                            setImage(e.target.files[0])
-                          }}
-                          className="hidden w-full h-full"
-                        />
+                    <div className="relative flex items-center justify-center cursor-pointer bg-gray-300 w-16 h-16 rounded-full overflow-hidden">
+                      <UploadIcon size={24} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={inputRef}
+                        name="Image"
+                        onChange={(e) => {
+                          setImage(e.target.files[0]);
+                        }}
+                        className="hidden w-full h-full"
+                      />
                     </div>
                   )}
                 </label>
@@ -347,13 +375,35 @@ export default function AdvertiserProfile({ advertiser }) {
                 {advertiser.advertiser.CompanyProfile.Website || "N/A"}{" "}
               </p>
               <p>
-                <strong>Hotline:</strong> {advertiser.advertiser.CompanyProfile.Hotline}
+                <strong>Hotline:</strong>{" "}
+                {advertiser.advertiser.CompanyProfile.Hotline}
               </p>
               <p>
-                <strong>Document:</strong> 
-                {advertiser.advertiser.Document.map(doc => (
-                  <iframe className='w-full h-[720px]' src={doc} />
-                ))}
+                <strong>Documents:</strong>
+                <ul>
+                  {advertiser.advertiser.Document.map((doc, index) => (
+                    <li key={index} className="my-2">
+                      <button
+                        className="text-blue-500 underline"
+                        onClick={() => setSelectedDoc(doc)}
+                      >
+                        Document {index + 1}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+
+                {selectedDoc && (
+                  <div className="mt-4">
+                    <button
+                      className="text-red-500 underline mb-2"
+                      onClick={() => setSelectedDoc(null)}
+                    >
+                      Close Document
+                    </button>
+                    <iframe className="w-full h-[720px]" src={selectedDoc} />
+                  </div>
+                )}
               </p>
 
               <button
@@ -371,17 +421,33 @@ export default function AdvertiserProfile({ advertiser }) {
 
               <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
                 <DialogContent>
-                  <DialogHeader>Are you sure you want to request deletion of your account?</DialogHeader>
+                  <DialogHeader>
+                    Are you sure you want to request deletion of your account?
+                  </DialogHeader>
                   <DialogFooter>
-                    <Button disabled={loading} onClick={() => setRequestOpen(false)}>Cancel</Button>
-                    <Button disabled={loading} variant='destructive' onClick={async () => {
-                      setLoading(true)
-                      await fetcher(`/users/request-deletion/${session?.data.user?.userId}`, {
-                        method: 'POST'
-                      })
-                      await signOut({ redirect: true, callbackUrl: '/' })
-                      setLoading(false)
-                    }}>Request Deletion</Button>
+                    <Button
+                      disabled={loading}
+                      onClick={() => setRequestOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      disabled={loading}
+                      variant="destructive"
+                      onClick={async () => {
+                        setLoading(true);
+                        await fetcher(
+                          `/users/request-deletion/${session?.data.user?.userId}`,
+                          {
+                            method: "POST",
+                          }
+                        );
+                        await signOut({ redirect: true, callbackUrl: "/" });
+                        setLoading(false);
+                      }}
+                    >
+                      Request Deletion
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>

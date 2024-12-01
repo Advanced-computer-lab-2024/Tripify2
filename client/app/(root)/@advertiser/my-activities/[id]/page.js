@@ -310,7 +310,7 @@ export default function EditActivity() {
 
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded"
+          className="bg-blue-500 text-white py-2 px-4 rounded w-full mt-5"
         >
           Save
         </button>

@@ -5,6 +5,7 @@ import { fetcher } from "@/lib/fetch-client";
 import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
 import { useSession } from "next-auth/react";
+
 export default function CreateActivity() {
   const session = useSession();
   const id = session?.data?.user?.id;
@@ -21,7 +22,6 @@ export default function CreateActivity() {
     Categories: [],
     Tags: [],
     AdvertiserId: id,
-    Rating: "",
   });
 
   const [categories, setCategories] = useState([]); // Available categories
@@ -184,19 +184,7 @@ export default function CreateActivity() {
             />
           </label>
         </div>
-        <div>
-          <label>
-            <strong>Rating:</strong>
-            <input
-              type="number"
-              name="Rating"
-              value={formData.Rating}
-              onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
-              required
-            />
-          </label>
-        </div>
+
         <div>
           <label>
             <strong>Special Discounts:</strong>
@@ -271,7 +259,7 @@ export default function CreateActivity() {
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded"
+          className="bg-blue-500 text-white py-2 px-4 rounded w-full mt-5"
         >
           Submit
         </button>

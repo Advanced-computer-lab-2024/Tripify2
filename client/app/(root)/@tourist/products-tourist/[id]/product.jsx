@@ -1,20 +1,27 @@
 "use client";
 
-import { useState , useEffect } from 'react'
-import Image from 'next/image'
-import { Star, ShoppingBag, User, Loader2 } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useRouter } from 'next/navigation'
-import { fetcher } from '@/lib/fetch-client'
-import { useCurrencyStore } from '@/providers/CurrencyProvider'
-import { convertPrice } from '@/lib/utils'
-import { useSession } from 'next-auth/react'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Heart } from "lucide-react";
+import { Star, ShoppingBag, User, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
+import { fetcher } from "@/lib/fetch-client";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import { convertPrice } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 export default function ProductPage({ product, cart }) {
-  const { currency } = useCurrencyStore()
+  const { currency } = useCurrencyStore();
 
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
@@ -134,28 +141,29 @@ export default function ProductPage({ product, cart }) {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const addToCart = async () => {
-      let newcart = [].concat(Cart);
-      let flag = false;
-      console.log(newcart)
-      console.log(newcart.length)
-      for (let i = 0; i<newcart.length; i++){
-        if (product._id == newcart[i].product){
-          flag = true;
-          newcart[i].quantity += quantity;
-        }
+    let newcart = [].concat(Cart);
+    let flag = false;
+    console.log(newcart);
+    console.log(newcart.length);
+    for (let i = 0; i < newcart.length; i++) {
+      if (product._id == newcart[i].product) {
+        flag = true;
+        newcart[i].quantity += quantity;
       }
-      if (!flag){
-        newcart.push({product: product._id, quantity: quantity})
-      }
-      try{const touristRes = await fetcher(`/tourists/${session.user.id}`, {
+    }
+    if (!flag) {
+      newcart.push({ product: product._id, quantity: quantity });
+    }
+    try {
+      const touristRes = await fetcher(`/tourists/${session.user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ Cart: newcart }),
@@ -167,12 +175,12 @@ export default function ProductPage({ product, cart }) {
       }
 
       const data = await touristRes.json();
-      } catch (error) {
-        console.error("Error updating cart:", error);
-      }
-      alert(`${quantity} ${product.Name} added`)
-      setCart(newcart)
-  }
+    } catch (error) {
+      console.error("Error updating cart:", error);
+    }
+    alert(`${quantity} ${product.Name} added`);
+    setCart(newcart);
+  };
 
   return (
     <div className="container px-4 py-8 mx-auto">
@@ -242,9 +250,25 @@ export default function ProductPage({ product, cart }) {
               }`}
               onClick={() => toggleWishlist(product._id)}
             >
-              {WishList2.includes(product._id)
-                ? "♥ Added to Wishlist"
-                : "♡ Add to Wishlist"}
+              {WishList2.includes(product._id) ? (
+                <>
+                  <Heart
+                    className="inline text-white"
+                    size={20}
+                    fill="currentColor"
+                  />
+                  <span className="ml-2"> Added to Wishlist </span>
+                </>
+              ) : (
+                <>
+                  <Heart
+                    className="inline text-gray-600"
+                    size={20}
+                    fill="none"
+                  />
+                  <span className="ml-2"> Add to Wishlist </span>
+                </>
+              )}
             </Button>
           </div>
           <p className="mb-4 text-sm text-gray-500">

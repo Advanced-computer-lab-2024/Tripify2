@@ -33,7 +33,7 @@ export default async function FlightDetailsPage({ params }) {
         </div>
         <FlightPrice price={flight.price.total} />
       </div>
-      <BookingForm flightId={flight._id} />
+      <BookingForm flightId={flight._id} flightPrice={flight.price.total} />
     </div>
   )
 }

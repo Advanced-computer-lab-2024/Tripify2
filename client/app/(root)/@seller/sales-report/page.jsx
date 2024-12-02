@@ -22,34 +22,41 @@ import {
     Tabs,
     TabsContent,
 } from "@/components/ui/tabs";
-import SalesReportBtnP from "@/components/shared/SalesReportBtnP";
+import SalesReportBtn from "@/components/shared/SalesReportBtnP";
 import { fetcher } from "@/lib/fetch-client";
+import { useSession } from "next-auth/react";
 
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
-    const [itineraries, setItineraries] = useState([]);
+    const [products, setProducts] = useState([]);
     const [startDate, setStartDate] = useState(null); // Start date for filtering
     const [endDate, setEndDate] = useState(null); // End date for filtering
+    const session=useSession()
 
     useEffect(() => {
         const fetchAndSortData = async () => {
-            const query2 = `/bookings/itin?sort=createdAt&order=${sortOrder}`;
+            const query = `/products?sort=createdAt&order=${sortOrder}`;
 
             try {
-                const itinResponse = await fetcher(query2);
+                const productsResponse = await fetcher(query);
+                
 
-                if (itinResponse?.ok) {
-                    const itinData = await itinResponse.json();
-                    setItineraries(
-                        filterByDateRange(sortByCreatedAt(itinData, "ItineraryId", sortOrder), startDate, endDate)
+                if (productsResponse?.ok) {
+                    const productsData = await productsResponse.json();
+                    setProducts(
+                        filterByDateRange(sortByCreatedAt(productsData, null, sortOrder), startDate, endDate)
                     );
                 }
 
-           
+               
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
+        console.log("seller id:")
+         console.log( products)
+        // console.log("user id:")
+        // console.log(session?.data?.user?.id)
 
         fetchAndSortData();
     }, [sortOrder, startDate, endDate]); // Refetch and filter data when date range or sort order changes
@@ -67,7 +74,7 @@ export default function DashboardPage() {
     const filterByDateRange = (data, start, end) => {
         return data.filter((item) => {
             const createdAt = new Date(
-                item?.ItineraryId?.createdAt 
+                item?.createdAt
             );
 
             const normalizedStart = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
@@ -84,27 +91,25 @@ export default function DashboardPage() {
         setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"));
     };
 
-    
+    const totalSales = products.filter((product) => product?.Seller?._id === session?.data?.user?.id)
+    .reduce(
+        (totals, product) => {
+            const price = product?.Price || 0;
+            const totalSales = product?.TotalSales || 0;
+            totals.totalSales += totalSales;
+            totals.totalRevenue += price * totalSales;
+            totals.discountedRevenue += price * totalSales * 0.9;
 
-    const totalSales2 = itineraries.reduce(
-        (totals, itin) => {
-            const itinerary = itin?.ItineraryId;
-            const participants = itin?.Participants || 0;
-            const price2 = itinerary?.Price || 0;
-            totals.totalSales += participants;
-            totals.totalRevenue += price2 * participants;
-            totals.discountedRevenue += price2 * participants * 0.1;
             return totals;
         },
         { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
     );
 
-  
     return (
         <Tabs defaultValue="all">
             <div className="flex items-center">
                 <div className="ml-auto flex items-center gap-2">
-                    <SalesReportBtnP />
+                    <SalesReportBtn />
                     <button onClick={toggleSortOrder}>
                         {sortOrder === "desc" ? "Sort: Newest to Oldest" : "Sort: Oldest to Newest"}
                     </button>
@@ -152,37 +157,27 @@ export default function DashboardPage() {
                             </TableHeader>
                             <TableBody>
                                 {/* Products */}
-                               
-                                {/* Itineraries */}
                                 <TableRow>
                                     <TableCell className="hidden sm:table-cell">
-                                        <strong>Itineraries</strong>
+                                        <strong>Products</strong>
                                     </TableCell>
                                 </TableRow>
-                                {itineraries?.map((booking) =>
-                                    booking?._id ? (
-                                        <TableRow key={booking._id}>
-                                            <TableCell className="hidden sm:table-cell">
-                                                {booking.ItineraryId?.Name}
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell">
-                                                ${booking.ItineraryId?.Price || 0}
-                                            </TableCell>
-                                            <TableCell>{booking.Participants || 0}</TableCell>
-                                            <TableCell>
-                                                ${(booking.ItineraryId?.Price || 0) * (booking.Participants || 0)}
-                                            </TableCell>
-                                            <TableCell>
-                                                ${(booking.ItineraryId?.Price || 0) * (booking.Participants || 0) * 0.1}
-                                            </TableCell>
+                                {products?.filter((product) => session?.data?.user?.id===product?.Seller?._id  )
+                                .map((product) =>
+                                    product?._id ? (
+                                        <TableRow key={product._id}>
+                                            <TableCell className="hidden sm:table-cell">{product.Name}</TableCell>
+                                            <TableCell className="hidden sm:table-cell">${product.Price}</TableCell>
+                                            <TableCell>{product.TotalSales}</TableCell>
+                                            <TableCell>${product.Price * product.TotalSales}</TableCell>
+                                            <TableCell>${product.Price * product.TotalSales * 0.9}</TableCell>
                                             <TableCell className="hidden md:table-cell">
-                                                {new Date(booking?.ItineraryId?.createdAt).toLocaleDateString()}
+                                                {new Date(product?.createdAt).toLocaleDateString()}
                                             </TableCell>
                                         </TableRow>
                                     ) : null
                                 )}
-                                {/* Activities */}
-                              
+                               
                                 {/* Total Row */}
                                 <TableRow>
                                     <TableCell className="hidden sm:table-cell">
@@ -190,13 +185,13 @@ export default function DashboardPage() {
                                     </TableCell>
                                     <TableCell>-</TableCell> {/* Empty cell for alignment */}
                                     <TableCell>
-                                        <strong>{ totalSales2.totalSales}</strong>
+                                        <strong>{totalSales.totalSales }</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${ totalSales2.totalRevenue}</strong>
+                                        <strong>${totalSales.totalRevenue}</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${totalSales2.discountedRevenue }</strong>
+                                        <strong>${totalSales.discountedRevenue}</strong>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

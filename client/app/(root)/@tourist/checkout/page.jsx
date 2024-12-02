@@ -43,7 +43,11 @@ const checkoutMainPage = async () => {
     };
 
     // return <CheckoutComponent params={params} />;
-    return <CheckoutComponent params={params} />;
+    return (
+      <div className="p-6 px-14">
+        <CheckoutComponent params={params} />
+      </div>
+    );
   } catch (e) {
     return <h1>error fetching tourist</h1>;
   }

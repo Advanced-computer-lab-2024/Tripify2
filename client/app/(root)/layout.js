@@ -12,7 +12,8 @@ import FirgadeProvider from "@/providers/FrigadeProvider";
 
 export const metadata = {
   title: "Tripify",
-  description: "Tripify is a travel companion app that helps you plan your trips and book accommodations with ease.",
+  description:
+    "Tripify is a travel companion app that helps you plan your trips and book accommodations with ease.",
 };
 
 const poppins = Poppins({

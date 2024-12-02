@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -209,7 +210,7 @@ const ActivityComponent = ({ params }) => {
     }
   );
 
-  console.log(activitiesWithCategoriesAndTags);
+  //console.log(activitiesWithCategoriesAndTags);
 
   return (
     <div className="grid h-screen grid-cols-6">
@@ -266,13 +267,18 @@ const ActivityComponent = ({ params }) => {
 
         <div className="mb-4">
           <label htmlFor="priceRange" className="mb-2 font-bold text-black">
-            Price: <span className="font-normal">{filteredPrice}</span>
+            Price:{" "}
+            <span className="font-normal">
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {filteredPrice}
+            </span>
           </label>
           <input
             id="priceRange"
             type="range"
             className="w-full range"
             min="0"
+            step="0.01"
             max={Math.round(maxPrice)}
             value={filteredPrice}
             onChange={handleRangeChangePrice}
@@ -299,29 +305,25 @@ const ActivityComponent = ({ params }) => {
       <div className="col-span-5 p-4 overflow-auto">
         <h2 className="mb-4 text-2xl font-bold text-black">Activities</h2>
 
-        <div className="mb-4">
+        <div className="mb-4 flex items-center space-x-4">
           <input
             type="text"
             value={search}
             onChange={handleSearchChange}
             placeholder="Search..."
-            className="w-full p-2 border border-gray-300 rounded"
+            className="flex-1 p-2 border border-gray-300 rounded"
           />
-        </div>
-
-        <div className="mb-4">
-          <button
-            onClick={handleSortPrice}
-            className="p-2 mr-4 text-black bg-blue-500 rounded hover:bg-blue-600"
-          >
-            Sort by Price {sortOrderPrice === "desc" ? "↑" : "↓"}
-          </button>
-
           <button
             onClick={handleSortRating}
             className="p-2 text-black bg-blue-500 rounded hover:bg-blue-600"
           >
-            Sort by Rating {sortOrderRating === "desc" ? "↑" : "↓"}
+            Rating {sortOrderRating === "desc" ? "↑" : "↓"}
+          </button>
+          <button
+            onClick={handleSortPrice}
+            className="p-2 mr-4 text-black bg-blue-500 rounded hover:bg-blue-600"
+          >
+            Price {sortOrderPrice === "desc" ? "↑" : "↓"}
           </button>
         </div>
 
@@ -374,16 +376,33 @@ const ActivityComponent = ({ params }) => {
                       {convertPrice(activity.Price, currency)}
                     </p>
                     <p>Advertiser: {activity.AdvertiserId._id}</p>
+
+                    <p>Date: {new Date(activity.Date).toLocaleDateString()}</p>
+
+                    <p>
+                      Tags:{" "}
+                      {activity.Tags.map((tag) => (
+                        <Badge
+                          key={tag._id}
+                          variant="neutral"
+                          className={`text-white bg-blue-500 mr-2`}
+                        >
+                          {tag.Tag}
+                        </Badge>
+                      ))}
+                    </p>
                     <p>
                       Categories:{" "}
-                      {activity.CategoryId.map(
-                        (category) => category.Category
-                      ).join(", ")}
+                      {activity.CategoryId.map((category) => (
+                        <Badge
+                          key={category._id}
+                          variant="neutral"
+                          className={`text-white bg-blue-500 mr-2`}
+                        >
+                          {category.Category}
+                        </Badge>
+                      ))}
                     </p>
-                    <p>
-                      Tags: {activity.Tags.map((tag) => tag.Tag).join(", ")}
-                    </p>
-                    <p>Date: {new Date(activity.Date).toLocaleDateString()}</p>
                   </CardDescription>
                 </CardContent>
               </Card>

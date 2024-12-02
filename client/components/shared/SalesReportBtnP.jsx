@@ -14,15 +14,8 @@ export default function SalesReportBtn() {
 
     return (
         <div className="flex gap-2">
-                 <Button onClick={() => handleRedirect('/sales-report')}>
-                All
-            </Button>
-            <Button onClick={() => handleRedirect('/sales-report/itineraries')}>
-                Itineraries
-            </Button>
-            <Button onClick={() => handleRedirect('/sales-report/activities')}>
-                Activities
-            </Button>
+
+
         </div>
     );
 }

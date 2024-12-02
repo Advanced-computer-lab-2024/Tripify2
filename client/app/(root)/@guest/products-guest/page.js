@@ -2,8 +2,12 @@
 import { useEffect, useState } from "react";
 import AllproductsGuest from "@/components/ui/AllproductsGuest";
 import { fetcher } from "@/lib/fetch-client";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import { useSession } from "next-auth/react";
 
 export default function Products() {
+  const { currency } = useCurrencyStore();
+
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,7 +36,7 @@ export default function Products() {
 
       console.log("Stringified Data: ", stringifiedData);
 
-      setProducts(data.filter(product => !product.Archived));
+      setProducts(data.filter((product) => !product.Archived));
       setFilteredProducts(data);
 
       const prices = data.map((product) => product.Price);
@@ -80,44 +84,65 @@ export default function Products() {
   }, [currentMaxPrice]);
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        style={styles.searchInput}
-      />
+    <div className="grid h-screen grid-cols-6 gap-4">
+      <div className="col-span-1 p-4">
+        <h2 className="mb-6 text-lg font-bold text-black">Filter</h2>
 
-      <div style={styles.filterContainer}>
-        <div>
-          <label>Max Price: ${currentMaxPrice.toFixed(2)}</label>
+        <div className="mb-4">
+          <label htmlFor="priceRange" className="mb-2 text-black">
+            <span className="font-bold"> Price: </span>
+            <span className="ml-2">
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {currentMaxPrice.toFixed(2)}
+            </span>
+          </label>
           <input
+            id="priceRange"
             type="range"
+            className="w-full range"
             min={minPrice}
             max={maxPrice}
             step="0.01"
             value={currentMaxPrice}
             onChange={(e) => setCurrentMaxPrice(parseFloat(e.target.value))}
-            style={styles.slider}
           />
         </div>
 
-        <div>
-          <label>Sort by Rating: </label>
-          <select
-            value={sortOption}
-            onChange={handleSortChange}
-            style={styles.dropdown}
-          >
-            <option value="none">None</option>
-            <option value="lowToHigh">Lowest to Highest</option>
-            <option value="highToLow">Highest to Lowest</option>
-          </select>
+        <div className="mb-4">
+          <label>
+            <span className="mb-2 text-black font-bold mr-2">Rating: </span>
+          </label>
+          <div>
+            <select
+              value={sortOption}
+              onChange={handleSortChange}
+              className="w-full p-2 mt-2 border border-gray-300 rounded"
+            >
+              <option value="none">None</option>
+              <option value="lowToHigh">Lowest to Highest</option>
+              <option value="highToLow">Highest to Lowest</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <AllproductsGuest products={filteredProducts} searchQuery={searchQuery} />
+      <div className="col-span-5 p-4 overflow-auto">
+        <h2 className="mb-4 text-2xl font-bold text-black">Products</h2>
+
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <AllproductsGuest
+          products={filteredProducts}
+          searchQuery={searchQuery}
+        />
+      </div>
     </div>
   );
 }

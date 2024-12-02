@@ -33,6 +33,8 @@ const {
   updateQuantityProductAndStatus,
   getallItineraryBookings,
   getallActivityBookings,
+  getItineraryBookingsById,
+  getActivityBookingsById,
 } = require("../controllers/bookingController");
 
 const bodyParser = require("body-parser");
@@ -111,5 +113,9 @@ router.route("/itin")
 .get(getallItineraryBookings)
 router.route("/act")
 .get(getallActivityBookings)
+router.route("/act/:id")
+.get(getActivityBookingsById)
+router.route("/itin/:id")
+.get(getItineraryBookingsById)
 
 module.exports = router;

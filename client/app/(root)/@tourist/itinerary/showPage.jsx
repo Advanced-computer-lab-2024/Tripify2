@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
 
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -273,13 +274,18 @@ const ItineraryComponent = ({ params }) => {
 
         <div className="mb-4">
           <label htmlFor="priceRange" className="mb-2 font-bold text-black">
-            Price: <span className="font-normal">{filteredPrice}</span>
+            Price:{" "}
+            <span className="font-normal">
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {filteredPrice}
+            </span>
           </label>
           <input
             id="priceRange"
             type="range"
             className="w-full range"
             min="0"
+            step="0.01"
             max={Math.round(maxPrice)}
             value={filteredPrice}
             onChange={handleRangeChangePrice}
@@ -306,22 +312,19 @@ const ItineraryComponent = ({ params }) => {
       <div className="col-span-5 p-4 overflow-auto">
         <h2 className="mb-4 text-2xl font-bold text-black">Itineraries</h2>
 
-        <div className="mb-4">
+        <div className="mb-4 flex items-center space-x-4">
           <input
             type="text"
             value={search}
             onChange={handleSearchChange}
             placeholder="Search..."
-            className="w-full p-2 border border-gray-300 rounded"
+            className="flex-1 p-2 border border-gray-300 rounded"
           />
-        </div>
-
-        <div className="mb-4">
           <button
             onClick={handleSortRating}
             className="p-2 text-black bg-blue-500 rounded hover:bg-blue-600"
           >
-            Sort by Rating {sortOrder === "desc" ? "↑" : "↓"}
+            Rating {sortOrder === "desc" ? "↑" : "↓"}
           </button>
         </div>
 
@@ -375,17 +378,33 @@ const ItineraryComponent = ({ params }) => {
                     </p>
                     <p>Language: {itinerary.Language}</p>
                     <p>
-                      Tags: {itinerary.Tag.map((tag) => tag.Tag).join(", ")}
-                    </p>
-                    <p>
-                      Categories:{" "}
-                      {itinerary.Category.map(
-                        (category) => category.Category
-                      ).join(", ")}
-                    </p>
-                    <p>
                       Start Date:{" "}
                       {new Date(itinerary.StartDate).toLocaleDateString()}
+                    </p>
+                    <p>
+                      Tags:{" "}
+                      {itinerary.Tag.map((tag) => (
+                        <Badge
+                          key={tag._id}
+                          variant="neutral"
+                          className="text-white bg-blue-500 mr-2"
+                        >
+                          {tag.Tag}
+                        </Badge>
+                      ))}
+                    </p>
+
+                    <p>
+                      Categories:{" "}
+                      {itinerary.Category.map((category) => (
+                        <Badge
+                          key={category._id}
+                          variant="neutral"
+                          className="text-white bg-blue-500 mr-2"
+                        >
+                          {category.Category}
+                        </Badge>
+                      ))}
                     </p>
                   </CardDescription>
                 </CardContent>

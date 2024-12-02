@@ -1,7 +1,18 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function AllproductsGuest({ products, searchQuery }) {
+  const { currency } = useCurrencyStore();
+
   const router = useRouter();
 
   // console.log(products);
@@ -21,18 +32,36 @@ export default function AllproductsGuest({ products, searchQuery }) {
   };
 
   return (
-    <div style={styles.productGrid}>
+    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-6">
       {filteredProducts.map((eachproduct) => (
-        <div key={eachproduct._id} style={styles.productCard}>
-          <h2 style={styles.productName}>{eachproduct.Name}</h2>
-          <p style={styles.productPrice}>Price: ${eachproduct.Price}</p>
-          <button
-            style={styles.detailsButton}
-            onClick={() => handleViewDetails(eachproduct._id)}
-          >
-            View Details
-          </button>
-        </div>
+        <Card
+          key={eachproduct._id}
+          className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100 flex flex-col"
+          onClick={() => handleViewDetails(eachproduct._id)}
+        >
+          <CardHeader className="flex-grow justify-between relative">
+            <img
+              src={eachproduct.Image}
+              alt={eachproduct.Name}
+              className="object-cover w-full h-48 mb-2 rounded-lg"
+            />
+          </CardHeader>
+          <CardContent>
+            <CardTitle className="text-lg font-bold">
+              {eachproduct.Name}
+            </CardTitle>
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center">
+                <span className="mr-1">{eachproduct.Rating}</span>
+              </div>
+            </div>
+            <CardDescription className="text-sm text-black-600">
+              Price:{" "}
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {convertPrice(eachproduct.Price, currency)}
+            </CardDescription>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );

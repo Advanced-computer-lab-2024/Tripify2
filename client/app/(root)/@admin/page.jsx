@@ -283,23 +283,7 @@ export default async function DashboardPage()
                                             {user?.UserId?.createdAt}
                                         </TableCell>
                                         <TableCell>
-                                        {/* <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                aria-haspopup="true"
-                                                size="icon"
-                                                variant="ghost"
-                                                >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Toggle menu</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu> */}
+
                                         
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
@@ -308,12 +292,7 @@ export default async function DashboardPage()
                             </TableBody>
                         </Table>
                     </CardContent>
-                    {/* <CardFooter>
-                        <div className="text-xs text-muted-foreground">
-                        Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                        products
-                        </div>
-                    </CardFooter> */}
+
                 </Card>
             </TabsContent>
             <TabsContent value="tourguides">
@@ -328,9 +307,7 @@ export default async function DashboardPage()
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    {/* <TableHead className="hidden w-[100px] sm:table-cell">
-                                        <span className="sr-only">Image</span>
-                                    </TableHead> */}
+
                                     <TableHead>Name</TableHead>
                                     <TableHead className="hidden md:table-cell">
                                         Email
@@ -362,23 +339,7 @@ export default async function DashboardPage()
                                             {user?.UserId?.createdAt}
                                         </TableCell>
                                         <TableCell>
-                                        {/* <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                aria-haspopup="true"
-                                                size="icon"
-                                                variant="ghost"
-                                                >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Toggle menu</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu> */}
+
                                         
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
@@ -387,12 +348,7 @@ export default async function DashboardPage()
                             </TableBody>
                         </Table>
                     </CardContent>
-                    {/* <CardFooter>
-                        <div className="text-xs text-muted-foreground">
-                        Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                        products
-                        </div>
-                    </CardFooter> */}
+
                 </Card>
             </TabsContent>
             <TabsContent value="sellers">
@@ -407,9 +363,7 @@ export default async function DashboardPage()
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    {/* <TableHead className="hidden w-[100px] sm:table-cell">
-                                        <span className="sr-only">Image</span>
-                                    </TableHead> */}
+
                                     <TableHead>Name</TableHead>
                                     <TableHead className="hidden md:table-cell">
                                         Email
@@ -441,23 +395,7 @@ export default async function DashboardPage()
                                             {user?.UserId?.createdAt}
                                         </TableCell>
                                         <TableCell>
-                                        {/* <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                aria-haspopup="true"
-                                                size="icon"
-                                                variant="ghost"
-                                                >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Toggle menu</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu> */}
+
                                         
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
@@ -466,12 +404,7 @@ export default async function DashboardPage()
                             </TableBody>
                         </Table>
                     </CardContent>
-                    {/* <CardFooter>
-                        <div className="text-xs text-muted-foreground">
-                        Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                        products
-                        </div>
-                    </CardFooter> */}
+
                 </Card>
             </TabsContent>
             <TabsContent value="tourismGovernors">
@@ -486,9 +419,7 @@ export default async function DashboardPage()
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    {/* <TableHead className="hidden w-[100px] sm:table-cell">
-                                        <span className="sr-only">Image</span>
-                                    </TableHead> */}
+
                                     <TableHead>Name</TableHead>
                                     <TableHead className="hidden md:table-cell">
                                         Email
@@ -520,24 +451,7 @@ export default async function DashboardPage()
                                             {user?.UserId?.createdAt}
                                         </TableCell>
                                         <TableCell>
-                                        {/* <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                aria-haspopup="true"
-                                                size="icon"
-                                                variant="ghost"
-                                                >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Toggle menu</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu> */}
-                                        
+
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
                                     </TableRow>
@@ -545,12 +459,7 @@ export default async function DashboardPage()
                             </TableBody>
                         </Table>
                     </CardContent>
-                    {/* <CardFooter>
-                        <div className="text-xs text-muted-foreground">
-                        Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                        products
-                        </div>
-                    </CardFooter> */}
+
                 </Card>
             </TabsContent>
         </Tabs>

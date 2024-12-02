@@ -7,7 +7,9 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     },
     "allowJs": true,
     "skipLibCheck": true,
@@ -25,14 +27,22 @@
         "name": "next"
       }
     ],
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "app/(auth)/sign-up/advertiser/page.jsx", "app/(auth)/sign-in/page.jsx", "app/(root)/@admin/admins/page.jsx", "app/(root)/@tourismGovernor/change-password/page.jsx", "app/(root)/@tourist/complaints/page.jsx", "app/(root)/@tourist/products-tourist/my-products/page.jsx", "lib/utils.js"  ],
+    "**/*.tsx",
+    "app/(auth)/sign-up/advertiser/page.jsx",
+    "app/(auth)/sign-in/page.jsx",
+    "app/(root)/@admin/admins/page.jsx",
+    "app/(root)/@tourismGovernor/change-password/page.jsx",
+    "app/(root)/@tourist/complaints/page.jsx",
+    "app/(root)/@tourist/products-tourist/my-products/page.jsx",
+    "lib/utils.js"
+  ],
   "exclude": [
     "node_modules"
   ]

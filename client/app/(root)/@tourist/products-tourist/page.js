@@ -66,7 +66,7 @@ export default function Products() {
 
       const Tourist = await res.json();
       setWishList(Tourist.Wishlist);
-      setCart(Tourist.Cart)
+      setCart(Tourist.Cart);
       console.log("WENT BACK", Tourist.Wishlist);
     } catch (e) {
       console.error("Error fetching tourist:", e);
@@ -113,54 +113,68 @@ export default function Products() {
   }, [currentMaxPrice]);
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        style={styles.searchInput}
-      />
+    <div className="grid h-screen grid-cols-6 gap-4">
+      <div className="col-span-1 p-4">
+        <h2 className="mb-6 text-lg font-bold text-black">Filter</h2>
 
-      <div style={styles.filterContainer}>
-        <div>
-          <label>
-            Max Price:{" "}
-            {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
-            {currentMaxPrice.toFixed(2)}
+        <div className="mb-4">
+          <label htmlFor="priceRange" className="mb-2 text-black">
+            <span className="font-bold">Price: </span>
+            <span className="ml-2">
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {currentMaxPrice.toFixed(2)}
+            </span>
           </label>
           <input
+            id="priceRange"
             type="range"
+            className="w-full range"
             min={minPrice}
             max={maxPrice}
             step="0.01"
             value={currentMaxPrice}
             onChange={(e) => setCurrentMaxPrice(parseFloat(e.target.value))}
-            style={styles.slider}
           />
         </div>
 
-        <div>
-          <label>Sort by Rating: </label>
-          <select
-            value={sortOption}
-            onChange={handleSortChange}
-            style={styles.dropdown}
-          >
-            <option value="none">None</option>
-            <option value="lowToHigh">Lowest to Highest</option>
-            <option value="highToLow">Highest to Lowest</option>
-          </select>
+        <div className="mb-4">
+          <label>
+            <span className="mb-2 text-black font-bold mr-2">Rating: </span>
+          </label>
+          <div>
+            <select
+              value={sortOption}
+              onChange={handleSortChange}
+              className="w-full p-2 mt-2 border border-gray-300 rounded"
+            >
+              <option value="none">None</option>
+              <option value="lowToHigh">Lowest to Highest</option>
+              <option value="highToLow">Highest to Lowest</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <AllproductsTourist
-        products={filteredProducts}
-        searchQuery={searchQuery}
-        currentMaxPrice={currentMaxPrice}
-        wishlist={WishList1}
-        cart={cart}
-      />
+      <div className="col-span-5 p-4 overflow-auto">
+        <h2 className="mb-4 text-2xl font-bold text-black">Products</h2>
+
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <AllproductsTourist
+          products={filteredProducts}
+          searchQuery={searchQuery}
+          currentMaxPrice={currentMaxPrice}
+          wishlist={WishList1}
+          cart={cart}
+        />
+      </div>
     </div>
   );
 }

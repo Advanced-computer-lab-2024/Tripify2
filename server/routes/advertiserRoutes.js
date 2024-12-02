@@ -8,7 +8,7 @@ const {
   getAdvertiserById,
   getAdvertiserActivities,
   acceptAdvertiser,
-  rejectAdvertiser
+  rejectAdvertiser,
 } = require("../controllers/advertiserController");
 const verifyAdvertiser = require("../middleware/verifyAdvertiser");
 const verifyAdmin = require("../middleware/verifyAdminOnly");

@@ -83,8 +83,48 @@ const getallItineraryBookings = async (req, res) => {
   } catch (e) {
     res.status(400).json({ msg: e.message });
   }
-};
 
+  };
+  
+  const getItineraryBookingsById = async (req, res) => {
+    const { id } = req.params; 
+    try {
+      const bookings = await ItineraryBooking.find({
+        "ItineraryId": id,
+        Status: "Confirmed",   
+      });
+      if (!bookings || bookings.length === 0) {
+        return res.status(200).json({Participants: 0 });
+        
+      }
+      const Participants = bookings.reduce((sum, booking) => sum + (booking.Participants || 0), 0);
+      res.status(200).json({
+        Participants
+      });
+    } catch (err) {
+      res.status(500).json({ msg: "Server error", error: err.message });
+    }
+  };
+    const getActivityBookingsById = async (req, res) => {
+    const { id } = req.params; 
+    try {
+      const bookings = await   ActivityBooking.find({
+        "ActivityId": id,
+        Status: "Confirmed",   
+      });
+      if (!bookings || bookings.length === 0) {
+        return res.status(200).json({Participants: 0 });
+        
+      }
+      const Participants = bookings.reduce((sum, booking) => sum + (booking.Participants || 0), 0);
+      res.status(200).json({
+        Participants
+      });
+    } catch (err) {
+      res.status(500).json({ msg: "Server error", error: err.message });
+    }
+  };
+  
 const getSingleItineraryBooking = async (req, res) => {
   const { id } = req.params;
   console.log(id);
@@ -1597,4 +1637,6 @@ module.exports = {
   updateQuantityProductAndStatus,
   getallItineraryBookings,
   getallActivityBookings,
+  getItineraryBookingsById,
+  getActivityBookingsById,
 };

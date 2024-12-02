@@ -33,16 +33,25 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchAndSortData = async () => {
-            const query2 = `/bookings/itin?sort=createdAt&order=${sortOrder}`;
+            const query2 = `/itineraries?sort=createdAt&order=${sortOrder}`;
 
             try {
                 const itinResponse = await fetcher(query2);
 
                 if (itinResponse?.ok) {
                     const itinData = await itinResponse.json();
+                    const itinerariesWithParticipants = await Promise.all(itinData.map(async (itin) => {
+                        const participantResponse = await fetcher(`/bookings/itin/${itin._id}`);
+                        // console.log(itin._id)
+                        const participants = participantResponse?.ok ? await participantResponse.json() : [];
+                        // console.log(participants)
+                        return { ...itin, participants }; // Merge participants with the itinerary
+                    }));
+    
                     setItineraries(
-                        filterByDateRange(sortByCreatedAt(itinData, "ItineraryId", sortOrder), startDate, endDate)
+                        filterByDateRange(sortByCreatedAt(itinerariesWithParticipants, "ItineraryId", sortOrder), startDate, endDate)
                     );
+                    // console.log(itinerariesWithParticipants)
                 }
 
            
@@ -89,8 +98,8 @@ export default function DashboardPage() {
     const totalSales2 = itineraries.reduce(
         (totals, itin) => {
             const itinerary = itin?.ItineraryId;
-            const participants = itin?.Participants || 0;
-            const price2 = itinerary?.Price || 0;
+            const participants = itin?.participants?.Participants || 0;
+            const price2 = itin?.Price || 0;
             totals.totalSales += participants;
             totals.totalRevenue += price2 * participants;
             totals.discountedRevenue += price2 * participants * 0.1;
@@ -163,20 +172,20 @@ export default function DashboardPage() {
                                     booking?._id ? (
                                         <TableRow key={booking._id}>
                                             <TableCell className="hidden sm:table-cell">
-                                                {booking.ItineraryId?.Name}
+                                                {booking?.Name}
                                             </TableCell>
                                             <TableCell className="hidden sm:table-cell">
-                                                ${booking.ItineraryId?.Price || 0}
+                                                ${booking?.Price || 0}
                                             </TableCell>
-                                            <TableCell>{booking.Participants || 0}</TableCell>
+                                            <TableCell>{booking?.participants?.Participants || 0}</TableCell>
                                             <TableCell>
-                                                ${(booking.ItineraryId?.Price || 0) * (booking.Participants || 0)}
+                                                ${(booking?.Price || 0) * (booking?.participants?.Participants || 0)}
                                             </TableCell>
                                             <TableCell>
-                                                ${(booking.ItineraryId?.Price || 0) * (booking.Participants || 0) * 0.1}
+                                                ${(booking?.Price || 0) * (booking?.participants?.Participants|| 0) * 0.1}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
-                                                {new Date(booking?.ItineraryId?.createdAt).toLocaleDateString()}
+                                                {new Date(booking?.createdAt).toLocaleDateString()}
                                             </TableCell>
                                         </TableRow>
                                     ) : null

@@ -1,10 +1,15 @@
 // @tourist/layout.js
 import Dashboard from "@/components/ui/dashboard";
 
+import localFont from "next/font/local";
+
+const geistMono = localFont({ src: "../../../public/fonts/GeistMonoVF.woff" });
+const geistSans = localFont({ src: "../../../public/fonts/GeistVF.woff" });
+
 export default async function GuestLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body className={geistSans.className}>
         <header>
           <Dashboard
             params={{

@@ -14,7 +14,7 @@ import { useCurrencyStore } from '@/providers/CurrencyProvider'
 import { convertPrice } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 export default function ProductPage({ product, cart }) {
-  const { currency } = useCurrencyStore()
+  const { currency } = useCurrencyStore();
 
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
@@ -180,12 +180,12 @@ export default function ProductPage({ product, cart }) {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const addToCart = async () => {
     let newcart = [].concat(Cart);
@@ -334,9 +334,25 @@ export default function ProductPage({ product, cart }) {
                 }`}
               onClick={() => toggleWishlist(product._id)}
             >
-              {WishList2.includes(product._id)
-                ? "♥ Added to Wishlist"
-                : "♡ Add to Wishlist"}
+              {WishList2.includes(product._id) ? (
+                <>
+                  <Heart
+                    className="inline text-white"
+                    size={20}
+                    fill="currentColor"
+                  />
+                  <span className="ml-2"> Added to Wishlist </span>
+                </>
+              ) : (
+                <>
+                  <Heart
+                    className="inline text-gray-600"
+                    size={20}
+                    fill="none"
+                  />
+                  <span className="ml-2"> Add to Wishlist </span>
+                </>
+              )}
             </Button>
           </div>
           <p className="mb-4 text-sm text-gray-500">

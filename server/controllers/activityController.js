@@ -16,7 +16,6 @@ const createActivity = async (req, res) => {
     AdvertiserId,
     Duration,
     Image,
-    Rating,
   } = req.body;
 
   const advertiser = await advertiserModel.findById(AdvertiserId, "UserId");
@@ -74,7 +73,6 @@ const createActivity = async (req, res) => {
       AdvertiserId,
       Duration,
       Image,
-      Rating,
     });
     await newActivity.save();
 
@@ -102,18 +100,24 @@ const getActivity = async (req, res) => {
   console.log(categories, tags);
 
   try {
-    if (!categories || !tags || categories?.length === 0 || tags?.length === 0) {
+    if (
+      !categories ||
+      !tags ||
+      categories?.length === 0 ||
+      tags?.length === 0
+    ) {
       const activity = await activityModel
         .find({})
         .populate("Tags")
         .populate("CategoryId")
         .populate("AdvertiserId");
       res.status(200).json(activity);
-    }
-    else {
-
+    } else {
       const activity = await activityModel
-        .find({ CategoryId: { $in: categories.split('-') }, Tags: { $in: tags.split('-') } })
+        .find({
+          CategoryId: { $in: categories.split("-") },
+          Tags: { $in: tags.split("-") },
+        })
         .populate("Tags")
         .populate("CategoryId")
         .populate("AdvertiserId");
@@ -142,8 +146,8 @@ const getActivityById = async (req, res) => {
           },
           {
             path: "CompanyProfile",
-          }
-        ]
+          },
+        ],
       });
 
     if (!findActivity) {

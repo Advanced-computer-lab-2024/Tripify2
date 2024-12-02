@@ -18,8 +18,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Callout } from "@/components/ui/Callout";
 import { useRouter } from "next/navigation";
 import { fetcher } from "@/lib/fetch-client";
+import { convertPrice } from "@/lib/utils";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
 
 export default function UserPurchases({ user, productBookings }) {
+  const { currency } = useCurrencyStore();
+
   const router = useRouter();
 
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
@@ -107,8 +111,16 @@ export default function UserPurchases({ user, productBookings }) {
                     Quantity: {product.Quantity}
                   </p>
                   <p className="mb-4 text-sm text-gray-500">
-                    Price: $
-                    {(product.ProductId.Price * product.Quantity).toFixed(2)}
+                    Price:{" "}
+                    {currency === "USD"
+                      ? "$"
+                      : currency === "EUR"
+                      ? "€"
+                      : "EGP"}{" "}
+                    {convertPrice(
+                      (product.ProductId.Price * product.Quantity).toFixed(2),
+                      currency
+                    )}
                   </p>
                   <Button
                     className="w-full mb-4"
@@ -116,7 +128,6 @@ export default function UserPurchases({ user, productBookings }) {
                       router.push(`/products-tourist/${product.ProductId._id}`)
                     }
                   >
-                    <MessageSquare className="w-4 h-4 mr-2" />
                     Details
                   </Button>
                   {hasUserReviewed(product.ProductId) ? (

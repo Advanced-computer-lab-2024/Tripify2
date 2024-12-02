@@ -3,6 +3,7 @@ import { fetcher } from "@/lib/fetch-client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -163,13 +164,20 @@ const PlacesPage = () => {
               <CardContent>
                 <CardDescription className="text-sm text-black-600">
                   <p>
-                    Tags:{" "}
                     {place.Tags.map((tagId) => {
                       const foundTag = tags.find(
                         (actualTag) => actualTag._id === tagId
                       );
-                      return foundTag ? foundTag.Tag : null;
-                    }).join(", ")}
+                      return foundTag ? (
+                        <Badge
+                          key={foundTag._id}
+                          variant="neutral"
+                          className="text-white bg-blue-500 mr-2"
+                        >
+                          {foundTag.Tag}
+                        </Badge>
+                      ) : null;
+                    })}
                   </p>
                 </CardDescription>
               </CardContent>

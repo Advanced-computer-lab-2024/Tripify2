@@ -2,11 +2,26 @@
 import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { fetcher } from "@/lib/fetch-client";
 import { useSession } from "next-auth/react";
 
-export default function AllproductsTourist({ products, searchQuery, currentMaxPrice, wishlist, cart }) {
+import { Heart, ShoppingCart } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+export default function AllproductsTourist({
+  products,
+  searchQuery,
+  currentMaxPrice,
+  wishlist,
+  cart,
+}) {
   // const session = useSession();
   // const id = session?.data?.user?.id;
   const { currency } = useCurrencyStore();
@@ -14,15 +29,15 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
   const [Cart, setCart] = useState(cart);
   const router = useRouter();
   const { data: session, status } = useSession(); // Get session status and data
-  
-  // console.log(products);
-  useEffect(()=>{
-    setCart(wishlist);
-  },[wishlist]);
 
-  useEffect(()=>{
+  // console.log(products);
+  useEffect(() => {
+    setWishlist(wishlist);
+  }, [wishlist]);
+
+  useEffect(() => {
     setCart(cart);
-  },[cart]);
+  }, [cart]);
 
   // useEffect(() => {
   //   if (status === "authenticated"){
@@ -39,10 +54,7 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
     };
   }
 
-  
-
-
-  const UpdateWishList = debounce(async (userId,UpdatedWishList) => {
+  const UpdateWishList = debounce(async (userId, UpdatedWishList) => {
     try {
       const res = await fetcher(`/tourists/${userId}`, {
         method: "PATCH",
@@ -58,23 +70,25 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
         return <>error</>;
       }
 
-      console.log({"All Products" :await res.json()});
-
+      console.log({ "All Products": await res.json() });
     } catch (e) {
       console.error("Error fetching tourist's wishlist:", e);
     }
-  },300);
+  }, 300);
 
   // console.log("Max Price: ", currentMaxPrice)
-  products.forEach((product) => console.log("Price: ", Number(convertPrice(product.Price, currency)) <= currentMaxPrice));
+  products.forEach((product) =>
+    console.log(
+      "Price: ",
+      Number(convertPrice(product.Price, currency)) <= currentMaxPrice
+    )
+  );
   const filteredProducts = products?.filter(
     (product) =>
       product.Name.toLowerCase().includes(searchQuery.toLowerCase()) &&
       // product.Price.toString().includes(searchQuery)
       Number(convertPrice(product.Price, currency)) <= currentMaxPrice
   );
-
-  
 
   if (!filteredProducts || filteredProducts.length === 0) {
     return <h2>No products found.</h2>;
@@ -86,140 +100,121 @@ export default function AllproductsTourist({ products, searchQuery, currentMaxPr
 
   const toggleWishlist = (productId) => {
     let x;
-    setWishlist((prevWishlist) =>{
+    setWishlist((prevWishlist) => {
       prevWishlist.includes(productId)
-        ?x= prevWishlist.filter((id) => id !== productId) 
-        : x=[...prevWishlist, productId] 
+        ? (x = prevWishlist.filter((id) => id !== productId))
+        : (x = [...prevWishlist, productId]);
       UpdateWishList(session.user.id, x);
       return x;
-      }
-    );
+    });
   };
 
-  const addToCart = async (productId, availablequantity) => {   
+  const addToCart = async (productId, availablequantity) => {
     let newcart = [].concat(Cart);
     let flag = false;
-    console.log("before")
-    console.log(newcart)
+    console.log("before");
+    console.log(newcart);
     let currentquantity = 1;
-      for (let i = 0; i<newcart.length; i++){
-        if (productId == newcart[i].product){
-          flag = true;
-          newcart[i].quantity += 1;
-          currentquantity = newcart[i].quantity;
+    for (let i = 0; i < newcart.length; i++) {
+      if (productId == newcart[i].product) {
+        flag = true;
+        newcart[i].quantity += 1;
+        currentquantity = newcart[i].quantity;
+      }
+    }
+    if (flag == false) {
+      newcart.push({ product: productId, quantity: 1 });
+    }
+    //console.log("after");
+    //console.log(newcart);
+    if (availablequantity >= currentquantity) {
+      try {
+        const touristRes = await fetcher(`/tourists/${session.user.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Cart: newcart }),
+        });
+
+        if (!touristRes.ok) {
+          const errorData = await touristRes.json();
+          throw new Error(errorData.message || "Failed to update cart");
         }
-      }
-      if (flag == false){
-        newcart.push({product: productId, quantity: 1})
-      }
-      console.log("after")
-      console.log(newcart)
-    if (availablequantity >= currentquantity){
-      try{const touristRes = await fetcher(`/tourists/${session.user.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ Cart: newcart }),
-      });
 
-      if (!touristRes.ok) {
-        const errorData = await touristRes.json();
-        throw new Error(errorData.message || "Failed to update cart");
-      }
-
-      const data = await touristRes.json();
+        const data = await touristRes.json();
       } catch (error) {
         console.error("Error updating cart:", error);
       }
-      alert("added to cart")
-      console.log("add")
-      console.log(newcart)
-      setCart(newcart)
-    }
-    else{
-      alert("item out of stock")
+      alert("added to cart");
+      //console.log("add");
+      //console.log(newcart);
+      setCart(newcart);
+    } else {
+      alert("item out of stock");
     }
   };
 
   return (
-    <div style={styles.productGrid}>
+    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-6">
       {filteredProducts.map((eachproduct) => (
-        <div key={eachproduct._id} style={styles.productCard}>
-          <h2 style={styles.productName}>{eachproduct.Name}</h2>
-          <p style={styles.productPrice}>Price: {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : 'EGP'}{convertPrice(eachproduct.Price, currency)}</p>
-          <button
-            style={styles.detailsButton}
-            onClick={() => handleViewDetails(eachproduct._id)}
-          >
-            View Details
-          </button>
-          <button
-              style={styles.wishlistButton}
-              onClick={() => toggleWishlist(eachproduct._id)}
-            >
-              <span
-                style={
-                  WishList.includes(eachproduct._id)
-                    ? styles.heartActive
-                    : styles.heart
-                }
+        <Card
+          key={eachproduct._id}
+          className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100 flex flex-col"
+          onClick={() => handleViewDetails(eachproduct._id)}
+        >
+          <CardHeader className="flex-grow justify-between relative">
+            <img
+              src={eachproduct.Image}
+              alt={eachproduct.Name}
+              className="object-cover w-full h-48 mb-2 rounded-lg"
+            />
+          </CardHeader>
+          <CardContent>
+            <CardTitle className="text-lg font-bold">
+              {eachproduct.Name}
+            </CardTitle>
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center">
+                <span className="mr-1">{eachproduct.Rating}</span>
+              </div>
+              <div
+                className="text-2xl cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation(); //prevent parent click
+                  toggleWishlist(eachproduct._id);
+                }}
               >
-                ♥
-              </span>
+                <Heart
+                  size={23}
+                  className={
+                    WishList.includes(eachproduct._id)
+                      ? "text-red-500"
+                      : "text-gray-600"
+                  }
+                  fill={
+                    WishList.includes(eachproduct._id) ? "currentColor" : "none"
+                  }
+                />
+              </div>
+            </div>
+            <CardDescription className="text-sm text-black-600">
+              Price:{" "}
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {convertPrice(eachproduct.Price, currency)}
+            </CardDescription>
+          </CardContent>
+          <div className="p-4 flex flex-col space-y-3 mt-auto item-center">
+            <button
+              className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition flex items-center justify-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart(eachproduct._id, eachproduct.AvailableQuantity);
+              }}
+            >
+              <ShoppingCart className="h-5 w-5 mr-2" /> Add to Cart
             </button>
-            <button className="mt-2 border rounded-md bg-black text-white p-2 px-4" onClick={() => addToCart(eachproduct._id, eachproduct.AvailableQuantity)}>
-              Add To Cart
-            </button>
-        </div>
+          </div>
+        </Card>
       ))}
     </div>
   );
 }
-
-const styles = {
-  productGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-    gap: "20px",
-    padding: "20px",
-  },
-  productCard: {
-    backgroundColor: "#f9f9f9",
-    borderRadius: "8px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    padding: "20px",
-    textAlign: "center",
-    transition: "transform 0.2s",
-  },
-  productName: {
-    fontSize: "18px",
-    fontWeight: "bold",
-    marginBottom: "10px",
-  },
-  productPrice: {
-    fontSize: "16px",
-    color: "#888",
-    marginBottom: "15px",
-  },
-  detailsButton: {
-    padding: "10px 20px",
-    backgroundColor: "black",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    transition: "background-color 0.3s",
-  },
-  wishlistButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '1.5rem',
-    marginLeft: '0.5rem',
-  },
-  heart: {
-    color: 'gray',
-  },
-  heartActive: {
-    color: 'red',
-  },
-};

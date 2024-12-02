@@ -15,11 +15,11 @@ import { Button } from "./button";
 export default function AdvertiserProfile({ advertiser }) {
   const session = useSession();
   const id = session?.data?.user?.id;
-  console.log("iddd", id);
+  //console.log("iddd", id);
   const router = useRouter();
 
   const [image, setImage] = useState(advertiser.advertiser?.Image ?? null);
-  console.log(advertiser);
+  //console.log(advertiser);
   const { startUpload } = useUploadThing("imageUploader");
   const inputRef = useRef(null);
   const [requestOpen, setRequestOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function AdvertiserProfile({ advertiser }) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isProfileCreateMode, setIsProfileCreateMode] = useState(false);
   const [isProfileEditMode, setIsProfileEditMode] = useState(false);
-  console.log(advertiser.advertiser);
+  //console.log(advertiser.advertiser);
   const [formData, setFormData] = useState({
     UserName: advertiser.advertiser.UserId?.UserName || "",
     Email: advertiser.advertiser.UserId?.Email || "",
@@ -214,393 +214,383 @@ export default function AdvertiserProfile({ advertiser }) {
   };
 
   return (
-    <div>
-      <header>
-        <Dashboard params={{ role: "Advertiser" }} />
-      </header>
+    <div className="flex flex-col items-center p-4 my-10">
+      {/* User Image and Name at the Top */}
+      <div className="flex flex-col items-center mb-8">
+        <img
+          src={image}
+          alt="User Avatar"
+          className="w-24 h-24 rounded-full mb-4"
+        />
+        <h1 className="text-2xl font-bold text-purple-600">
+          {formData.UserName}
+        </h1>
+      </div>
 
-      <div className="flex flex-col items-center p-4 my-10">
-        {/* User Image and Name at the Top */}
-        <div className="flex flex-col items-center mb-8">
-          <img
-            src={image}
-            alt="User Avatar"
-            className="w-24 h-24 rounded-full mb-4"
-          />
-          <h1 className="text-2xl font-bold text-purple-600">
-            {formData.UserName}
-          </h1>
-        </div>
-
-        {/* Information Section */}
-        <div className="w-full p-4 mt-8 bg-white border border-gray-300 rounded-md shadow-md">
-          <h2 className="top-[-15px] left-[10%] transform -translate-x-0 bg-white px-2 text-lg font-semibold text-gray-700 mb-5">
-            Information
-          </h2>
-          {isEditMode ? (
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label>
-                  <strong>Name:</strong>
-                  <input
-                    type="text"
-                    name="UserName"
-                    value={formData.UserName}
-                    onChange={handleInputChange}
-                    className="border p-2 w-full"
-                  />
-                </label>
-              </div>
-              <div>
-                <label>
-                  <strong>Image:</strong>
-                  {image ? (
-                    <div className="relative w-16 h-16 cursor-pointer rounded-full overflow-hidden">
-                      <Image
-                        width={64}
-                        height={64}
-                        src={
-                          typeof image === "string"
-                            ? image
-                            : URL.createObjectURL(image)
-                        }
-                        alt="advertiser image"
-                      />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        ref={inputRef}
-                        name="Image"
-                        onChange={(e) => {
-                          setImage(e.target.files[0]);
-                        }}
-                        className="hidden w-full h-full"
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative flex items-center justify-center cursor-pointer bg-gray-300 w-16 h-16 rounded-full overflow-hidden">
-                      <UploadIcon size={24} />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        ref={inputRef}
-                        name="Image"
-                        onChange={(e) => {
-                          setImage(e.target.files[0]);
-                        }}
-                        className="hidden w-full h-full"
-                      />
-                    </div>
-                  )}
-                </label>
-              </div>
-              <div>
-                <label>
-                  <strong>Email:</strong>
-                  <input
-                    type="email"
-                    name="Email"
-                    value={formData.Email}
-                    onChange={handleInputChange}
-                    className="border p-2 w-full"
-                  />
-                </label>
-              </div>
-              <div>
-                <label>
-                  <strong>Website:</strong>
-                  <input
-                    type="text"
-                    name="Website"
-                    value={formData.Website}
-                    onChange={handleInputChange}
-                    className="border p-2 w-full"
-                  />
-                </label>
-              </div>
-              <div>
-                <label>
-                  <strong>Hotline:</strong>
-                  <input
-                    type="text"
-                    name="Hotline"
-                    value={formData.Hotline}
-                    onChange={handleInputChange}
-                    className="border p-2 w-full"
-                  />
-                </label>
-              </div>
-
-              <div>
-                <label>
-                  <strong>Old Password:</strong>
-                  <input
-                    type="password"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </label>
-              </div>
-              <div>
-                <label>
-                  <strong>New Password:</strong>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="border p-2 w-full"
-                  />
-                </label>
-              </div>
-              <button
-                type="submit"
-                className="bg-blue-500 text-white py-2 px-4 mt-4 rounded"
-              >
-                Save
-              </button>
-            </form>
-          ) : (
+      {/* Information Section */}
+      <div className="w-full p-4 mt-8 bg-white border border-gray-300 rounded-md shadow-md">
+        <h2 className="top-[-15px] left-[10%] transform -translate-x-0 bg-white px-2 text-lg font-semibold text-gray-700 mb-5">
+          Information
+        </h2>
+        {isEditMode ? (
+          <form onSubmit={handleSubmit}>
             <div>
-              <p>
-                <strong>Name:</strong>{" "}
-                {advertiser.advertiser.UserId?.UserName || "N/A"}
-              </p>
-              <p>
-                <strong>Email:</strong>{" "}
-                {advertiser.advertiser.UserId?.Email || "N/A"}
-              </p>
-              <p>
-                <strong>Website:</strong>{" "}
-                {advertiser.advertiser.CompanyProfile.Website || "N/A"}{" "}
-              </p>
-              <p>
-                <strong>Hotline:</strong>{" "}
-                {advertiser.advertiser.CompanyProfile.Hotline}
-              </p>
-              <p>
-                <strong>Documents:</strong>
-                <ul>
-                  {advertiser.advertiser.Document.map((doc, index) => (
-                    <li key={index} className="my-2">
-                      <button
-                        className="text-blue-500 underline"
-                        onClick={() => setSelectedDoc(doc)}
-                      >
-                        Document {index + 1}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-
-                {selectedDoc && (
-                  <div className="mt-4">
-                    <button
-                      className="text-red-500 underline mb-2"
-                      onClick={() => setSelectedDoc(null)}
-                    >
-                      Close Document
-                    </button>
-                    <iframe className="w-full h-[720px]" src={selectedDoc} />
+              <label>
+                <strong>Name:</strong>
+                <input
+                  type="text"
+                  name="UserName"
+                  value={formData.UserName}
+                  onChange={handleInputChange}
+                  className="border p-2 w-full"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                <strong>Image:</strong>
+                {image ? (
+                  <div className="relative w-16 h-16 cursor-pointer rounded-full overflow-hidden">
+                    <Image
+                      width={64}
+                      height={64}
+                      src={
+                        typeof image === "string"
+                          ? image
+                          : URL.createObjectURL(image)
+                      }
+                      alt="advertiser image"
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={inputRef}
+                      name="Image"
+                      onChange={(e) => {
+                        setImage(e.target.files[0]);
+                      }}
+                      className="hidden w-full h-full"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative flex items-center justify-center cursor-pointer bg-gray-300 w-16 h-16 rounded-full overflow-hidden">
+                    <UploadIcon size={24} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={inputRef}
+                      name="Image"
+                      onChange={(e) => {
+                        setImage(e.target.files[0]);
+                      }}
+                      className="hidden w-full h-full"
+                    />
                   </div>
                 )}
-              </p>
-
-              <button
-                onClick={handleEditClick}
-                className="bg-yellow-500 text-white py-2 px-4 mt-4 rounded"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => setRequestOpen(true)}
-                className="bg-red-500 text-white py-2 px-4 mt-4 ml-2 rounded"
-              >
-                Request Deletion
-              </button>
-
-              <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
-                <DialogContent>
-                  <DialogHeader>
-                    Are you sure you want to request deletion of your account?
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button
-                      disabled={loading}
-                      onClick={() => setRequestOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      disabled={loading}
-                      variant="destructive"
-                      onClick={async () => {
-                        setLoading(true);
-                        await fetcher(
-                          `/users/request-deletion/${session?.data.user?.userId}`,
-                          {
-                            method: "POST",
-                          }
-                        );
-                        await signOut({ redirect: true, callbackUrl: "/" });
-                        setLoading(false);
-                      }}
-                    >
-                      Request Deletion
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-
-              <div>
-                <hr className="m-4" />
-              </div>
-
-              <div>
-                <label>
-                  <strong>Company Profile:</strong>
-                  <div>
-                    {(formData?.CompanyProfile && isProfileEditMode) ||
-                    (!formData?.CompanyProfile && isProfileCreateMode) ? (
-                      <form onSubmit={handleProfileSubmit}>
-                        <div>
-                          <label>
-                            <strong>Name:</strong>
-                            <input
-                              type="text"
-                              name="Name"
-                              value={profileformData.Name}
-                              onChange={handleProfileInputChange}
-                              className="border p-2 w-full"
-                            />
-                          </label>
-                          <label>
-                            <strong>Industry:</strong>
-                            <input
-                              type="text"
-                              name="Industry"
-                              value={profileformData.Industry}
-                              onChange={handleProfileInputChange}
-                              className="border p-2 w-full"
-                            />
-                          </label>
-                          <label>
-                            <strong>Founded Date:</strong>
-                            <input
-                              type="date"
-                              name="FoundedDate"
-                              value={
-                                profileformData.FoundedDate
-                                  ? format(
-                                      new Date(profileformData.FoundedDate),
-                                      "yyyy-MM-dd"
-                                    )
-                                  : ""
-                              }
-                              onChange={handleProfileInputChange}
-                              className="border p-2 w-full mb-4"
-                              required
-                            />
-                          </label>
-                          <label>
-                            <strong>Headquarters:</strong>
-                            <input
-                              type="text"
-                              name="Headquarters"
-                              value={profileformData.Headquarters}
-                              onChange={handleProfileInputChange}
-                              className="border p-2 w-full"
-                            />
-                          </label>
-                          <label>
-                            <strong>Description:</strong>
-                            <input
-                              type="text"
-                              name="Description"
-                              value={profileformData.Description}
-                              onChange={handleProfileInputChange}
-                              className="border p-2 w-full"
-                            />
-                          </label>
-                          <label>
-                            <strong>Website:</strong>
-                            <input
-                              type="text"
-                              name="Website"
-                              value={profileformData.Website}
-                              onChange={handleProfileInputChange}
-                              className="border p-2 w-full"
-                            />
-                          </label>
-                          <label>
-                            <strong>Email:</strong>
-                            <input
-                              type="text"
-                              name="Email"
-                              value={profileformData.Email}
-                              onChange={handleProfileInputChange}
-                              className="border p-2 w-full"
-                            />
-                          </label>
-                        </div>
-                        <button
-                          type="submit"
-                          className="bg-blue-500 text-white py-2 px-4 mt-4 rounded"
-                        >
-                          Save
-                        </button>
-                      </form>
-                    ) : formData.CompanyProfile ? (
-                      <div>
-                        <p>
-                          <strong>Name:</strong>{" "}
-                          {formData?.CompanyProfile?.Name || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Industry:</strong>{" "}
-                          {formData?.CompanyProfile?.Industry || "N/A"}
-                        </p>
-                        <p>
-                          <strong>FoundedDate:</strong>{" "}
-                          {formData?.CompanyProfile?.FoundedDate || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Headquarters:</strong>{" "}
-                          {formData?.CompanyProfile?.Headquarters || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Description:</strong>{" "}
-                          {formData?.CompanyProfile?.Description || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Website:</strong>{" "}
-                          {formData?.CompanyProfile?.Website || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Email:</strong>{" "}
-                          {formData?.CompanyProfile?.Email || "N/A"}
-                        </p>
-                        <button
-                          onClick={handleEditCompanyProfileClick}
-                          className="bg-yellow-500 text-white py-2 px-4 mt-4 rounded"
-                        >
-                          Edit Company Profile
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={handleCreateCompanyProfileClick}
-                        className="bg-yellow-500 text-white py-2 px-4 mt-4 rounded"
-                      >
-                        Create Company Profile
-                      </button>
-                    )}
-                  </div>
-                </label>
-              </div>
+              </label>
             </div>
-          )}
-        </div>
+            <div>
+              <label>
+                <strong>Email:</strong>
+                <input
+                  type="email"
+                  name="Email"
+                  value={formData.Email}
+                  onChange={handleInputChange}
+                  className="border p-2 w-full"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                <strong>Website:</strong>
+                <input
+                  type="text"
+                  name="Website"
+                  value={formData.Website}
+                  onChange={handleInputChange}
+                  className="border p-2 w-full"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                <strong>Hotline:</strong>
+                <input
+                  type="text"
+                  name="Hotline"
+                  value={formData.Hotline}
+                  onChange={handleInputChange}
+                  className="border p-2 w-full"
+                />
+              </label>
+            </div>
+
+            <div>
+              <label>
+                <strong>Old Password:</strong>
+                <input
+                  type="password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="border p-2 w-full"
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                <strong>New Password:</strong>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="border p-2 w-full"
+                />
+              </label>
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 mt-4 rounded"
+            >
+              Save
+            </button>
+          </form>
+        ) : (
+          <div>
+            <p>
+              <strong>Name:</strong>{" "}
+              {advertiser.advertiser.UserId?.UserName || "N/A"}
+            </p>
+            <p>
+              <strong>Email:</strong>{" "}
+              {advertiser.advertiser.UserId?.Email || "N/A"}
+            </p>
+            <p>
+              <strong>Website:</strong>{" "}
+              {advertiser.advertiser.CompanyProfile.Website || "N/A"}{" "}
+            </p>
+            <p>
+              <strong>Hotline:</strong>{" "}
+              {advertiser.advertiser.CompanyProfile.Hotline}
+            </p>
+            <p>
+              <strong>Documents:</strong>
+              <ul>
+                {advertiser.advertiser.Document.map((doc, index) => (
+                  <li key={index} className="my-2">
+                    <button
+                      className="text-blue-500 underline"
+                      onClick={() => setSelectedDoc(doc)}
+                    >
+                      Document {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              {selectedDoc && (
+                <div className="mt-4">
+                  <button
+                    className="text-red-500 underline mb-2"
+                    onClick={() => setSelectedDoc(null)}
+                  >
+                    Close Document
+                  </button>
+                  <iframe className="w-full h-[720px]" src={selectedDoc} />
+                </div>
+              )}
+            </p>
+
+            <button
+              onClick={handleEditClick}
+              className="bg-yellow-500 text-white py-2 px-4 mt-4 rounded"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => setRequestOpen(true)}
+              className="bg-red-500 text-white py-2 px-4 mt-4 ml-2 rounded"
+            >
+              Request Deletion
+            </button>
+
+            <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  Are you sure you want to request deletion of your account?
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    disabled={loading}
+                    onClick={() => setRequestOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={loading}
+                    variant="destructive"
+                    onClick={async () => {
+                      setLoading(true);
+                      await fetcher(
+                        `/users/request-deletion/${session?.data.user?.userId}`,
+                        {
+                          method: "POST",
+                        }
+                      );
+                      await signOut({ redirect: true, callbackUrl: "/" });
+                      setLoading(false);
+                    }}
+                  >
+                    Request Deletion
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <div>
+              <hr className="m-4" />
+            </div>
+
+            <div>
+              <h2 className="text-xl font-bold mb-5">Company Profile</h2>
+              {(formData?.CompanyProfile && isProfileEditMode) ||
+              (!formData?.CompanyProfile && isProfileCreateMode) ? (
+                <form onSubmit={handleProfileSubmit}>
+                  <div>
+                    <label>
+                      <strong>Name:</strong>
+                      <input
+                        type="text"
+                        name="Name"
+                        value={profileformData.Name}
+                        onChange={handleProfileInputChange}
+                        className="border p-2 w-full"
+                      />
+                    </label>
+                    <label>
+                      <strong>Industry:</strong>
+                      <input
+                        type="text"
+                        name="Industry"
+                        value={profileformData.Industry}
+                        onChange={handleProfileInputChange}
+                        className="border p-2 w-full"
+                      />
+                    </label>
+                    <label>
+                      <strong>Founded Date:</strong>
+                      <input
+                        type="date"
+                        name="FoundedDate"
+                        value={
+                          profileformData.FoundedDate
+                            ? format(
+                                new Date(profileformData.FoundedDate),
+                                "yyyy-MM-dd"
+                              )
+                            : ""
+                        }
+                        onChange={handleProfileInputChange}
+                        className="border p-2 w-full mb-4"
+                        required
+                      />
+                    </label>
+                    <label>
+                      <strong>Headquarters:</strong>
+                      <input
+                        type="text"
+                        name="Headquarters"
+                        value={profileformData.Headquarters}
+                        onChange={handleProfileInputChange}
+                        className="border p-2 w-full"
+                      />
+                    </label>
+                    <label>
+                      <strong>Description:</strong>
+                      <input
+                        type="text"
+                        name="Description"
+                        value={profileformData.Description}
+                        onChange={handleProfileInputChange}
+                        className="border p-2 w-full"
+                      />
+                    </label>
+                    <label>
+                      <strong>Website:</strong>
+                      <input
+                        type="text"
+                        name="Website"
+                        value={profileformData.Website}
+                        onChange={handleProfileInputChange}
+                        className="border p-2 w-full"
+                      />
+                    </label>
+                    <label>
+                      <strong>Email:</strong>
+                      <input
+                        type="text"
+                        name="Email"
+                        value={profileformData.Email}
+                        onChange={handleProfileInputChange}
+                        className="border p-2 w-full"
+                      />
+                    </label>
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white py-2 px-4 mt-4 rounded"
+                  >
+                    Save
+                  </button>
+                </form>
+              ) : formData.CompanyProfile ? (
+                <div>
+                  <p>
+                    <strong>Name:</strong>{" "}
+                    {formData?.CompanyProfile?.Name || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Industry:</strong>{" "}
+                    {formData?.CompanyProfile?.Industry || "N/A"}
+                  </p>
+                  <p>
+                    <strong>FoundedDate:</strong>{" "}
+                    {formData?.CompanyProfile?.FoundedDate || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Headquarters:</strong>{" "}
+                    {formData?.CompanyProfile?.Headquarters || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Description:</strong>{" "}
+                    {formData?.CompanyProfile?.Description || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Website:</strong>{" "}
+                    {formData?.CompanyProfile?.Website || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Email:</strong>{" "}
+                    {formData?.CompanyProfile?.Email || "N/A"}
+                  </p>
+                  <button
+                    onClick={handleEditCompanyProfileClick}
+                    className="bg-yellow-500 text-white py-2 px-4 mt-4 rounded"
+                  >
+                    Edit Company Profile
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleCreateCompanyProfileClick}
+                  className="bg-yellow-500 text-white py-2 px-4 mt-4 rounded"
+                >
+                  Create Company Profile
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

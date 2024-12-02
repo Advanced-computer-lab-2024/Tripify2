@@ -126,45 +126,48 @@ export default function DashboardPage() {
 
   return (
     <Tabs defaultValue="all">
-      <header>
-        <Dashboard params={{ role: "Advertiser" }} />
-      </header>
       <div className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
           <SalesReportBtnP />
-          <button onClick={toggleSortOrder}>
-            {sortOrder === "desc"
-              ? "Sort: Newest to Oldest"
-              : "Sort: Oldest to Newest"}
-          </button>
         </div>
       </div>
-      <div className="flex gap-4 my-4">
-        <div>
-          <label>Start Date</label>
-          <ReactDatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            dateFormat="yyyy-MM-dd"
-            className="input"
-            placeholderText="Select Start Date"
-          />
-        </div>
-        <div>
-          <label>End Date</label>
-          <ReactDatePicker
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            dateFormat="yyyy-MM-dd"
-            className="input"
-            placeholderText="Select End Date"
-          />
-        </div>
-      </div>
-      <TabsContent value="all">
+      <TabsContent className="mt-0" value="all">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
-            <CardTitle>Sales Report</CardTitle>
+            <CardTitle className="flex justify-between items-center">
+              <div>Sales Report</div>
+              <div className="flex gap-4 font-normal text-base">
+                <div>
+                  <ReactDatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    dateFormat="yyyy-MM-dd"
+                    className="input rounded-md"
+                    placeholderText="Select Start Date"
+                  />
+                </div>
+                <div>
+                  <ReactDatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                    dateFormat="yyyy-MM-dd"
+                    className="input rounded-md"
+                    placeholderText="Select End Date"
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={toggleSortOrder}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition duration-200"
+                  >
+                    {sortOrder === "desc"
+                      ? "Newest to Oldest"
+                      : "Oldest to Newest"}
+                  </button>
+                </div>
+              </div>
+            </CardTitle>
+
             <CardDescription>View Activity Revenue Streams.</CardDescription>
           </CardHeader>
           <CardContent>

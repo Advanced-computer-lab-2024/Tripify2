@@ -1,15 +1,21 @@
 require("dotenv").config();
 require("express-async-errors");
 
+const cron = require('node-cron');
 const express = require("express");
 const app = express();
 
+const BookingReminderService = require("./config/booking-reminder.service");
+const BirthdayService = require("./config/birthday.service");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
 const connectDB = require("./config/dbConn");
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3001;
+const socket = require("./config/socket");
+const reminderService = new BookingReminderService();
+const birthdayService = new BirthdayService();
 
 connectDB();
 
@@ -38,11 +44,28 @@ app.use("/reviews", require("./routes/reviewRoutes"));
 app.use("/complaints", require("./routes/complaintRoutes"));
 app.use("/flights", require("./routes/flightRoutes"));
 app.use("/transportations", require("./routes/transportationRoutes"));
+app.use("/notifications", require("./routes/notificationRoutes"));
+app.use("/promo-codes", require("./routes/promoCodeRoutes"));
 // app.use("/users", require("./routes/userRoutes"));
+
+cron.schedule('2 23 * * *', async () => {
+  //birthday notification and promoCode
+  console.log('Cron job started');
+  await Promise.all([
+    reminderService.checkAndSendReminders(),
+    birthdayService.checkAndSendBirthdayPromoCodes()
+  ]);
+});
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  try {
+    socket.init(server);
+    console.log('Socket.IO initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize Socket.IO:', error);
+  }
 });
 
 mongoose.connection.on("error", (err) => {

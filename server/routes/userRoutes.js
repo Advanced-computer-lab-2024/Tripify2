@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const { getAllDeleteRequests, getAllUsers, createUser, getUser, updateUser, deleteUser, updatePassword, requestDeleteUser } = require('../controllers/userController')
+const { resetPassword, sendPasswordResetOTP, getAllDeleteRequests, getAllUsers, createUser, getUser, updateUser, deleteUser, updatePassword, requestDeleteUser } = require('../controllers/userController')
 const verifyUser = require('../middleware/verifyJWT')
 const verifyAdmin = require('../middleware/verifyAdminOnly')
 
@@ -21,5 +21,8 @@ router.route('/request-deletion/:id')
 
 router.route('/get-all/delete-requests')
     .get(verifyAdmin, getAllDeleteRequests)
+
+router.post('/forgot-password', sendPasswordResetOTP);
+router.post('/reset-password', resetPassword);
 
 module.exports = router;

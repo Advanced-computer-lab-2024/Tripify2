@@ -16,6 +16,9 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const mongoose = require("mongoose");
 const { convertPrice, convertToUSD } = require("../config/currencyHelpers.js");
 const Transportation = require("../models/Transportation.js");
+const NotificationService = require('../config/notification.service');
+const notificationService = new NotificationService();
+const PromoCode = require("../models/PromoCode.js");
 
 // const usdToEur = 0.92;
 // const usdToEgp = 50;
@@ -33,6 +36,32 @@ const Transportation = require("../models/Transportation.js");
 //     if(currency === 'EGP') return (price / usdToEgp).toFixed(2);
 //     return price;
 // }
+
+const calculatePriceAfterPromo = async (originalPrice, promoCode, userId) => {
+  if (!promoCode) return originalPrice;
+
+  const promoCodeDoc = await PromoCode.findOne({ Code: promoCode.toUpperCase() });
+
+  if (!promoCodeDoc) {
+    throw new Error("Invalid promo code");
+  }
+
+  if (!promoCodeDoc.ApplicableToAll && !promoCodeDoc.EligibleUsers.includes(userId)) {
+    throw new Error("You are not eligible to use this promo code");
+  }
+
+  if (promoCodeDoc.Type === "percentage") {
+    return originalPrice * (1 - promoCodeDoc.Value / 100);
+  } else {
+    return Math.max(0, originalPrice - promoCodeDoc.Value);
+  }
+};
+
+const getPromoCodeId = async (code) => {
+  if (!code) return null;
+  const promoCode = await PromoCode.findOne({ Code: code.toUpperCase() });
+  return promoCode?._id || null;
+};
 
 const getMyItineraryBookings = async (req, res) => {
   try {
@@ -101,17 +130,21 @@ const getSingleItineraryBooking = async (req, res) => {
 
 const createItineraryBooking = async (req, res) => {
   const { id } = req.params;
-  const { currency, Participants } = req.body;
+  const { currency, Participants, promoCode } = req.body;
 
   try {
     const itinerary = await ItineraryModel.findById(id);
     const tourist = await TouristModel.findOne({ UserId: req._id }, "Wallet");
 
-    const totalPrice =
+    let totalPrice =
       Number(convertPrice(itinerary.Price, currency)) * Participants;
-    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    const walletDeduction = Math.min(walletBalance, totalPrice);
-    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    // const walletDeduction = Math.min(walletBalance, totalPrice);
+    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+
+    if (promoCode) {
+      totalPrice = await calculatePriceAfterPromo(totalPrice, promoCode, req._id);
+    }
 
     if (itinerary.RemainingBookings < Participants) {
       return res.status(400).json({ msg: "Not enough spots left" });
@@ -126,14 +159,14 @@ const createItineraryBooking = async (req, res) => {
             product_data: {
               name: itinerary.Name,
             },
-            unit_amount: Math.round((remainingPrice * 100) / Participants),
+            unit_amount: Math.round((totalPrice * 100) / Participants),
           },
           quantity: Participants,
         },
       ],
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
-      cancel_url: `${process.env.CLIENT_URL}/itineraries/${id}`,
+      success_url: `${process.env.CLIENT_URL}/itinerary/${id}`,
+      cancel_url: `${process.env.CLIENT_URL}/itinerary/${id}`,
       metadata: {
         ItineraryId: id,
         UserId: req._id,
@@ -141,6 +174,7 @@ const createItineraryBooking = async (req, res) => {
         ItineraryStartDate: itinerary.StartDate.toDateString(),
         ItineraryEndDate: itinerary.EndDate.toDateString(),
         currency,
+        promoCode
       },
     });
 
@@ -155,6 +189,17 @@ const cancelItineraryBooking = async (req, res) => {
 
   try {
     const booking = await ItineraryBooking.findById(id);
+
+    const bookingPrice = booking.TotalPaid;
+    const bookingCurrency = booking.Currency;
+
+    const tourist = await TouristModel.findOne({ UserId: booking.UserId }, "Wallet")
+
+    const addedBalance = convertPrice(((bookingPrice || 0) / 100), bookingCurrency);
+    const newWalletBalance = parseFloat(tourist.Wallet) + addedBalance;
+
+    tourist.Wallet = newWalletBalance.toFixed(2);
+    await tourist.save();
 
     if (booking.UserId.toString() !== req._id.toString()) {
       return res.status(400).json({ msg: "Unauthorized" });
@@ -178,7 +223,7 @@ const cancelItineraryBooking = async (req, res) => {
 
 const createActivityBooking = async (req, res) => {
   const { id } = req.params;
-  const { currency, Participants } = req.body;
+  const { currency, Participants, promoCode } = req.body;
 
   try {
     const activity = await ActivityModel.findById(id);
@@ -186,16 +231,20 @@ const createActivityBooking = async (req, res) => {
 
     console.log(activity);
 
-    const totalPrice =
+    let totalPrice =
       Number(
         convertPrice(
           activity.Price * ((100 - activity.SpecialDiscounts) / 100),
           currency
         )
       ) * Participants;
-    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    const walletDeduction = Math.min(walletBalance, totalPrice);
-    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+
+    if (promoCode) {
+      totalPrice = await calculatePriceAfterPromo(totalPrice, promoCode, req._id);
+    }
+    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    // const walletDeduction = Math.min(walletBalance, totalPrice);
+    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -206,7 +255,7 @@ const createActivityBooking = async (req, res) => {
             product_data: {
               name: activity.Name,
             },
-            unit_amount: Math.round((remainingPrice * 100) / Participants),
+            unit_amount: Math.round((totalPrice * 100) / Participants),
           },
           quantity: Participants,
         },
@@ -220,6 +269,7 @@ const createActivityBooking = async (req, res) => {
         Participants,
         ActivityDate: activity.Date.toDateString(),
         currency,
+        promoCode
       },
     });
 
@@ -234,6 +284,16 @@ const cancelActivityBooking = async (req, res) => {
 
   try {
     const booking = await ActivityBooking.findById(id);
+    const bookingPrice = booking.TotalPaid;
+    const bookingCurrency = booking.Currency;
+
+    const tourist = await TouristModel.findOne({ UserId: booking.UserId }, "Wallet")
+
+    const addedBalance = convertPrice(((bookingPrice || 0) / 100), bookingCurrency);
+    const newWalletBalance = parseFloat(tourist.Wallet) + addedBalance;
+
+    tourist.Wallet = newWalletBalance.toFixed(2);
+    await tourist.save();
 
     if (booking.UserId.toString() !== req._id.toString()) {
       return res.status(400).json({ msg: "Unauthorized" });
@@ -484,7 +544,7 @@ const acceptBooking = async (req, res) => {
       const sessionDB = await mongoose.startSession();
       sessionDB.startTransaction();
 
-      const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+      const tourist = await TouristModel.findOne({ UserId: metadata.UserId }).populate('UserId');
 
       const itinerary = await ItineraryModel.findByIdAndUpdate(
         metadata.ItineraryId,
@@ -514,6 +574,8 @@ const acceptBooking = async (req, res) => {
         { new: true }
       );
 
+      const promoCodeId = await getPromoCodeId(metadata.promoCode);
+
       await ItineraryBooking.create({
         UserId: metadata.UserId,
         Status: "Confirmed",
@@ -523,6 +585,7 @@ const acceptBooking = async (req, res) => {
         ItineraryStartDate: new Date(metadata.ItineraryStartDate),
         ItineraryEndDate: new Date(metadata.ItineraryEndDate),
         Currency: session.currency.toUpperCase(),
+        PromoCode: promoCodeId
       });
 
       const totalPaidInUSD = convertToUSD(
@@ -541,8 +604,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -584,7 +647,11 @@ const acceptBooking = async (req, res) => {
       //     })
       // ])
 
-      console.log(itinerary, metadata);
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Itinerary Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your booking for the itinerary '" + itinerary.Name + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (session.amount_total / 100) + " " + session.currency.toUpperCase() + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
 
       await sessionDB.commitTransaction();
       sessionDB.endSession();
@@ -594,7 +661,10 @@ const acceptBooking = async (req, res) => {
       const sessionDB = await mongoose.startSession();
       sessionDB.startTransaction();
 
-      const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+      const tourist = await TouristModel.findOne({ UserId: metadata.UserId }).populate('UserId');
+      const activity = await ActivityModel.findById(metadata.ActivityId);
+
+      const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
       await ActivityBooking.create({
         UserId: metadata.UserId,
@@ -604,6 +674,7 @@ const acceptBooking = async (req, res) => {
         Participants: metadata.Participants,
         ActivityDate: new Date(metadata.ActivityDate),
         Currency: session.currency.toUpperCase(),
+        PromoCode: promoCodeId
       });
 
       const totalPaidInUSD = convertToUSD(
@@ -622,8 +693,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -634,6 +705,12 @@ const acceptBooking = async (req, res) => {
         },
       });
 
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Activity Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your booking for the activity '" + activity.Name + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (session.amount_total / 100) + " " + session.currency.toUpperCase() + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
+
       await sessionDB.commitTransaction();
       sessionDB.endSession();
 
@@ -642,15 +719,19 @@ const acceptBooking = async (req, res) => {
       const sessionDB = await mongoose.startSession();
       sessionDB.startTransaction();
 
-      const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+      const tourist = await TouristModel.findOne({ UserId: metadata.UserId }).populate('UserId');
+      const product = await ProductModel.findById(metadata.ProductId);
+
+      const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
       await ProductBooking.create({
         UserId: metadata.UserId,
         Status: "Confirmed",
         TotalPaid: session.amount_total,
-        ProductId: metadata.ProductId,
-        Quantity: metadata.Quantity,
+        Products: [{ ProductId: metadata.ProductId, Quantity: metadata.Quantity }],
+        PaymentMethod: 'credit-card',
         Currency: session.currency.toUpperCase(),
+        PromoCode: promoCodeId
       });
 
       await ProductModel.findByIdAndUpdate(
@@ -697,8 +778,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -708,6 +789,12 @@ const acceptBooking = async (req, res) => {
           Wallet: "0.00",
         },
       });
+
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Product Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your order for the product '" + product.Name + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (session.amount_total / 100) + " " + session.currency.toUpperCase() + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
 
       await sessionDB.commitTransaction();
       sessionDB.endSession();
@@ -717,7 +804,10 @@ const acceptBooking = async (req, res) => {
       const sessionDB = await mongoose.startSession();
       sessionDB.startTransaction();
 
-      const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+      const tourist = await TouristModel.findOne({ UserId: metadata.UserId }).populate('UserId');
+      const flight = await FlightModel.findById(metadata.FlightId);
+
+      const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
       await FlightBooking.create({
         UserId: metadata.UserId,
@@ -726,6 +816,7 @@ const acceptBooking = async (req, res) => {
         FlightId: metadata.FlightId,
         NumberSeats: metadata.NumberSeats,
         Currency: session.currency.toUpperCase(),
+        PromoCode: promoCodeId
       });
 
       const totalPaidInUSD = convertToUSD(
@@ -744,8 +835,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -755,6 +846,12 @@ const acceptBooking = async (req, res) => {
           Wallet: "0.00",
         },
       });
+
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Flight Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your booking for the flight from '" + flight.origin + "' to '" + flight.destination + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (session.amount_total / 100) + " " + session.currency.toUpperCase() + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
 
       await sessionDB.commitTransaction();
       sessionDB.endSession();
@@ -764,7 +861,10 @@ const acceptBooking = async (req, res) => {
       const sessionDB = await mongoose.startSession();
       sessionDB.startTransaction();
 
-      const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+      const tourist = await TouristModel.findOne({ UserId: metadata.UserId }).populate('UserId');
+      const hotel = await HotelModel.findById(metadata.HotelId);
+
+      const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
       await HotelBooking.create({
         UserId: metadata.UserId,
@@ -773,6 +873,7 @@ const acceptBooking = async (req, res) => {
         HotelId: metadata.HotelId,
         OfferId: metadata.OfferId,
         Currency: session.currency.toUpperCase(),
+        PromoCode: promoCodeId
       });
 
       const totalPaidInUSD = convertToUSD(
@@ -791,8 +892,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -803,6 +904,12 @@ const acceptBooking = async (req, res) => {
         },
       });
 
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Hotel Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your booking for the hotel '" + hotel.name + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (session.amount_total / 100) + " " + session.currency.toUpperCase() + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
+
       await sessionDB.commitTransaction();
       sessionDB.endSession();
 
@@ -811,7 +918,10 @@ const acceptBooking = async (req, res) => {
       const sessionDB = await mongoose.startSession();
       sessionDB.startTransaction();
 
-      const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+      const tourist = await TouristModel.findOne({ UserId: metadata.UserId }).populate('UserId');
+      const transportation = await Transportation.findById(metadata.TransportationId);
+
+      const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
       // Create transportation booking
       await TransportationBooking.create({
@@ -824,6 +934,7 @@ const acceptBooking = async (req, res) => {
         PickupLocation: metadata.pickupLocation,
         DropoffLocation: metadata.dropoffLocation,
         Currency: session.currency.toUpperCase(),
+        PromoCode: promoCodeId
       });
 
       // Update transportation availability if needed
@@ -848,8 +959,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -860,68 +971,89 @@ const acceptBooking = async (req, res) => {
         },
       });
 
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Transportation Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your booking for the transportation of type '" + transportation.type + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (session.amount_total / 100) + " " + session.currency.toUpperCase() + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
+
       await sessionDB.commitTransaction();
       sessionDB.endSession();
 
       return res.status(200).json({ msg: "Booking confirmed" });
     }
     else if (metadata.Products) {
-        const products = JSON.parse(metadata.Products);
-        const sessionDB = await mongoose.startSession();
-        sessionDB.startTransaction();
+      const products = JSON.parse(metadata.Products);
+      const sessionDB = await mongoose.startSession();
+      sessionDB.startTransaction();
 
-        const tourist = await TouristModel.findOne({ UserId: metadata.UserId });
+      const tourist = await TouristModel.findOne({ UserId: metadata.UserId }).populate('UserId');
+      const productsData = await Promise.all(products.map(async (product) => {
+        const productData = await ProductModel.findById(product.ProductId);
+        return productData;
+      }))
 
-        await ProductBooking.create({
-            UserId: metadata.UserId,
-            Status: 'Confirmed',
-            TotalPaid: session.amount_total,
-            Products: products.map(product => ({ ProductId: product.ProductId, Quantity: product.Quantity })),
-            Currency: session.currency.toUpperCase(),
-            PaymentMethod: 'credit-card'
-        });
+      const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
-        await Promise.all(products.map(async (product) => {
-            await ProductModel.findByIdAndUpdate(product.ProductId, [
-                {
-                    $set: {
-                        AvailableQuantity: {
-                            $cond: {
-                                if: { $gte: ["$AvailableQuantity", parseInt(product.Quantity)] },
-                                then: { $subtract: ["$AvailableQuantity", parseInt(product.Quantity)] },
-                                else: "$AvailableQuantity"
-                            }
-                        },
-                        TotalSales: { 
-                            $add: [
-                              { $ifNull: ["$TotalSales", 0] }, 
-                              parseInt(product.Quantity)
-                            ]
-                          }
-                    }
-                }
-            ], { new: true })
-        }))
+      await ProductBooking.create({
+        UserId: metadata.UserId,
+        Status: 'Confirmed',
+        TotalPaid: session.amount_total,
+        Products: products.map(product => ({ ProductId: product.ProductId, Quantity: product.Quantity })),
+        Currency: session.currency.toUpperCase(),
+        PaymentMethod: 'credit-card',
+        PromoCode: promoCodeId
+      });
 
-        const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
-        const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
-        const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
-        const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
-        const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
-
-        
-        await TouristModel.findByIdAndUpdate(tourist._id, {
+      await Promise.all(products.map(async (product) => {
+        await ProductModel.findByIdAndUpdate(product.ProductId, [
+          {
             $set: {
-            LoyaltyPoints: newLoayltyPointsEarned,
-            TotalLoyaltyPoints: newTotalLoayltyPoints,
-            Badge: newBadge,
-            Wallet: "0.00",
-            Cart: []
-            },
-        });
+              AvailableQuantity: {
+                $cond: {
+                  if: { $gte: ["$AvailableQuantity", parseInt(product.Quantity)] },
+                  then: { $subtract: ["$AvailableQuantity", parseInt(product.Quantity)] },
+                  else: "$AvailableQuantity"
+                }
+              },
+              TotalSales: {
+                $add: [
+                  { $ifNull: ["$TotalSales", 0] },
+                  parseInt(product.Quantity)
+                ]
+              }
+            }
+          }
+        ], { new: true })
+      }))
 
-        await sessionDB.commitTransaction();
-        sessionDB.endSession();
+      const totalPaidInUSD = convertToUSD(session.amount_total / 100, session.currency.toUpperCase());
+      const totalLoyaltyPointsEarned = totalPaidInUSD * (tourist.Badge === 'Gold' ? 1.5 : tourist.Badge === 'Silver' ? 1 : 0.5);
+      const newTotalLoayltyPoints = tourist.TotalLoyaltyPoints + totalLoyaltyPointsEarned;
+      const newLoayltyPointsEarned = tourist.LoyaltyPoints + totalLoyaltyPointsEarned;
+      const newBadge = newTotalLoayltyPoints >= 500000 ? 'Gold' : newTotalLoayltyPoints >= 100000 ? 'Silver' : 'Bronze';
+
+
+      await TouristModel.findByIdAndUpdate(tourist._id, {
+        $set: {
+          LoyaltyPoints: newLoayltyPointsEarned,
+          TotalLoyaltyPoints: newTotalLoayltyPoints,
+          Badge: newBadge,
+          Wallet: "0.00",
+          Cart: []
+        },
+      });
+
+      const listOfProducts = productsData.map(product => product.Name);
+
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Product Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your order for the products '" + listOfProducts.join(', ') + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (session.amount_total / 100) + " " + session.currency.toUpperCase() + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
+
+      await sessionDB.commitTransaction();
+      sessionDB.endSession();
     }
 
     return res.status(400).json({ msg: "Invalid metadata" });
@@ -932,16 +1064,19 @@ const acceptBooking = async (req, res) => {
 
 const createProductBooking = async (req, res) => {
   const { id } = req.params;
-  const { currency, Quantity } = req.body;
+  const { currency, Quantity, promoCode } = req.body;
 
   try {
     const product = await ProductModel.findById(id);
     const tourist = await TouristModel.findOne({ UserId: req._id }, "Wallet");
 
-    const totalPrice = Number(convertPrice(product.Price, currency)) * Quantity;
-    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    const walletDeduction = Math.min(walletBalance, totalPrice);
-    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    let totalPrice = Number(convertPrice(product.Price, currency)) * Quantity;
+    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    // const walletDeduction = Math.min(walletBalance, totalPrice);
+    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    if (promoCode) {
+      totalPrice = await calculatePriceAfterPromo(totalPrice, promoCode, req._id);
+    }
 
     if (product.AvailableQuantity < Quantity) {
       return res.status(400).json({ msg: "Not enough spots left" });
@@ -956,7 +1091,7 @@ const createProductBooking = async (req, res) => {
             product_data: {
               name: product.Name,
             },
-            unit_amount: Math.round((remainingPrice * 100) / Quantity),
+            unit_amount: Math.round((totalPrice * 100) / Quantity),
           },
           quantity: Quantity,
         },
@@ -969,6 +1104,7 @@ const createProductBooking = async (req, res) => {
         UserId: req._id,
         Quantity,
         currency,
+        promoCode
       },
     });
 
@@ -1044,7 +1180,7 @@ const cancelOrderProductBooking = async (req, res) => {
       //console.log(`tourist: ${tourist}`);
       //console.log(typeof tourist.Wallet);
       //console.log(typeof order.TotalPaid);
-      tourist.Wallet = parseFloat(tourist.Wallet) + order.TotalPaid;
+      tourist.Wallet = parseFloat(tourist.Wallet) + (order.TotalPaid / 100);
       await tourist.save();
     }
 
@@ -1066,12 +1202,12 @@ const cancelOrderProductBooking = async (req, res) => {
 };
 
 const createProductBookingCart = async (req, res) => {
-  const { touristId, products, currency, paymentMethod } = req.body;
+  const { touristId, products, currency, paymentMethod, promoCode } = req.body;
 
   try {
     //console.log("hereeeeeeeeeeeeeeeeee");
     //console.log(products);
-    const tourist = await TouristModel.findOne({ _id: touristId }, "Wallet");
+    const tourist = await TouristModel.findOne({ _id: touristId }, "Wallet UserId").populate('UserId');
 
     //console.log(tourist);
 
@@ -1107,6 +1243,10 @@ const createProductBookingCart = async (req, res) => {
       });
     }
 
+    if (promoCode) {
+      totalPrice = await calculatePriceAfterPromo(totalPrice, promoCode, tourist.UserId._id.toString());
+    }
+
     //console.log("stops here test 1");
 
     if (paymentMethod === "wallet") {
@@ -1137,7 +1277,7 @@ const createProductBookingCart = async (req, res) => {
       const booking = new ProductBooking({
         UserId: touristId,
         Status: "Confirmed",
-        TotalPaid: totalPrice,
+        TotalPaid: totalPrice * 100,
         Currency: currency,
         Products: productDetails,
         PaymentMethod: paymentMethod,
@@ -1147,6 +1287,13 @@ const createProductBookingCart = async (req, res) => {
 
       tourist.Cart = [];
       await tourist.save();
+
+      const productNames = productDetails.map(product => product.Name);
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Product Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your order for the products '" + productNames.join(', ') + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (totalPrice) + " " + currency + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
 
       return res
         .status(200)
@@ -1201,13 +1348,21 @@ const createProductBookingCart = async (req, res) => {
       const booking = new ProductBooking({
         UserId: touristId,
         Status: "Pending",
-        TotalPaid: totalPrice,
+        TotalPaid: totalPrice * 100,
         Currency: currency,
         Products: productDetails,
         PaymentMethod: paymentMethod,
       });
 
       await booking.save();
+
+      const productNames = productDetails.map(product => product.Name);
+      console.log(productNames);
+      await notificationService.sendEmail({
+        recipientEmail: tourist.UserId.Email,
+        subject: "Tripify: New Product Booking Confirmed",
+        content: "Hello " + tourist.UserId.UserName + ",<br />Your order for the products '" + productNames.join(', ') + "' has been confirmed.<br />Enjoy your trip!<br /><br /><strong>Total Paid: </strong>" + (totalPrice) + " " + currency + "<br /><br /><br />Thank you for choosing Tripify!<br />Tripify Team"
+      })
 
       return res
         .status(200)
@@ -1222,17 +1377,21 @@ const createProductBookingCart = async (req, res) => {
 
 const createFlightBooking = async (req, res) => {
   const { id } = req.params;
-  const { currency, NumberSeats } = req.body;
+  const { currency, NumberSeats, promoCode } = req.body;
 
   try {
     const flight = await FlightModel.findById(id);
     const tourist = await TouristModel.findOne({ UserId: req._id }, "Wallet");
 
-    const totalPrice =
+    let totalPrice =
       Number(convertPrice(flight.price.total, currency)) * NumberSeats;
-    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    const walletDeduction = Math.min(walletBalance, totalPrice);
-    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    // const walletDeduction = Math.min(walletBalance, totalPrice);
+    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+
+    if (promoCode) {
+      totalPrice = await calculatePriceAfterPromo(totalPrice, promoCode, req._id);
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -1243,7 +1402,7 @@ const createFlightBooking = async (req, res) => {
             product_data: {
               name: flight.type,
             },
-            unit_amount: Math.round((remainingPrice * 100) / NumberSeats),
+            unit_amount: Math.round((totalPrice * 100) / NumberSeats),
           },
           quantity: NumberSeats,
         },
@@ -1256,6 +1415,7 @@ const createFlightBooking = async (req, res) => {
         UserId: req._id,
         NumberSeats,
         currency,
+        promoCode
       },
     });
 
@@ -1279,22 +1439,25 @@ const getMyFlightBookings = async (req, res) => {
 
 const createHotelBooking = async (req, res) => {
   const { id } = req.params;
-  const { currency, OfferId } = req.body;
+  const { currency, OfferId, promoCode } = req.body;
 
   try {
     const hotel = await HotelModel.findById(id);
     const tourist = await TouristModel.findOne({ UserId: req._id }, "Wallet");
 
-    const totalPrice =
+    let totalPrice =
       Number(
         convertPrice(
           hotel.offers.find((offer) => offer.id === OfferId).price.total,
           currency
         )
       ) * 1;
-    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    const walletDeduction = Math.min(walletBalance, totalPrice);
-    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    // const walletDeduction = Math.min(walletBalance, totalPrice);
+    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    if (promoCode) {
+      totalPrice = await calculatePriceAfterPromo(totalPrice, promoCode, req._id);
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -1305,7 +1468,7 @@ const createHotelBooking = async (req, res) => {
             product_data: {
               name: hotel.name,
             },
-            unit_amount: Math.round((remainingPrice * 100) / 1),
+            unit_amount: Math.round((totalPrice * 100) / 1),
           },
           quantity: 1,
         },
@@ -1318,6 +1481,7 @@ const createHotelBooking = async (req, res) => {
         UserId: req._id,
         OfferId,
         currency,
+        promoCode
       },
     });
 
@@ -1341,7 +1505,7 @@ const getMyHotelBookings = async (req, res) => {
 
 const createTransportationBooking = async (req, res) => {
   const { id } = req.params;
-  const { currency, startDate, endDate, pickupLocation, dropoffLocation } =
+  const { currency, startDate, endDate, pickupLocation, dropoffLocation, promoCode } =
     req.body;
 
   try {
@@ -1351,12 +1515,15 @@ const createTransportationBooking = async (req, res) => {
     const numberOfDays = Math.ceil(
       (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
     );
-    const totalPrice = Number(
+    let totalPrice = Number(
       convertPrice(transportation.pricePerDay * numberOfDays, currency)
     );
-    const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
-    const walletDeduction = Math.min(walletBalance, totalPrice);
-    const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    // const walletBalance = convertPrice(Number(tourist.Wallet) || 0, currency);
+    // const walletDeduction = Math.min(walletBalance, totalPrice);
+    // const remainingPrice = Math.max(totalPrice - walletDeduction, 0);
+    if (promoCode) {
+      totalPrice = await calculatePriceAfterPromo(totalPrice, promoCode, req._id);
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -1367,7 +1534,7 @@ const createTransportationBooking = async (req, res) => {
             product_data: {
               name: `${transportation.name} - ${transportation.type}`,
             },
-            unit_amount: Math.round(remainingPrice * 100),
+            unit_amount: Math.round(totalPrice * 100),
           },
           quantity: 1,
         },
@@ -1383,6 +1550,7 @@ const createTransportationBooking = async (req, res) => {
         pickupLocation,
         dropoffLocation,
         currency,
+        promoCode
       },
     });
 

@@ -3,6 +3,8 @@ const ItineraryModel = require("../models/Itinerary.js");
 const tourGuideModel = require("../models/Tourguide.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
+const NotificationService = require('../config/notification.service');
+const notificationService = new NotificationService();
 
 const createItinerary = async (req, res) => {
   //add a new itinerary to the database with
@@ -83,6 +85,13 @@ const createItinerary = async (req, res) => {
 };
 const getItineraries = async (req, res) => {
   const { categories, tags } = req.query;
+
+  // await notificationService.createNotification({
+  //   Message: 'New Itinerary Created' + new Date().toLocaleString(),
+  //   TargetRoute: '/itinerary',
+  //   Type: 'success',
+  //   UserId: '6704edde8eb50e6de0f16da6'
+  // })
 
   try {
     if (!categories || !tags || categories?.length === 0 || tags?.length === 0) {
@@ -174,8 +183,10 @@ const updateItinerary = async (req, res) => {
   if (
     !updatedItinerary ||
     updatedItinerary.TourGuide.toString() !== tourGuide?._id.toString()
-  )
+  ) {
+    console.log("Unauthorized TourGuide!")
     return res.status(400).json({ message: "Unauthorized TourGuide!" });
+  }
 
   // console.log("==============================");
   // console.log(req.body);
@@ -206,7 +217,7 @@ const updateItinerary = async (req, res) => {
         new: true,
         runValidators: true,
       }
-    ).populate("TourGuide");
+    ).populate("TourGuide").catch((e) => console.log(e));
     // .populate("Tag")
     // .populate("Category")
 
@@ -273,7 +284,26 @@ const flagItinerary = async (req, res) => {
   try {
     const itinerary = await ItineraryModel.findById(id)
     itinerary.Inappropriate = !itinerary.Inappropriate
+
     await itinerary.save()
+
+    if (itinerary.Inappropriate) {
+      const tourGuide = await tourGuideModel.findById(itinerary.TourGuide, "UserId").populate("UserId");
+
+      await Promise.all([
+        notificationService.createNotification({
+          Message: "The Itinerary ''" + itinerary.Name + "'' has been flagged as inappropriate",
+          TargetRoute: '/itinerary/' + id,
+          Type: 'error',
+          UserId: tourGuide.UserId._id.toString()
+        }),
+        notificationService.sendEmail({
+          recipientEmail: tourGuide.UserId.Email,
+          subject: "Tripify: Inappropriate Itinerary Flagged",
+          content: "The Itinerary '" + itinerary.Name + "' has been flagged as inappropriate"
+        })
+      ])
+    }
     // const itinerary = await ItineraryModel.findByIdAndUpdate(id, { Inappropriate: true }, { new: true });
 
     if (!itinerary) return res.status(404).json({ msg: `Cannot find any Itinerary with id ${id}` });

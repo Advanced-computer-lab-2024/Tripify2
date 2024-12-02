@@ -1,5 +1,6 @@
 
 'use client'
+import Notifications from '@/components/shared/Notifications';
 import LogoutBtn from '@/components/ui/LogoutBtn';
 import { useRouter } from 'next/navigation';
 
@@ -39,6 +40,7 @@ const Dashboard = () => {
           Post a Product for Sale
         </button>
         <LogoutBtn />
+        <Notifications />
       </div>
     </div>
   );
@@ -49,7 +51,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'start',
     alignItems: 'center',
     height: '100vh',
   },

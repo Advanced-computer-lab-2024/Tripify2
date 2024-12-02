@@ -3,6 +3,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { FiMenu } from "react-icons/fi";
 import LogoutBtn from "@/components/ui/LogoutBtn";
+import Notifications from "@/components/shared/Notifications";
 
 import localFont from "next/font/local";
 
@@ -239,7 +240,7 @@ export default function Dashboard({ params }) {
         <h3 className="text-lg font-bold">Logo</h3>
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div id='heading' className="flex items-center space-x-4">
         {showHamburger ? (
           <button
             onClick={toggleSidebar}
@@ -265,9 +266,9 @@ export default function Dashboard({ params }) {
                           handleReroute(element.link);
                         }
                       }}
-                      className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${
-                        isActive ? "underline" : ""
-                      }`}
+                      id={element.name.toLowerCase()}
+                      className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${isActive ? "underline" : ""
+                        }`}
                     >
                       {element.name}
                     </button>
@@ -277,9 +278,8 @@ export default function Dashboard({ params }) {
                           <button
                             key={sublinkIndex}
                             onClick={() => handleReroute(sublink.link)}
-                            className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
-                              pathname === sublink.link ? "underline" : ""
-                            }`}
+                            className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${pathname === sublink.link ? "underline" : ""
+                              }`}
                           >
                             {sublink.name}
                           </button>
@@ -293,6 +293,7 @@ export default function Dashboard({ params }) {
             </nav>
           </div>
         )}
+        <Notifications />
       </div>
 
       {sidebarVisible && (
@@ -303,9 +304,8 @@ export default function Dashboard({ params }) {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-gray-100 z-20 transform ${
-          sidebarVisible ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-300 ease-in-out`}
+        className={`fixed top-0 right-0 h-full w-64 bg-gray-100 z-20 transform ${sidebarVisible ? "translate-x-0" : "translate-x-full"
+          } transition-transform duration-300 ease-in-out`}
       >
         <nav className="flex flex-col p-4">
           {dashboardElements.map((element, index) => (
@@ -325,9 +325,8 @@ export default function Dashboard({ params }) {
                     <button
                       key={sublinkIndex}
                       onClick={() => handleReroute(sublink.link)}
-                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
-                        pathname === sublink.link ? "underline" : ""
-                      }`}
+                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${pathname === sublink.link ? "underline" : ""
+                        }`}
                     >
                       {sublink.name}
                     </button>

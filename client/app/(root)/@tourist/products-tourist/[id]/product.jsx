@@ -1,8 +1,8 @@
 "use client";
 
-import { useState , useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Star, ShoppingBag, User, Loader2 } from 'lucide-react'
+import { Star, ShoppingBag, User, Loader2, Tag } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -22,8 +22,53 @@ export default function ProductPage({ product, cart }) {
   const [loading, setLoading] = useState(false);
   const [WishList2, setWishList] = useState([]);
   const { data: session, status } = useSession();
+  const [promoCode, setPromoCode] = useState('');
+  const [promoError, setPromoError] = useState('');
+  const [promoSuccess, setPromoSuccess] = useState('');
+  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [validatingPromo, setValidatingPromo] = useState(false);
   const [getWishList, setGetWishList] = useState(true);
   const [Cart, setCart] = useState(cart);
+
+  const validatePromoCode = async () => {
+    if (!promoCode.trim()) {
+      setPromoError('Please enter a promo code');
+      return;
+    }
+
+    setValidatingPromo(true);
+    setPromoError('');
+    setPromoSuccess('');
+
+    try {
+      const response = await fetcher('/promo-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: promoCode,
+          amount: product.Price * quantity
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        setPromoError(error.message);
+        setDiscountedPrice(null);
+        return;
+      }
+
+      const data = await response.json();
+      setDiscountedPrice(data.type === 'percentage' ? (((100 - data.value) / 100) * product.Price) * quantity : ((product.Price * quantity) - data.value));
+      setPromoSuccess(data.type === 'percentage'
+        ? `${data.value}% discount applied!`
+        : `${currency} ${convertPrice(data.value, currency)} discount applied!`);
+    } catch (error) {
+      setPromoError('Error validating promo code');
+      setDiscountedPrice(null);
+    } finally {
+      setValidatingPromo(false);
+    }
+  };
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -109,6 +154,7 @@ export default function ProductPage({ product, cart }) {
           body: JSON.stringify({
             currency,
             Quantity: quantity,
+            promoCode: promoCode || undefined
           }),
         }
       );
@@ -142,20 +188,21 @@ export default function ProductPage({ product, cart }) {
   }
 
   const addToCart = async () => {
-      let newcart = [].concat(Cart);
-      let flag = false;
-      console.log(newcart)
-      console.log(newcart.length)
-      for (let i = 0; i<newcart.length; i++){
-        if (product._id == newcart[i].product){
-          flag = true;
-          newcart[i].quantity += quantity;
-        }
+    let newcart = [].concat(Cart);
+    let flag = false;
+    console.log(newcart)
+    console.log(newcart.length)
+    for (let i = 0; i < newcart.length; i++) {
+      if (product._id == newcart[i].product) {
+        flag = true;
+        newcart[i].quantity += quantity;
       }
-      if (!flag){
-        newcart.push({product: product._id, quantity: quantity})
-      }
-      try{const touristRes = await fetcher(`/tourists/${session.user.id}`, {
+    }
+    if (!flag) {
+      newcart.push({ product: product._id, quantity: quantity })
+    }
+    try {
+      const touristRes = await fetcher(`/tourists/${session.user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ Cart: newcart }),
@@ -167,11 +214,11 @@ export default function ProductPage({ product, cart }) {
       }
 
       const data = await touristRes.json();
-      } catch (error) {
-        console.error("Error updating cart:", error);
-      }
-      alert(`${quantity} ${product.Name} added`)
-      setCart(newcart)
+    } catch (error) {
+      console.error("Error updating cart:", error);
+    }
+    alert(`${quantity} ${product.Name} added`)
+    setCart(newcart)
   }
 
   return (
@@ -193,11 +240,10 @@ export default function ProductPage({ product, cart }) {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-5 h-5 ${
-                    i < Math.floor(product.Rating)
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-300"
-                  }`}
+                  className={`w-5 h-5 ${i < Math.floor(product.Rating)
+                    ? "text-yellow-400 fill-current"
+                    : "text-gray-300"
+                    }`}
                 />
               ))}
             </div>
@@ -205,11 +251,58 @@ export default function ProductPage({ product, cart }) {
               ({product.Reviews.length} reviews)
             </span>
           </div>
-          <p className="mb-4 text-2xl font-bold">
-            {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
-            {convertPrice(product.Price, currency)}
-          </p>
+          <div className="mb-4">
+            {discountedPrice ? (
+              <>
+                <p className="text-2xl font-bold text-blue-600">
+                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+                  {convertPrice(discountedPrice, currency).toFixed(2)}
+                </p>
+                <p className="text-lg text-gray-500 line-through">
+                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+                  {convertPrice(product.Price * quantity, currency).toFixed(2)}
+                </p>
+              </>
+            ) : (
+              <p className="text-2xl font-bold">
+                {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+                {convertPrice(product.Price * quantity, currency)}
+              </p>
+            )}
+          </div>
           <p className="mb-6 text-gray-600">{product.Description}</p>
+          <div className="mb-6">
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Have a promo code?
+            </label>
+            <div className="flex gap-2">
+              <Input
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                placeholder="Enter promo code"
+                className="uppercase"
+              />
+              <Button
+                onClick={validatePromoCode}
+                disabled={validatingPromo}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {validatingPromo ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Tag className="w-4 h-4" />
+                )}
+                Apply
+              </Button>
+            </div>
+            {promoError && (
+              <p className="mt-1 text-sm text-red-500">{promoError}</p>
+            )}
+            {promoSuccess && (
+              <p className="mt-1 text-sm text-green-500">{promoSuccess}</p>
+            )}
+          </div>
           <div className="flex items-center mb-6">
             <Input
               type="number"
@@ -235,11 +328,10 @@ export default function ProductPage({ product, cart }) {
           <div className="flex items-center mb-6 space-x-4">
             <Button
               variant={WishList2.includes(product._id) ? "solid" : "outline"}
-              className={`transition-all duration-200 ease-in-out ${
-                WishList2.includes(product._id)
-                  ? "bg-red-500 text-white hover:bg-red-600"
-                  : "bg-gray-200 hover:bg-gray-300"
-              }`}
+              className={`transition-all duration-200 ease-in-out ${WishList2.includes(product._id)
+                ? "bg-red-500 text-white hover:bg-red-600"
+                : "bg-gray-200 hover:bg-gray-300"
+                }`}
               onClick={() => toggleWishlist(product._id)}
             >
               {WishList2.includes(product._id)
@@ -291,11 +383,10 @@ export default function ProductPage({ product, cart }) {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-4 h-4 ${
-                              i < review.Rating
-                                ? "text-yellow-400 fill-current"
-                                : "text-gray-300"
-                            }`}
+                            className={`w-4 h-4 ${i < review.Rating
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-300"
+                              }`}
                           />
                         ))}
                       </div>

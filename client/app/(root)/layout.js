@@ -6,7 +6,9 @@ import { Poppins } from "next/font/google";
 import "../globals.css";
 import { getSession } from "@/lib/session";
 import AuthProvider from "@/providers/SessionProvider";
+import { NotificationProvider } from "@/providers/NotificationProvider";
 import { CurrencyStoreProvider } from "@/providers/CurrencyProvider";
+import FirgadeProvider from "@/providers/FrigadeProvider";
 
 export const metadata = {
   title: "Tripify",
@@ -38,28 +40,30 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${GeistSans.className} ${poppins.variable} antialiased dark:bg-gray-950`}>
-      <CurrencyStoreProvider>
-        <AuthProvider>
-          <body>
-            {/* <header>
-              <Dashboard params={{ role: "Advertiser" }} />
-            </header> */}
-            {session?.user?.role === "Tourist"
-              ? tourist
-              : session?.user?.role === "Admin"
-                ? admin
-                : session?.user?.role === "Advertiser"
-                  ? advertiser
-                  : session?.user?.role === "Seller"
-                    ? seller
-                    : session?.user?.role === "TourGuide"
-                      ? tourGuide
-                      : session?.user?.role === "TourismGovernor"
-                        ? tourismGovernor
-                        : guest}
-          </body>
-        </AuthProvider>
-      </CurrencyStoreProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <CurrencyStoreProvider>
+            <body>
+              {/* <header>
+                <Dashboard params={{ role: "Advertiser" }} />
+              </header> */}
+              {session?.user?.role === "Tourist"
+                ? <FirgadeProvider>{tourist}</FirgadeProvider>
+                : session?.user?.role === "Admin"
+                  ? admin
+                  : session?.user?.role === "Advertiser"
+                    ? advertiser
+                    : session?.user?.role === "Seller"
+                      ? seller
+                      : session?.user?.role === "TourGuide"
+                        ? tourGuide
+                        : session?.user?.role === "TourismGovernor"
+                          ? tourismGovernor
+                          : <FirgadeProvider>{guest}</FirgadeProvider>}
+            </body>
+          </CurrencyStoreProvider>
+        </NotificationProvider>
+      </AuthProvider>
     </html>
   );
 }

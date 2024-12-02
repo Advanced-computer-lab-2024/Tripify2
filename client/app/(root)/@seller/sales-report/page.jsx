@@ -22,15 +22,13 @@ import {
     Tabs,
     TabsContent,
 } from "@/components/ui/tabs";
-import SalesReportBtn from "@/components/admin/SalesReportBtn";
+import SalesReportBtn from "@/components/shared/SalesReportBtnP";
 import { fetcher } from "@/lib/fetch-client";
 import { useSession } from "next-auth/react";
 
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
     const [products, setProducts] = useState([]);
-    const [itineraries, setItineraries] = useState([]);
-    const [acts, setActs] = useState([]);
     const [startDate, setStartDate] = useState(null); // Start date for filtering
     const [endDate, setEndDate] = useState(null); // End date for filtering
     const session=useSession()
@@ -55,6 +53,10 @@ export default function DashboardPage() {
                 console.error("Error fetching data:", error);
             }
         };
+        console.log("seller id:")
+         console.log( products)
+        // console.log("user id:")
+        // console.log(session?.data?.user?.id)
 
         fetchAndSortData();
     }, [sortOrder, startDate, endDate]); // Refetch and filter data when date range or sort order changes
@@ -72,8 +74,6 @@ export default function DashboardPage() {
     const filterByDateRange = (data, start, end) => {
         return data.filter((item) => {
             const createdAt = new Date(
-                item?.ItineraryId?.createdAt ||
-                item?.ActivityId?.createdAt ||
                 item?.createdAt
             );
 
@@ -99,6 +99,7 @@ export default function DashboardPage() {
             totals.totalSales += totalSales;
             totals.totalRevenue += price * totalSales;
             totals.discountedRevenue += price * totalSales * 0.9;
+
             return totals;
         },
         { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
@@ -161,7 +162,7 @@ export default function DashboardPage() {
                                         <strong>Products</strong>
                                     </TableCell>
                                 </TableRow>
-                                {products?.filter((product) => product?.Seller?._id === session?.data?.user?.id)
+                                {products?.filter((product) => session?.data?.user?.id===product?.Seller?._id  )
                                 .map((product) =>
                                     product?._id ? (
                                         <TableRow key={product._id}>

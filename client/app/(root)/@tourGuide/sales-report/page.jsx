@@ -40,9 +40,6 @@ export default function DashboardPage() {
 
             try {
                 const itinResponse = await fetcher(query2);
-
-   
-
                 if (itinResponse?.ok) {
                     const itinData = await itinResponse.json();
                     const itinerariesWithParticipants = await Promise.all(itinData.map(async (itin) => {
@@ -106,7 +103,7 @@ export default function DashboardPage() {
     .filter((itin) => itin?.TourGuide?._id === session?.data?.user?.id) // Filter itineraries by TourGuide ID
     .reduce(
         (totals, itin) => {
-            const participants = itin?.participants?.Participants || 0;
+            const participants = itin?.participants?.Participants.filterByDateRange || 0;
             const price2 = itin?.Price || 0;
             totals.totalSales += participants;
             totals.totalRevenue += price2 * participants;

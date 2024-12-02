@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
-import { Badge } from "@/components/ui/badge";
+import { RiDeleteBin5Line, RiEdit2Line } from "@remixicon/react";
 export default function AdvertiserProfile({ Activities }) {
   const AllActivities = Activities.Activities;
   const { currency } = useCurrencyStore();
@@ -57,9 +57,11 @@ export default function AdvertiserProfile({ Activities }) {
         <Dashboard params={{ role: "Advertiser" }} />
       </header>
 
-      <div className="p-6 max-w-6xl mx-auto">
+      <div className="p-6 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Activities</h1>
+          <h1 className="text-2xl font-bold">
+            Activities ({AllActivities.length})
+          </h1>
           <button
             onClick={handleCreateClick}
             className="bg-blue-500 text-white py-2 px-4 rounded"
@@ -88,7 +90,7 @@ export default function AdvertiserProfile({ Activities }) {
                 <CardContent>
                   <CardDescription className="text-sm text-black-600">
                     <p>
-                      Price:{" "}
+                      <span className="font-bold">Price: </span>
                       {currency === "USD"
                         ? "$"
                         : currency === "EUR"
@@ -97,18 +99,24 @@ export default function AdvertiserProfile({ Activities }) {
                       {convertPrice(activity.Price, currency)}
                     </p>
 
-                    <p>Date: {new Date(activity.Date).toLocaleDateString()}</p>
-                    <div className="flex justify-between w-full py-2">
+                    <p>
+                      <span className="font-bold">Date: </span>
+                      {new Date(activity.Date).toLocaleDateString()}
+                    </p>
+                    <hr className="mt-2" />
+                    <div className="flex justify-between w-full py-4 space-x-4">
                       <button
                         onClick={() => handleEditClick(activity._id)}
-                        className="bg-green-500 text-white py-2 px-3 rounded w-1/3"
+                        className="flex items-center justify-center bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600 transition duration-200 w-1/3"
                       >
+                        <RiEdit2Line size={18} className="mr-2" />
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteClick(activity._id)}
-                        className="bg-red-500 text-white py-2 px-3 rounded w-1/3"
+                        className="flex items-center justify-center bg-red-500 text-white py-2 px-1 rounded-md shadow-md hover:bg-red-600 transition duration-200 w-2/3"
                       >
+                        <RiDeleteBin5Line size={18} className="mr-2" />
                         Delete
                       </button>
                     </div>

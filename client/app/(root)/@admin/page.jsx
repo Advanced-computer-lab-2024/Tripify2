@@ -1,10 +1,11 @@
+'use client';
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -12,31 +13,82 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-  } from "@/components/ui/table"
-  import {
+} from '@/components/ui/table';
+import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-  } from "@/components/ui/tabs"
-import { fetcher } from "@/lib/fetch-client"
-import DeleteUserBtn from "@/components/admin/DeleteUserBtn"
+} from '@/components/ui/tabs';
 
-export default async function DashboardPage() 
-{
-    const advertisersResponse = await fetcher('/advertisers?accepted=true').catch(err => err)
-    const touristsResponse = await fetcher('/tourists').catch(err => err)
-    const tourguidesResponse = await fetcher('/tourguides?accepted=true').catch(err => err)
-    const sellersResponse = await fetcher('/sellers?accepted=true').catch(err => err)
-    const tourismGovernorsResponse = await fetcher('/tourism-governors').catch(err => err)
+import { useState, useEffect } from "react";
+import ReactDatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { fetcher } from '@/lib/fetch-client';
+import DeleteUserBtn from '@/components/admin/DeleteUserBtn';
 
-    let advertisers = [], tourists = [], tourguides = [], sellers = [], tourismGovernors = []
+export default function DashboardPage() {
+    const [advertisers, setAdvertisers] = useState([]);
+    const [tourists, setTourists] = useState([]);
+    const [tourguides, setTourguides] = useState([]);
+    const [sellers, setSellers] = useState([]);
+    const [tourismGovernors, setTourismGovernors] = useState([]);
 
-    if(advertisersResponse?.ok) advertisers = await advertisersResponse.json()
-    if(touristsResponse?.ok) tourists = await touristsResponse.json()
-    if(tourguidesResponse?.ok) tourguides = await tourguidesResponse.json()
-    if(sellersResponse?.ok) sellers = await sellersResponse.json()
-    if(tourismGovernorsResponse?.ok) tourismGovernors = await tourismGovernorsResponse.json()
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+
+    useEffect(() => {
+        const fetchAndSortData = async () => {
+            const queries = [
+                { url: '/advertisers?accepted=true', setter: setAdvertisers },
+                { url: '/tourists', setter: setTourists },
+                { url: '/tourguides?accepted=true', setter: setTourguides },
+                { url: '/sellers?accepted=true', setter: setSellers },
+                { url: '/tourism-governors', setter: setTourismGovernors }
+            ];
+
+            try {
+                for (const { url, setter } of queries) {
+                    const response = await fetcher(url);
+                    if (response?.ok) {
+                        const data = await response.json();
+                        const filteredData = filterByDateRange(data, startDate, endDate);
+                        setter(filteredData);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchAndSortData();
+    }, [startDate, endDate]);
+    const filterByDateRange = (data, start, end) => {
+        return data.filter((item) => {
+            // Use item.UserId or item directly to get createdAt
+            const createdAt = new Date(item?.UserId?.createdAt || item?.createdAt);
+    
+            if (!createdAt) return false;
+    
+            const normalizedStart = start ? new Date(start) : null;
+            const normalizedEnd = end ? new Date(end) : null;
+    
+            if (normalizedStart) {
+                normalizedStart.setHours(0, 0, 0, 0);
+            }
+            if (normalizedEnd) {
+                normalizedEnd.setHours(23, 59, 59, 999);
+            }
+    
+            const isAfterStart = normalizedStart ? createdAt >= normalizedStart : true;
+            const isBeforeEnd = normalizedEnd ? createdAt <= normalizedEnd : true;
+    
+            return isAfterStart && isBeforeEnd;
+        });
+    };
+
+    const allUsers = [...advertisers, ...tourists, ...tourguides, ...sellers, ...tourismGovernors];
+    const totalUsers = allUsers.length;
 
     return (
         <Tabs defaultValue="all">
@@ -50,33 +102,27 @@ export default async function DashboardPage()
                     <TabsTrigger value="tourismGovernors">Tourism Governors</TabsTrigger>
                 </TabsList>
                 <div className="ml-auto flex items-center gap-2">
-                    {/* <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8 gap-1">
-                            <ListFilter className="h-3.5 w-3.5" />
-                            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                            Filter
-                            </span>
-                        </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuCheckboxItem checked>
-                            Active
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem>Draft</DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem>
-                            Archived
-                        </DropdownMenuCheckboxItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Button size="sm" className="h-8 gap-1">
-                        <PlusCircle className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Add Product
-                        </span>
-                    </Button> */}
+                <div>
+                    <label>Start Date</label>
+                    <ReactDatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        dateFormat="yyyy-MM-dd"
+                        className="input"
+                        placeholderText="Select Start Date"
+                    />
+                </div>
+                <div>
+                    <label>End Date</label>
+                    <ReactDatePicker
+                        selected={endDate}
+                        onChange={(date) => setEndDate(date)}
+                        dateFormat="yyyy-MM-dd"
+                        className="input"
+                        placeholderText="Select End Date"
+                    />
+                </div>
+  
                 </div>
             </div>
             <TabsContent value="all">
@@ -85,15 +131,15 @@ export default async function DashboardPage()
                         <CardTitle>Users</CardTitle>
                         <CardDescription>
                             View all users currently accepted on the platform.
+                            Total Users: {totalUsers}
                         </CardDescription>
+                        
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    {/* <TableHead className="hidden w-[100px] sm:table-cell">
-                                        <span className="sr-only">Image</span>
-                                    </TableHead> */}
+                   
                                     <TableHead>Name</TableHead>
                                     <TableHead className="hidden md:table-cell">
                                         Email
@@ -110,7 +156,7 @@ export default async function DashboardPage()
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {[...advertisers, ...tourists, ...tourguides, ...sellers, ...tourismGovernors].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
+                                {allUsers.sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
                                     <TableRow key={user?._id}>
                                         <TableCell className="hidden sm:table-cell">
                                             {user?.UserId?.UserName}
@@ -122,26 +168,10 @@ export default async function DashboardPage()
                                             {user?.UserId?.Role}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            {user?.UserId?.createdAt}
+                                        {new Date(user?.UserId?.createdAt).toLocaleDateString()}
+
                                         </TableCell>
                                         <TableCell>
-                                        {/* <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                aria-haspopup="true"
-                                                size="icon"
-                                                variant="ghost"
-                                                >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Toggle menu</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu> */}
                                         
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
@@ -150,12 +180,7 @@ export default async function DashboardPage()
                             </TableBody>
                         </Table>
                     </CardContent>
-                    {/* <CardFooter>
-                        <div className="text-xs text-muted-foreground">
-                        Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                        products
-                        </div>
-                    </CardFooter> */}
+                   
                 </Card>
             </TabsContent>
             <TabsContent value="advertisers">
@@ -164,15 +189,15 @@ export default async function DashboardPage()
                         <CardTitle>Advertisers</CardTitle>
                         <CardDescription>
                             View all advertisers currently accepted on the platform.
+                            Total Users: {[...advertisers].length}
+
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Table>
+ <Table>
                             <TableHeader>
                                 <TableRow>
-                                    {/* <TableHead className="hidden w-[100px] sm:table-cell">
-                                        <span className="sr-only">Image</span>
-                                    </TableHead> */}
+                                   
                                     <TableHead>Name</TableHead>
                                     <TableHead className="hidden md:table-cell">
                                         Email
@@ -189,7 +214,8 @@ export default async function DashboardPage()
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {[...advertisers].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
+
+                            {[...advertisers].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
                                     <TableRow key={user?._id}>
                                         <TableCell className="hidden sm:table-cell">
                                             {user?.UserId?.UserName}
@@ -201,26 +227,11 @@ export default async function DashboardPage()
                                             {user?.UserId?.Role}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            {user?.UserId?.createdAt}
+                                        {new Date(user?.UserId?.createdAt).toLocaleDateString()}
                                         </TableCell>
+
                                         <TableCell>
-                                        {/* <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                aria-haspopup="true"
-                                                size="icon"
-                                                variant="ghost"
-                                                >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Toggle menu</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                <DropdownMenuItem>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu> */}
+                                       
                                         
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
@@ -243,6 +254,8 @@ export default async function DashboardPage()
                         <CardTitle>Tourists</CardTitle>
                         <CardDescription>
                             View all tourists currently on the platform.
+                            Total Users: {[...tourists].length}
+
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -268,7 +281,7 @@ export default async function DashboardPage()
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {[...tourists].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
+                                {[ ...tourists].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
                                     <TableRow key={user?._id}>
                                         <TableCell className="hidden sm:table-cell">
                                             {user?.UserId?.UserName}
@@ -280,11 +293,9 @@ export default async function DashboardPage()
                                             {user?.UserId?.Role}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            {user?.UserId?.createdAt}
+                                        {new Date(user?.UserId?.createdAt).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell>
-
-                                        
+                                        <TableCell>                                     
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
                                     </TableRow>
@@ -292,7 +303,6 @@ export default async function DashboardPage()
                             </TableBody>
                         </Table>
                     </CardContent>
-
                 </Card>
             </TabsContent>
             <TabsContent value="tourguides">
@@ -301,6 +311,8 @@ export default async function DashboardPage()
                         <CardTitle>Tourguides</CardTitle>
                         <CardDescription>
                             View all tourguides currently accepted on the platform.
+                            Total Users: {[...tourguides].length}
+
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -324,7 +336,7 @@ export default async function DashboardPage()
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {[...tourguides].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
+                                {[ ...tourguides].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
                                     <TableRow key={user?._id}>
                                         <TableCell className="hidden sm:table-cell">
                                             {user?.UserId?.UserName}
@@ -336,11 +348,9 @@ export default async function DashboardPage()
                                             {user?.UserId?.Role}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            {user?.UserId?.createdAt}
+                                        {new Date(user?.UserId?.createdAt).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell>
-
-                                        
+                                        <TableCell>                                       
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
                                     </TableRow>
@@ -348,7 +358,6 @@ export default async function DashboardPage()
                             </TableBody>
                         </Table>
                     </CardContent>
-
                 </Card>
             </TabsContent>
             <TabsContent value="sellers">
@@ -357,6 +366,8 @@ export default async function DashboardPage()
                         <CardTitle>Sellers</CardTitle>
                         <CardDescription>
                             View all sellers currently accepted on the platform.
+                            Total Users: {[...sellers].length}
+
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -380,7 +391,7 @@ export default async function DashboardPage()
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {[...sellers].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
+                                {[ ...sellers].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
                                     <TableRow key={user?._id}>
                                         <TableCell className="hidden sm:table-cell">
                                             {user?.UserId?.UserName}
@@ -392,10 +403,9 @@ export default async function DashboardPage()
                                             {user?.UserId?.Role}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            {user?.UserId?.createdAt}
+                                        {new Date(user?.UserId?.createdAt).toLocaleDateString()}
                                         </TableCell>
                                         <TableCell>
-
                                         
                                             <DeleteUserBtn user={user} />
                                         </TableCell>
@@ -413,6 +423,8 @@ export default async function DashboardPage()
                         <CardTitle>Tourism Governors</CardTitle>
                         <CardDescription>
                             View all tourism governors currently accepted on the platform.
+                            Total Users: {[...tourismGovernors].length}
+
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -436,7 +448,7 @@ export default async function DashboardPage()
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {[...tourismGovernors].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
+                                {[ ...tourismGovernors].sort((a, b) => a?.createdAt - b?.createdAt).map((user) => user.UserId?._id ? (
                                     <TableRow key={user?._id}>
                                         <TableCell className="hidden sm:table-cell">
                                             {user?.UserId?.UserName}
@@ -448,7 +460,7 @@ export default async function DashboardPage()
                                             {user?.UserId?.Role}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
-                                            {user?.UserId?.createdAt}
+                                        {new Date(user?.UserId?.createdAt).toLocaleDateString()}
                                         </TableCell>
                                         <TableCell>
 
@@ -458,6 +470,7 @@ export default async function DashboardPage()
                                 ) : null)}
                             </TableBody>
                         </Table>
+ 
                     </CardContent>
 
                 </Card>

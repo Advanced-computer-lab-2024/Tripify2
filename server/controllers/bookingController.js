@@ -105,6 +105,62 @@ const getallItineraryBookings = async (req, res) => {
       res.status(500).json({ msg: "Server error", error: err.message });
     }
   };
+  const getItineraryBookingsByIdAndDate = async (req, res) => {
+    const { id, createdAt } = req.params; // Itinerary ID and createdAt date in params
+  
+    try {
+      // Parse the createdAt date from params
+      const createdAtDate = new Date(createdAt);
+  
+      // Validate the createdAt date
+      if (isNaN(createdAtDate.getTime())) {
+        return res.status(400).json({ msg: "Invalid date format in createdAt parameter" });
+      }
+  
+      // Log the parsed createdAt date for debugging
+      console.log("Parsed createdAt date: ", createdAtDate);
+  
+      // Define the start and end of the day for the given date
+      const startOfDay = new Date(Date.UTC(createdAtDate.getUTCFullYear(), createdAtDate.getUTCMonth(), createdAtDate.getUTCDate(), 0, 0, 0));
+      const endOfDay = new Date(Date.UTC(createdAtDate.getUTCFullYear(), createdAtDate.getUTCMonth(), createdAtDate.getUTCDate(), 23, 59, 59, 999));
+  
+      // Log the start and end of the day for debugging
+      console.log("Start of day: ", startOfDay);
+      console.log("End of day: ", endOfDay);
+  
+      // Query for bookings with the specified ID, status, and date range
+      const bookings = await ItineraryBooking.find({
+        "ItineraryId": id,
+        Status: "Confirmed",
+        createdAt: { $gte: startOfDay, $lt: endOfDay }, // Filter for the entire day
+      }).populate('ItineraryId'); // Optional: Populate the ItineraryId if needed
+  
+      // If no bookings found, return 0 participants
+      bookings.forEach(booking => {
+        console.log("Booking Created At: ", booking.createdAt); // Print the createdAt field of each booking
+    });
+      if (!bookings || bookings.length === 0) {
+        return res.status(200).json({ Participants: 0 });
+      }
+  
+      // Calculate total participants
+      const Participants = bookings.reduce((sum, booking) => sum + (booking.Participants || 0), 0);
+  
+      // Return the total participants
+      res.status(200).json({
+        Participants,
+      });
+    } catch (err) {
+      // Log error for debugging
+      console.error("Error fetching bookings:", err.message);
+      
+      // Handle server errors
+      res.status(500).json({ msg: "Server error", error: err.message });
+    }
+  };
+  
+  
+  
     const getActivityBookingsById = async (req, res) => {
     const { id } = req.params; 
     try {
@@ -1639,4 +1695,5 @@ module.exports = {
   getallActivityBookings,
   getItineraryBookingsById,
   getActivityBookingsById,
+  getItineraryBookingsByIdAndDate,
 };

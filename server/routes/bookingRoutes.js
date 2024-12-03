@@ -35,6 +35,7 @@ const {
   getallActivityBookings,
   getItineraryBookingsById,
   getActivityBookingsById,
+  getItineraryBookingsByIdAndDate,
 } = require("../controllers/bookingController");
 
 const bodyParser = require("body-parser");
@@ -117,5 +118,5 @@ router.route("/act/:id")
 .get(getActivityBookingsById)
 router.route("/itin/:id")
 .get(getItineraryBookingsById)
-
+router.route("/itin/:id/created-at/:createdAt").get(getItineraryBookingsByIdAndDate);
 module.exports = router;

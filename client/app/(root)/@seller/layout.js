@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import localFont from "next/font/local";
 import AccountAdmin from "@/components/admin/AccountAdmin"
 
+import Footer from "@/components/shared/Footer";
 
 const geistMono = localFont({ src: "../../../public/fonts/GeistMonoVF.woff" });
 const geistSans = localFont({ src: "../../../public/fonts/GeistVF.woff" });
@@ -68,6 +69,7 @@ export default function RootLayout({ children }) {
             </main>
           </div>
         </div>
+        <footer/>
       </body>
     </html>
   );

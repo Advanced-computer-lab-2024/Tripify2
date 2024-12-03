@@ -34,21 +34,27 @@ export default function DashboardPage() {
     const [endDate, setEndDate] = useState(null); // End date for filtering
     const session=useSession()
 
+    
     useEffect(() => {
         const fetchAndSortData = async () => {
             const query = `/products?sort=createdAt&order=${sortOrder}`;
-    
+            
             try {
                 const productsResponse = await fetcher(query);
-    
+                
                 if (productsResponse?.ok) {
                     const productsData = await productsResponse.json();
+
+                    console.log("productsData:", productsData);
     
-                    const sellerId = session?.data?.user?.id;
+                    const sellerId = session?.data?.user?.userId;
+                    console.log("sellerId:", sellerId);
                     const filteredProducts = productsData.filter(
                         (product) => product?.Seller?._id === sellerId
                     );
-    
+                    
+                    console.log("filteredProducts:", filteredProducts);
+                    
                     setProducts(
                         filterByDateRange(sortByCreatedAt(filteredProducts, null, sortOrder), startDate, endDate)
                     );
@@ -57,11 +63,12 @@ export default function DashboardPage() {
                 console.error("Error fetching data:", error);
             }
         };
+        
+        if(!session?.data?.user?.userId) return
+        else fetchAndSortData();
+    }, [sortOrder, startDate, endDate, session]); 
     
-        fetchAndSortData();
-    }, [sortOrder, startDate, endDate, session?.data?.user?.id]); 
     
-
     // Helper function to sort by createdAt for both flat and nested structures
     const sortByCreatedAt = (data, nestedKey, order) => {
         return [...data].sort((a, b) => {
@@ -70,15 +77,15 @@ export default function DashboardPage() {
             return order === "asc" ? dateA - dateB : dateB - dateA;
         });
     };
-
+    
     // Helper function to filter data by a specific date range
     const filterByDateRange = (data, start, end) => {
         return data.filter((item) => {
             const createdAt = new Date(
-
+                
                 item?.createdAt
             );
-
+            
             const normalizedStart = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
             const normalizedEnd = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
 
@@ -88,11 +95,11 @@ export default function DashboardPage() {
             return isAfterStart && isBeforeEnd;
         });
     };
-
+    
     const toggleSortOrder = () => {
         setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"));
     };
-
+    
     const totalSales = products.reduce(
         (totals, product) => {
             const price = product?.Price || 0;
@@ -105,8 +112,9 @@ export default function DashboardPage() {
         { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
     );
 
-   
-
+    
+    if(!session?.data?.user?.userId) return null;
+    
     return (
         <Tabs defaultValue="all">
             <div className="flex items-center">

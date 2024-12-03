@@ -269,7 +269,7 @@ export default function Dashboard({ params }) {
                           handleReroute(element.link);
                         }
                       }}
-                      id={element.name.toLowerCase()}
+                      id={element.name.toLowerCase() === 'sign up' ? 'sign-up' : element.name.toLowerCase()}
                       className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${isActive ? "underline" : ""
                         }`}
                     >

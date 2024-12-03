@@ -12,7 +12,7 @@ export default function Sellersides2() {
         <>
             <Link
                 href="/"
-                className={cn("flex items-center rounded-[4px] gap-4 px-2.5 py-2.5 hover:text-foreground", pathname === "/" ? "bg-muted text-black" : "text-muted-foreground")}
+                className={cn("flex items-center rounded-[4px] gap-4 px-2.5 py-2.5 hover:text-foreground", pathname === "/" || pathname === "/products" ? "bg-muted text-black" : "text-muted-foreground")}
             >
                 <Package className="w-5 h-5" />
                 Products

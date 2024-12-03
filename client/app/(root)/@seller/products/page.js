@@ -1,152 +1,281 @@
-"use client";
-import { useEffect, useState } from "react";
-import Allproducts from "@/components/shared/Allproducts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { fetcher } from "@/lib/fetch-client"
+import Search from "@/components/admin/Search"
+import PriceSlider from "@/components/admin/PriceSlider"
+import SortRatingBtn from "@/components/admin/SortRatingBtn"
+import ViewReviewsBtn from "@/components/admin/ViewReviewsBtn"
+import ViewStatisticsBtn from "@/components/admin/ViewStatisticsBtn"
+import ClearFiltersBtn from "@/components/admin/ClearFiltersBtn"
+import ProductEditBtn from "@/components/admin/ProductEditBtn"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { getSession } from "@/lib/session"
+import Image from "next/image"
 
-export default function Products() {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [minPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(100);
-  const [currentMaxPrice, setCurrentMaxPrice] = useState(100);
-  const [sortOption, setSortOption] = useState("none"); // State for sorting
+export default async function DashboardPage({ searchParams }) {
+  const session = await getSession()
 
-  // Function to fetch products
-  const fetchProducts = async () => {
-    try {
-      const response = await fetcher("/products", {
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-          "Accept": "application/json",
-        },
-      });
+  console.log(session.user.userId)
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+  const maxPrice = searchParams['maxPrice'] ?? undefined
+  const minPrice = searchParams['minPrice'] ?? undefined
+  const search = searchParams['search'] ?? undefined
+  const rating = searchParams['rating'] ?? undefined
 
-      let data = await response.json();
+  let query = '/products?'
+  if (search) query += `search=${search}&`
+  if (minPrice) query += `minPrice=${minPrice}&`
+  if (maxPrice) query += `maxPrice=${maxPrice}`
 
-      // Stringify the fetched data
-      const stringifiedData = JSON.stringify(data);
+  if (query.endsWith("?")) query = '/products'
 
-      console.log("Stringified Data: ", stringifiedData); // For debugging
+  const productsResponse = await fetcher(query).catch(err => err)
 
-      const filteredData = data.filter(product => !product.Archived);
+  let products = []
 
-      setProducts(filteredData);
-      setFilteredProducts(filteredData);
-
-      // Extract max price from products
-      const prices = filteredData.map((product) => product.Price);
-      const maxPrice = Math.max(...prices);
-      setMaxPrice(maxPrice);
-      setCurrentMaxPrice(maxPrice);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
-
-  const filterByPrice = () => {
-    const filtered = products.filter(
-      (product) => product.Price >= minPrice && product.Price <= currentMaxPrice
-    );
-    sortProducts(filtered); // Apply sorting after filtering
-  };
-
-  const handleSortChange = (event) => {
-    setSortOption(event.target.value);
-    sortProducts(filteredProducts, event.target.value);
-  };
-
-  const sortProducts = (productsToSort, sortOrder = sortOption) => {
-    let sortedProducts = [...productsToSort];
-    if (sortOrder === "lowToHigh") {
-      sortedProducts.sort((a, b) => a.Rating - b.Rating);
-    } else if (sortOrder === "highToLow") {
-      sortedProducts.sort((a, b) => b.Rating - a.Rating);
-    }
-    setFilteredProducts(sortedProducts);
-  };
-
-  useEffect(() => {
-    fetchProducts();
-    const intervalId = setInterval(() => {
-      fetchProducts();
-    }, 60000); // Fetch every minute
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  useEffect(() => {
-    filterByPrice(); // Filter and sort when the price changes
-  }, [currentMaxPrice]);
+  if (productsResponse?.ok) products = await productsResponse.json()
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        style={styles.searchInput}
-      />
+      <Tabs defaultValue="all">
+          <div className="flex items-center">
+              <TabsList>
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="my-products">My Products</TabsTrigger>
+              </TabsList>
+              <div className="flex items-center gap-4 ml-auto">
 
-      {/* Single Price Slider */}
-      <div style={styles.filterContainer}>
-        <div>
-          <label>Max Price: ${currentMaxPrice.toFixed(2)}</label>
-          <input
-            type="range"
-            min={minPrice}
-            max={maxPrice}
-            step="0.01"
-            value={currentMaxPrice}
-            onChange={(e) => setCurrentMaxPrice(parseFloat(e.target.value))} // Parse as float
-            style={styles.slider}
-          />
-        </div>
 
-        {/* Sort Dropdown */}
-        <div>
-          <label>Sort by Rating: </label>
-          <select value={sortOption} onChange={handleSortChange} style={styles.dropdown}>
-            <option value="none">None</option>
-            <option value="lowToHigh">Lowest to Highest</option>
-            <option value="highToLow">Highest to Lowest</option>
-          </select>
-        </div>
-      </div>
+                  {(query !== '/products' || rating) && <ClearFiltersBtn />}
+                  <SortRatingBtn />
+                  <PriceSlider products={products} />
+                  <Search />
+              </div>
+          </div>
+          <TabsContent value="all">
+              <Card x-chunk="dashboard-06-chunk-0">
+                  <CardHeader>
+                      <CardTitle>Products</CardTitle>
+                      <CardDescription>
+                          View all products currently on the platform.
+                      </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      <Table>
+                          <TableHeader>
+                              <TableRow>
+                                  {/* <TableHead className="hidden w-[100px] sm:table-cell">
+                                      <span className="sr-only">Image</span>
+                                  </TableHead> */}
+                                  <TableHead>Image</TableHead>
+                                  <TableHead>Name</TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Owner's Name
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Description
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Price
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Rating
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Created at
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Archived
+                                  </TableHead>
+                                  <TableHead>
+                                      <span className="sr-only">Actions</span>
+                                  </TableHead>
+                              </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                              {products?.sort((a, b) => rating === 'asc' ? a?.Rating - b?.Rating : rating === 'desc' ? b?.Rating - a?.Rating : a?.createdAt - b?.createdAt).map((product) => product?._id ? (
+                                  <TableRow key={product?._id}>
+                                      <TableCell className="hidden sm:table-cell">
+                                          <Image
+                                              src={product?.Image.startsWith('http://') || product?.Image.startsWith('https://') || product?.Image.startsWith('www') || product?.Image.startsWith('i.') || product?.Image.startsWith('m.') ? product?.Image : `/images/${product?.Image}`}
+                                              width={50}
+                                              height={50}
+                                              alt={product?.Name}
+                                          />
+                                      </TableCell>
+                                      <TableCell className="hidden sm:table-cell">
+                                          {product?.Name}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          {product?.Seller?.UserName}
+                                      </TableCell>
 
-      {/* Pass filtered products and search query */}
-      <Allproducts products={filteredProducts} searchQuery={searchQuery} />
-    </div>
-  );
+                                      <TableCell>
+                                          <TooltipProvider>
+                                              <Tooltip>
+                                                  <TooltipTrigger>{product?.Description.slice(0, 10)}...</TooltipTrigger>
+                                                  <TooltipContent className='max-w-[420px]'>
+                                                      <p>{product?.Description}</p>
+                                                  </TooltipContent>
+                                              </Tooltip>
+                                          </TooltipProvider>
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          ${product?.Price}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          {product?.Rating}
+                                      </TableCell>
+                                      <TableCell className="hidden md:table-cell">
+                                          {product?.createdAt}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          {product?.Archived ? 'Yes' : 'No'}
+                                      </TableCell>
+                                  </TableRow>
+                              ) : null)}
+                          </TableBody>
+                      </Table>
+                  </CardContent>
+                  {/* <CardFooter>
+                      <div className="text-xs text-muted-foreground">
+                      Showing <strong>1-10</strong> of <strong>32</strong>{" "}
+                      products
+                      </div>
+                  </CardFooter> */}
+              </Card>
+          </TabsContent>
+          <TabsContent value="my-products">
+              <Card x-chunk="dashboard-06-chunk-0">
+                  <CardHeader>
+                      <CardTitle>My Products</CardTitle>
+                      <CardDescription>
+                          View all products currently on the platform created by me.
+                      </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      <Table>
+                          <TableHeader>
+                              <TableRow>
+                                  {/* <TableHead className="hidden w-[100px] sm:table-cell">
+                                      <span className="sr-only">Image</span>
+                                  </TableHead> */}
+                                  <TableHead>Image</TableHead>
+                                  <TableHead>Name</TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Owner's Name
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Description
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Price
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Rating
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Reviews
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Statistics
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Created at
+                                  </TableHead>
+                                  <TableHead className="hidden md:table-cell">
+                                      Archived
+                                  </TableHead>
+                                  <TableHead>
+                                      <span className="sr-only">Actions</span>
+                                  </TableHead>
+                              </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                              {products?.filter(product => product?.Seller?._id === session?.user?.userId).sort((a, b) => rating === 'asc' ? a?.Rating - b?.Rating : rating === 'desc' ? b?.Rating - a?.Rating : a?.createdAt - b?.createdAt).map((product) => product?._id ? (
+                                  <TableRow key={product?._id}>
+                                      <TableCell className="hidden sm:table-cell">
+                                          <Image
+                                              src={product?.Image.startsWith('http://') || product?.Image.startsWith('https://') || product?.Image.startsWith('www') || product?.Image.startsWith('i.') || product?.Image.startsWith('m.') ? product?.Image : `/images/${product?.Image}`}
+                                              width={80}
+                                              height={80}
+                                              alt={product?.Name}
+                                          />
+                                      </TableCell>
+                                      <TableCell className="hidden sm:table-cell">
+                                          {product?.Name}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          {product?.Seller?.UserName}
+                                      </TableCell>
+
+                                      <TableCell>
+                                          <TooltipProvider>
+                                              <Tooltip>
+                                                  <TooltipTrigger>{product?.Description.slice(0, 10)}...</TooltipTrigger>
+                                                  <TooltipContent className='max-w-[420px]'>
+                                                      <p>{product?.Description}</p>
+                                                  </TooltipContent>
+                                              </Tooltip>
+                                          </TooltipProvider>
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          ${product?.Price}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          {product?.Rating}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          <ViewReviewsBtn product={product} />
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          <ViewStatisticsBtn product={product} />
+                                      </TableCell>
+                                      <TableCell className="hidden md:table-cell">
+                                          {product?.createdAt}
+                                      </TableCell>
+                                      <TableCell className="font-medium">
+                                          {product?.Archived ? 'Yes' : 'No'}
+                                      </TableCell>
+                                      <TableCell className="hidden md:table-cell">
+                                          <ProductEditBtn product={product} />
+                                      </TableCell>
+                                  </TableRow>
+                              ) : null)}
+                          </TableBody>
+                      </Table>
+                  </CardContent>
+                  {/* <CardFooter>
+                      <div className="text-xs text-muted-foreground">
+                      Showing <strong>1-10</strong> of <strong>32</strong>{" "}
+                      products
+                      </div>
+                  </CardFooter> */}
+              </Card>
+          </TabsContent>
+      </Tabs>
+  )
 }
-
-const styles = {
-  searchInput: {
-    padding: "8px",
-    margin: "10px 0",
-    fontSize: "14px",
-    width: "50%",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-  },
-  filterContainer: {
-    display: "flex",
-    gap: "20px",
-    marginBottom: "20px",
-    alignItems: "center",
-  },
-  slider: {
-    width: "300px",
-    margin: "10px",
-  },
-  dropdown: {
-    padding: "8px",
-    fontSize: "14px",
-  },
-};

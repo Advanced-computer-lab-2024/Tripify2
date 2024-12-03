@@ -45,13 +45,16 @@ export default function DashboardPage() {
                         // Fetch all participants first (no date filter)
                         const participantResponse = await fetcher(`/bookings/itin/${itin._id}`);
                         const participants = participantResponse?.ok ? await participantResponse.json() : [];
-                        const totalParticipants = participants.length; // Total participants for the itinerary
+                        const totalParticipants = participants.Participants
                         
                         // Apply the date filter if dates are set
                         let filteredParticipants = await getParticipantsByDateRange(itin._id, startDate, endDate);
-                        if (filteredParticipants==[]) {
-                            filteredParticipants=participants;
-                        }
+                        // if (filteredParticipants==[]) {
+                        //     filteredParticipants=participants;
+                        // }
+                        //console.log(`...itin: ${JSON.stringify(itin)}`);
+                        //console.log(`totalParticipants: ${JSON.stringify(totalParticipants)}`)
+                        //console.log(`filteredParticipants: ${filteredParticipants}`)
                         return { 
                             ...itin, 
                             participants: filteredParticipants, 
@@ -59,8 +62,11 @@ export default function DashboardPage() {
                         };
                     }));
 
+                    const filteredItineraries = itinerariesWithParticipants.filter(itin => itin.participants.length > 0);
+                    //console.log(`filteredItineraries: ${filteredItineraries}`)
                     // Apply sorting after fetching
-                    setItineraries(itinerariesWithParticipants);
+                    //console.log(`itinerariesWithParticipants: ${itinerariesWithParticipants}`)
+                    setItineraries(filteredItineraries);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -77,7 +83,11 @@ export default function DashboardPage() {
         // Filter by start date
         if (startDate && !endDate) {
             const startDateStr = startDate.toISOString();
-            url += `${startDateStr}`;
+            const pos= startDateStr.indexOf("T");
+            const result= startDateStr.substring(0, pos);
+            //console.log(`startDataStr: ${startDateStr}`);
+            url += `${result}`;
+            //console.log(`url: ${url}`)
         }
         // Filter by end date
         else if (!startDate && endDate) {
@@ -97,7 +107,8 @@ export default function DashboardPage() {
 
         if (response?.ok) {
             const participants = await response.json();
-            return participants; // Return participants for this itinerary within the date range
+            console.log(`participants: ${JSON.stringify(participants)}`)
+            return participants.Participants; // Return participants for this itinerary within the date range
         }
         return []; // Return empty if no participants found or error
     };

@@ -5,6 +5,8 @@ import { Plane, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import localFont from "next/font/local";
+import AccountAdmin from "@/components/admin/AccountAdmin"
+
 
 const geistMono = localFont({ src: "../../../public/fonts/GeistMonoVF.woff" });
 const geistSans = localFont({ src: "../../../public/fonts/GeistVF.woff" });
@@ -56,6 +58,10 @@ export default function RootLayout({ children }) {
                   </nav>
                 </SheetContent>
               </Sheet>
+              <div className='flex items-center justify-end w-full gap-2'>
+              <AccountAdmin />
+              </div>
+
             </header>
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
               {children}

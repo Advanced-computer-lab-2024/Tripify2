@@ -106,7 +106,7 @@ export default function DashboardPage() {
             const totalSales = product?.TotalSales || 0;
             totals.totalSales += totalSales;
             totals.totalRevenue += price * totalSales;
-            totals.discountedRevenue += price * totalSales * 0.1;
+            totals.discountedRevenue += price * totalSales * 0.9;
             return totals;
         },
         { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                                             <TableCell className="hidden sm:table-cell">${product.Price}</TableCell>
                                             <TableCell>{product.TotalSales}</TableCell>
                                             <TableCell>${product.Price * product.TotalSales}</TableCell>
-                                            <TableCell>${product.Price * product.TotalSales * 0.1}</TableCell>
+                                            <TableCell>${product.Price * product.TotalSales * 0.9}</TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 {new Date(product?.createdAt).toLocaleDateString()}
                                             </TableCell>

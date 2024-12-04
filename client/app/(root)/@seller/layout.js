@@ -36,6 +36,7 @@ export default function RootLayout({ children }) {
               <div className="flex-1">
                 <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                   <Sellersides />
+                
                 </nav>
               </div>
             </div>

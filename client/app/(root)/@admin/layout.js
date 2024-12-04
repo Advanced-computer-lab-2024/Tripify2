@@ -10,7 +10,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Image from "next/image"
 import AccountAdmin from "@/components/admin/AccountAdmin"
 import localFont from 'next/font/local'
-import Notifications from "@/components/shared/Notifications"
 
 const geistMono = localFont({ src: '../../../public/fonts/GeistMonoVF.woff' })
 const geistSans = localFont({ src: '../../../public/fonts/GeistVF.woff' })
@@ -58,7 +57,6 @@ export default function RootLayout({ children }) {
 
 							<div className='flex items-center justify-end w-full gap-2'>
 								<AccountAdmin />
-								<Notifications />
 							</div>
 						</header>
 						<main className="grid items-start flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">

@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { Lock, LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Notifications from "@/components/shared/Notifications"
+
 export default function AccountAdmin() {
   const router = useRouter()
 
@@ -45,6 +47,8 @@ export default function AccountAdmin() {
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
+      <Notifications/>
+
     </DropdownMenu>
   )
 

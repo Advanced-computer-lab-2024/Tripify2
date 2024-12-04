@@ -92,10 +92,10 @@ export default function Dashboard({ params }) {
       break;
     case "Tour Guide":
       dashboardElements = [
-        { name: "My Profile", link: "/myprofile" },
-        { name: "My Itineraries", link: "/myitineraries" },
-        { name: "Create Itinerary", link: "/createitinerary" },
-        { name: "Sales Report", link: "/sales-report" },
+        { name: "Account", link: `/account/${id}` },
+        { name: "My Tours", link: "/myTours" },
+        { name: "Schedule", link: "/schedule" },
+        { name: "Earnings", link: "/earnings" },
       ];
       break;
     case "Advertiser":
@@ -103,7 +103,7 @@ export default function Dashboard({ params }) {
         { name: "My Profile", link: "/profile" },
         { name: "My Activities", link: "/my-activities" },
         { name: "Sales Report", link: "/sales-report" },
-        // { name: "Billing", link: "/billing" },
+        { name: "Tourists Report", link: "/tourists-report" },
       ];
       break;
     case "Seller":
@@ -243,7 +243,7 @@ export default function Dashboard({ params }) {
         <span className="">Tripify</span>
       </Link>
 
-      <div id='heading' className="flex items-center space-x-4">
+      <div id="heading" className="flex items-center space-x-4">
         {showHamburger ? (
           <button
             onClick={toggleSidebar}
@@ -269,9 +269,14 @@ export default function Dashboard({ params }) {
                           handleReroute(element.link);
                         }
                       }}
-                      id={element.name.toLowerCase() === 'sign up' ? 'sign-up' : element.name.toLowerCase()}
-                      className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${isActive ? "underline" : ""
-                        }`}
+                      id={
+                        element.name.toLowerCase() === "sign up"
+                          ? "sign-up"
+                          : element.name.toLowerCase()
+                      }
+                      className={`text-black font-normal py-2 px-4 rounded transition duration-300 ease-in-out ${
+                        isActive ? "underline" : ""
+                      }`}
                     >
                       {element.name}
                     </button>
@@ -281,8 +286,9 @@ export default function Dashboard({ params }) {
                           <button
                             key={sublinkIndex}
                             onClick={() => handleReroute(sublink.link)}
-                            className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${pathname === sublink.link ? "underline" : ""
-                              }`}
+                            className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
+                              pathname === sublink.link ? "underline" : ""
+                            }`}
                           >
                             {sublink.name}
                           </button>
@@ -307,8 +313,9 @@ export default function Dashboard({ params }) {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-gray-100 z-20 transform ${sidebarVisible ? "translate-x-0" : "translate-x-full"
-          } transition-transform duration-300 ease-in-out`}
+        className={`fixed top-0 right-0 h-full w-64 bg-gray-100 z-20 transform ${
+          sidebarVisible ? "translate-x-0" : "translate-x-full"
+        } transition-transform duration-300 ease-in-out`}
       >
         <nav className="flex flex-col p-4">
           {dashboardElements.map((element, index) => (
@@ -328,8 +335,9 @@ export default function Dashboard({ params }) {
                     <button
                       key={sublinkIndex}
                       onClick={() => handleReroute(sublink.link)}
-                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${pathname === sublink.link ? "underline" : ""
-                        }`}
+                      className={`block text-left w-full py-2 px-4 text-black hover:bg-gray-200 transition duration-300 ease-in-out ${
+                        pathname === sublink.link ? "underline" : ""
+                      }`}
                     >
                       {sublink.name}
                     </button>

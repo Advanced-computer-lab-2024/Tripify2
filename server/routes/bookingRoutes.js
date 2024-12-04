@@ -36,7 +36,10 @@ const {
   getItineraryBookingsById,
   getActivityBookingsById,
   getItineraryBookingsByIdAndDate,
-  getActivityBookingsByIdAndDate,
+  allItinerariesBookedForTourguide,
+  allActivitiesBookedForAdvertiser,
+  allBoughtProductsForThisSeller,
+  getAllActivityBookings,
 } = require("../controllers/bookingController");
 
 const bodyParser = require("body-parser");
@@ -111,15 +114,20 @@ router.post(
   bodyParser.raw({ type: "application/json" }),
   acceptBooking
 );
-router.route("/itin")
-.get(getallItineraryBookings)
-router.route("/act")
-.get(getallActivityBookings)
-router.route("/act/:id")
-.get(getActivityBookingsById)
-router.route("/itin/:id")
-.get(getItineraryBookingsById)
-router.route("/itin/:id/month/:month/year/:year").get(getItineraryBookingsByIdAndDate);
-router.route("/act/:id/month/:month/year/:year").get(getActivityBookingsByIdAndDate);
+router.route("/itin").get(getallItineraryBookings);
+router.route("/activ").get(getAllActivityBookings);
+router.route("/act").get(getallActivityBookings);
+router.route("/act/:id").get(getActivityBookingsById);
+router.route("/itin/:id").get(getItineraryBookingsById);
+router
+  .route("/itin/:id/created-at/:createdAt")
+  .get(getItineraryBookingsByIdAndDate);
+router
+  .route("/all-itineraries/booked-tourguide/:id")
+  .get(allItinerariesBookedForTourguide);
 
+router.route("/products/for/seller/:id").get(allBoughtProductsForThisSeller);
+router
+  .route("/activities-booked-for/:id")
+  .get(allActivitiesBookedForAdvertiser);
 module.exports = router;

@@ -209,7 +209,10 @@ export default function Explore({ params }) {
             </div>
           </div>
           <Link href="/create-vacation">
-            <Button className="flex items-center gap-2 px-6 py-2 font-semibold text-blue-600 transition-colors bg-white rounded-full hover:bg-blue-50">
+            <Button
+              id="start-vacation"
+              className="flex items-center gap-2 px-6 py-2 font-semibold text-blue-600 transition-colors bg-white rounded-full hover:bg-blue-50"
+            >
               Start Planning
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -230,6 +233,7 @@ export default function Explore({ params }) {
           className="w-full py-2 pl-10 pr-4 text-gray-700 transition duration-200 bg-gray-100 rounded-lg focus:outline-none focus:bg-white"
           style={{ border: "none", boxShadow: "none" }}
           value={search}
+          id="search-bar"
           onChange={(e) => {
             setSearch(e.target.value);
             setCurrentItineraryIndex(0);
@@ -240,7 +244,7 @@ export default function Explore({ params }) {
       </div>
 
       <Tabs defaultValue="all">
-        <TabsList className="flex space-x-4 mb-6">
+        <TabsList className="flex mb-6 space-x-4">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="itineraries">Itineraries</TabsTrigger>
           <TabsTrigger value="activities">Activities</TabsTrigger>
@@ -249,14 +253,14 @@ export default function Explore({ params }) {
 
         <TabsContent value="all">
           <button
-            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            className="mb-6 text-2xl font-semibold transition-all duration-300 hover:opacity-60 hover:filter hover:brightness-75"
             onClick={() => router.push("/itinerary")}
           >
             Itineraries ({filteredItineraries.length})
           </button>
           {filteredItineraries.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              <div className="grid grid-cols-1 gap-6 mb-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {getDisplayedItineraries().map((itinerary) => {
                   const isBookmarked = bookmarkedItinerary.includes(
                     itinerary._id
@@ -264,7 +268,7 @@ export default function Explore({ params }) {
                   return (
                     <Card
                       key={itinerary._id}
-                      className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                      className="relative transition-all duration-300 ease-in-out transform group hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                       onClick={() => router.push(`/itinerary/${itinerary._id}`)}
                     >
                       <img
@@ -277,7 +281,7 @@ export default function Explore({ params }) {
                       </CardHeader>
                       <CardContent>
                         <div
-                          className="absolute top-2 right-2 text-2xl"
+                          className="absolute text-2xl top-2 right-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleBookmark(itinerary._id, "itinerary");
@@ -330,14 +334,14 @@ export default function Explore({ params }) {
           <hr className="my-8 border-gray-300" />
 
           <button
-            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            className="mb-6 text-2xl font-semibold transition-all duration-300 hover:opacity-60 hover:filter hover:brightness-75"
             onClick={() => router.push("/activities")}
           >
             Activities ({filteredActivities.length})
           </button>
           {filteredActivities.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              <div className="grid grid-cols-1 gap-6 mb-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {getDisplayedActivities().map((activity) => {
                   const isBookmarked = bookmarkedActivity.includes(
                     activity._id
@@ -345,7 +349,7 @@ export default function Explore({ params }) {
                   return (
                     <Card
                       key={activity._id}
-                      className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                      className="relative transition-all duration-300 ease-in-out transform group hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                       onClick={() => router.push(`/activities/${activity._id}`)}
                     >
                       <img
@@ -367,7 +371,7 @@ export default function Explore({ params }) {
                           {convertPrice(activity.Price, currency)}
                         </p>
                         <div
-                          className="absolute top-2 right-2 text-2xl"
+                          className="absolute text-2xl top-2 right-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleBookmark(activity._id, "activity");
@@ -420,18 +424,18 @@ export default function Explore({ params }) {
           <hr className="my-8 border-gray-300" />
 
           <button
-            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            className="mb-6 text-2xl font-semibold transition-all duration-300 hover:opacity-60 hover:filter hover:brightness-75"
             onClick={() => router.push("/places")}
           >
             Places ({filteredPlaces.length})
           </button>
           {filteredPlaces.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              <div className="grid grid-cols-1 gap-6 mb-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {getDisplayedPlaces().map((place) => (
                   <Card
                     key={place._id}
-                    className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                    className="relative transition-all duration-300 ease-in-out transform group hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                     onClick={() => router.push(`/places/${place._id}`)}
                   >
                     <img
@@ -481,14 +485,14 @@ export default function Explore({ params }) {
 
         <TabsContent value="itineraries">
           <button
-            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            className="mb-6 text-2xl font-semibold transition-all duration-300 hover:opacity-60 hover:filter hover:brightness-75"
             onClick={() => router.push("/itinerary")}
           >
             Itineraries ({filteredItineraries.length})
           </button>
           {filteredItineraries.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              <div className="grid grid-cols-1 gap-6 mb-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {getDisplayedItineraries().map((itinerary) => {
                   const isBookmarked = bookmarkedItinerary.includes(
                     itinerary._id
@@ -496,7 +500,7 @@ export default function Explore({ params }) {
                   return (
                     <Card
                       key={itinerary._id}
-                      className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                      className="relative transition-all duration-300 ease-in-out transform group hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                       onClick={() => router.push(`/itinerary/${itinerary._id}`)}
                     >
                       <img
@@ -509,7 +513,7 @@ export default function Explore({ params }) {
                       </CardHeader>
                       <CardContent>
                         <div
-                          className="absolute top-2 right-2 text-2xl"
+                          className="absolute text-2xl top-2 right-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleBookmark(itinerary._id, "itinerary");
@@ -562,14 +566,14 @@ export default function Explore({ params }) {
 
         <TabsContent value="activities">
           <button
-            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            className="mb-6 text-2xl font-semibold transition-all duration-300 hover:opacity-60 hover:filter hover:brightness-75"
             onClick={() => router.push("/activities")}
           >
             Activities ({filteredActivities.length})
           </button>
           {filteredActivities.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              <div className="grid grid-cols-1 gap-6 mb-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {getDisplayedActivities().map((activity) => {
                   const isBookmarked = bookmarkedActivity.includes(
                     activity._id
@@ -577,7 +581,7 @@ export default function Explore({ params }) {
                   return (
                     <Card
                       key={activity._id}
-                      className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                      className="relative transition-all duration-300 ease-in-out transform group hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                       onClick={() => router.push(`/activities/${activity._id}`)}
                     >
                       <img
@@ -599,7 +603,7 @@ export default function Explore({ params }) {
                           {convertPrice(activity.Price, currency)}
                         </p>
                         <div
-                          className="absolute top-2 right-2 text-2xl"
+                          className="absolute text-2xl top-2 right-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleBookmark(activity._id, "activity");
@@ -652,18 +656,18 @@ export default function Explore({ params }) {
 
         <TabsContent value="places">
           <button
-            className="text-2xl font-semibold mb-6 hover:opacity-60 hover:filter hover:brightness-75 transition-all duration-300"
+            className="mb-6 text-2xl font-semibold transition-all duration-300 hover:opacity-60 hover:filter hover:brightness-75"
             onClick={() => router.push("/places")}
           >
             Places ({filteredPlaces.length})
           </button>
           {filteredPlaces.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-10">
+              <div className="grid grid-cols-1 gap-6 mb-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {getDisplayedPlaces().map((place) => (
                   <Card
                     key={place._id}
-                    className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+                    className="relative transition-all duration-300 ease-in-out transform group hover:scale-101 hover:shadow-xl hover:bg-gray-100"
                     onClick={() => router.push(`/places/${place._id}`)}
                   >
                     <img

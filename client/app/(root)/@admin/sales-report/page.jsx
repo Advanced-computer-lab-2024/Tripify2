@@ -160,7 +160,7 @@ export default function DashboardPage() {
     return (
         <Tabs defaultValue="all">
             <div className="flex items-center">
-                <div className="ml-auto flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-auto">
                     <SalesReportBtn />
                     <button onClick={toggleSortOrder}>
                         {sortOrder === "desc" ? "Sort: Newest to Oldest" : "Sort: Oldest to Newest"}

@@ -1,6 +1,9 @@
 const { default: mongoose } = require("mongoose");
 const userModel = require("../models/User.js");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+const NotificationService = require("../config/notification.service.js");
+const notificationService = new NotificationService();
 
 //create user Test
 // const CreateUserTest = async (req,res)=>{
@@ -17,6 +20,71 @@ const bcrypt = require("bcrypt");
 //     }
 
 // }
+
+const otpStore = new Map();
+
+const generateOTP = () => {
+  return crypto.randomInt(100000, 999999).toString();
+};
+
+const sendPasswordResetOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(email);
+    const user = await userModel.findOne({ Email: email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const otp = generateOTP();
+
+    otpStore.set(email, {
+      otp,
+      expiry: Date.now() + 600000
+    });
+
+    await notificationService.sendOTPEmail({ email, otp });
+
+    res.status(200).json({
+      message: 'OTP sent successfully',
+      email: email
+    });
+  } catch (error) {
+    console.error('Error in sendPasswordResetOTP:', error);
+    res.status(500).json({ message: 'Error sending OTP' });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const storedOTPData = otpStore.get(email);
+    if (!storedOTPData ||
+      storedOTPData.otp !== otp ||
+      Date.now() > storedOTPData.expiry) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    const user = await userModel.findOne({ Email: email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.Password = hashedPassword;
+    await user.save();
+
+    otpStore.delete(email);
+
+    res.status(200).json({ message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Error in resetPassword:', error);
+    res.status(500).json({ message: 'Error resetting password' });
+  }
+};
 
 const getAllDeleteRequests = async (req, res) => {
   try {
@@ -191,4 +259,4 @@ const requestDeleteUser = async (req, res) => {
   }
 }
 
-module.exports = { getAllDeleteRequests, requestDeleteUser, getAllUsers, getUser, updateUser, deleteUser, createUser, updatePassword };
+module.exports = { getAllDeleteRequests, requestDeleteUser, getAllUsers, getUser, updateUser, deleteUser, createUser, updatePassword, sendPasswordResetOTP, resetPassword };

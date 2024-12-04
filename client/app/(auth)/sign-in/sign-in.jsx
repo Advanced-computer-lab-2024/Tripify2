@@ -17,6 +17,7 @@ import { Loader2 } from "lucide-react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import Link from "next/link"
 
 const signInSchema = z.object({
     UserName: z.string().min(2, {
@@ -67,7 +68,7 @@ export default function SignIn()
 
     return (
         <div className='flex flex-col items-center justify-center flex-1 gap-24 p-8'>
-            <h1 className='font-semibold text-4xl font-poppins'>Welcome Back!</h1>
+            <h1 className='text-4xl font-semibold font-poppins'>Welcome Back!</h1>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <FormField
@@ -79,7 +80,7 @@ export default function SignIn()
                                 <FormControl>
                                     <Input disabled={loading} className='w-screen max-w-[340px] disabled:opacity-60' placeholder="e.g. johndoe" {...field} />
                                 </FormControl>
-                                <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                                <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
                             </FormItem>
                         )}
                     />
@@ -92,11 +93,19 @@ export default function SignIn()
                                 <FormControl>
                                     <Input disabled={loading} type="password" className='w-screen max-w-[340px] disabled:opacity-60' placeholder="" {...field} />
                                 </FormControl>
-                                <FormMessage className='absolute text-red-500 text-xs -bottom-6 left-0' />
+                                <FormMessage className='absolute left-0 text-xs text-red-500 -bottom-6' />
                             </FormItem>
                         )}
                     />
-                    <Button className='w-full flex items-center justify-center gap-2' type="submit">
+                    <div className="flex justify-end text-sm">
+                        <Link
+                            href="/forgot-password" 
+                            className="text-blue-500 transition-colors hover:text-blue-600"
+                        >
+                            Forgot password?
+                        </Link>
+                    </div>
+                    <Button className='flex items-center justify-center w-full gap-2' type="submit">
                         {loading ? <Loader2 className='animate-spin' size={16} /> : "Submit"}
                     </Button>
                     {error && (

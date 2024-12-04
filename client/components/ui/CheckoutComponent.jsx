@@ -189,7 +189,7 @@ const CheckoutComponent = ({ params }) => {
   };
 
   return (
-    <div className="checkout-container max-w-6xl mx-auto bg-white rounded-lg">
+    <div className="p-6 px-14">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Checkout</h1>
 
       {productsInCart.length > 0 ? (

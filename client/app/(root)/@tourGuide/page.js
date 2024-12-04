@@ -3,6 +3,7 @@ import Dashboard from "@/components/ui/dashboard";
 import React from "react";
 import { useRouter } from "next/navigation";
 import LogoutBtn from "@/components/ui/LogoutBtn";
+import Notifications from "@/components/shared/Notifications";
 
 function LandingPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ function LandingPage() {
       <h1 className="mb-4 text-2xl">
         <strong>Welcome Touguide</strong>
       </h1>
-      <div>
+      <div className="flex items-center">
         <button
           onClick={myProfileClick}
           className="px-4 py-2 mr-4 text-white bg-blue-500 rounded"
@@ -46,9 +47,10 @@ function LandingPage() {
           onClick={myReportClick}
           className="px-4 py-2 text-white bg-blue-500 rounded"
         >
-         View Sales Report
+          View Sales Report
         </button>
         <LogoutBtn />
+        <Notifications />
       </div>
     </div>
   );

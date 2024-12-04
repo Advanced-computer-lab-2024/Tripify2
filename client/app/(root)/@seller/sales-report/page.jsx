@@ -22,43 +22,53 @@ import {
     Tabs,
     TabsContent,
 } from "@/components/ui/tabs";
-import SalesReportBtn from "@/components/admin/SalesReportBtn";
+import SalesReportBtn from "@/components/shared/SalesReportBtnP";
 import { fetcher } from "@/lib/fetch-client";
 import { useSession } from "next-auth/react";
+
 
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
     const [products, setProducts] = useState([]);
-    const [itineraries, setItineraries] = useState([]);
-    const [acts, setActs] = useState([]);
     const [startDate, setStartDate] = useState(null); // Start date for filtering
     const [endDate, setEndDate] = useState(null); // End date for filtering
     const session=useSession()
 
+    
     useEffect(() => {
         const fetchAndSortData = async () => {
             const query = `/products?sort=createdAt&order=${sortOrder}`;
-
+            
             try {
                 const productsResponse = await fetcher(query);
                 
-
                 if (productsResponse?.ok) {
                     const productsData = await productsResponse.json();
+
+                    console.log("productsData:", productsData);
+    
+                    const sellerId = session?.data?.user?.userId;
+                    console.log("sellerId:", sellerId);
+                    const filteredProducts = productsData.filter(
+                        (product) => product?.Seller?._id === sellerId
+                    );
+                    
+                    console.log("filteredProducts:", filteredProducts);
+                    
                     setProducts(
-                        filterByDateRange(sortByCreatedAt(productsData, null, sortOrder), startDate, endDate)
+                        filterByDateRange(sortByCreatedAt(filteredProducts, null, sortOrder), startDate, endDate)
                     );
                 }
-
-               
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
-
-        fetchAndSortData();
-    }, [sortOrder, startDate, endDate]); // Refetch and filter data when date range or sort order changes
-
+        
+        if(!session?.data?.user?.userId) return
+        else fetchAndSortData();
+    }, [sortOrder, startDate, endDate, session]); 
+    
+    
     // Helper function to sort by createdAt for both flat and nested structures
     const sortByCreatedAt = (data, nestedKey, order) => {
         return [...data].sort((a, b) => {
@@ -67,16 +77,15 @@ export default function DashboardPage() {
             return order === "asc" ? dateA - dateB : dateB - dateA;
         });
     };
-
+    
     // Helper function to filter data by a specific date range
     const filterByDateRange = (data, start, end) => {
         return data.filter((item) => {
             const createdAt = new Date(
-                item?.ItineraryId?.createdAt ||
-                item?.ActivityId?.createdAt ||
+                
                 item?.createdAt
             );
-
+            
             const normalizedStart = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
             const normalizedEnd = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
 
@@ -86,24 +95,26 @@ export default function DashboardPage() {
             return isAfterStart && isBeforeEnd;
         });
     };
-
+    
     const toggleSortOrder = () => {
         setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"));
     };
-
-    const totalSales = products.filter((product) => product?.Seller?._id === session?.data?.user?.id)
-    .reduce(
+    
+    const totalSales = products.reduce(
         (totals, product) => {
             const price = product?.Price || 0;
             const totalSales = product?.TotalSales || 0;
             totals.totalSales += totalSales;
             totals.totalRevenue += price * totalSales;
-            totals.discountedRevenue += price * totalSales * 0.9;
+            totals.discountedRevenue += price * totalSales * 0.1;
             return totals;
         },
         { totalSales: 0, totalRevenue: 0, discountedRevenue: 0 }
     );
 
+    
+    if(!session?.data?.user?.userId) return null;
+    
     return (
         <Tabs defaultValue="all">
             <div className="flex items-center">
@@ -161,7 +172,7 @@ export default function DashboardPage() {
                                         <strong>Products</strong>
                                     </TableCell>
                                 </TableRow>
-                                {products?.filter((product) => product?.Seller?._id === session?.data?.user?.id)
+                                {products
                                 .map((product) =>
                                     product?._id ? (
                                         <TableRow key={product._id}>
@@ -169,14 +180,16 @@ export default function DashboardPage() {
                                             <TableCell className="hidden sm:table-cell">${product.Price}</TableCell>
                                             <TableCell>{product.TotalSales}</TableCell>
                                             <TableCell>${product.Price * product.TotalSales}</TableCell>
-                                            <TableCell>${product.Price * product.TotalSales * 0.9}</TableCell>
+                                            <TableCell>${product.Price * product.TotalSales * 0.1}</TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 {new Date(product?.createdAt).toLocaleDateString()}
                                             </TableCell>
                                         </TableRow>
                                     ) : null
                                 )}
-                               
+                                {/* Itineraries */}
+                              
+          
                                 {/* Total Row */}
                                 <TableRow>
                                     <TableCell className="hidden sm:table-cell">
@@ -190,7 +203,7 @@ export default function DashboardPage() {
                                         <strong>${totalSales.totalRevenue}</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${totalSales.discountedRevenue}</strong>
+                                        <strong>${totalSales.discountedRevenue }</strong>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

@@ -267,13 +267,18 @@ const ActivityComponent = ({ params }) => {
 
         <div className="mb-4">
           <label htmlFor="priceRange" className="mb-2 font-bold text-black">
-            Price: <span className="font-normal">{filteredPrice}</span>
+            Price:{" "}
+            <span className="font-normal">
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {filteredPrice}
+            </span>
           </label>
           <input
             id="priceRange"
             type="range"
             className="w-full range"
             min="0"
+            step="0.01"
             max={Math.round(maxPrice)}
             value={filteredPrice}
             onChange={handleRangeChangePrice}

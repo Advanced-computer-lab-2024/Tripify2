@@ -4,8 +4,16 @@ const advertiserModel = require("../models/Advertiser.js");
 const userModel = require("../models/User.js");
 const CompanyProfile = require("../models/CompanyProfile.js");
 const createAdvertiser = async (req, res) => {
-  const { UserName, Email, Password, Website, Hotline, Document, CompanyName, CompanyDescription } =
-    req.body;
+  const {
+    UserName,
+    Email,
+    Password,
+    Website,
+    Hotline,
+    Document,
+    CompanyName,
+    CompanyDescription,
+  } = req.body;
   try {
     if (
       !UserName ||
@@ -48,7 +56,7 @@ const createAdvertiser = async (req, res) => {
       Website,
       Hotline,
       AdvertiserId: newadvertiser._id,
-    })
+    });
 
     newadvertiser.CompanyProfile = newCompanyProfile._id;
     await newadvertiser.save();
@@ -65,14 +73,16 @@ const getAdvertisers = async (req, res) => {
   try {
     const { accepted, application } = req.query;
     if (accepted) {
-      const advertisers = await advertiserModel.find({ Accepted: true }).populate("UserId");
+      const advertisers = await advertiserModel
+        .find({ Accepted: true })
+        .populate("UserId");
       res.status(200).json(advertisers);
-    }
-    else if (application) {
-      const advertisers = await advertiserModel.find({ Accepted: null }).populate("UserId");
+    } else if (application) {
+      const advertisers = await advertiserModel
+        .find({ Accepted: null })
+        .populate("UserId");
       res.status(200).json(advertisers);
-    }
-    else {
+    } else {
       const advertisers = await advertiserModel.find().populate("UserId");
       res.status(200).json(advertisers);
     }
@@ -90,6 +100,7 @@ const getAdvertiserActivities = async (req, res) => {
       .findOne({ UserId: req._id }, "Activities")
       .lean()
       .populate("Activities");
+
     if (!activities)
       return res.status(400).json({ message: "No Activities where found!" });
     return res.status(200).json(activities);
@@ -154,11 +165,11 @@ const updateAdvertiser = async (req, res) => {
       { new: true }
     );
 
-    console.log("Image: ", Image)
+    console.log("Image: ", Image);
 
     const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(
       id,
-      { Document, Image: Image ?? (advertiser.Image ?? "") },
+      { Document, Image: Image ?? advertiser.Image ?? "" },
       { new: true }
     );
 
@@ -166,7 +177,7 @@ const updateAdvertiser = async (req, res) => {
       updatedAdvertiser.CompanyProfile,
       { Website, Hotline },
       { new: true }
-    )
+    );
 
     res.status(200).json({
       message: "Advertiser and user updated successfully",
@@ -182,7 +193,9 @@ const deleteAdvertiser = async (req, res) => {
 
   try {
     const deletedAdvertiser = await advertiserModel.findByIdAndDelete(id);
-    const deletedUser = await userModel.findByIdAndDelete(deletedAdvertiser.UserId);
+    const deletedUser = await userModel.findByIdAndDelete(
+      deletedAdvertiser.UserId
+    );
 
     if (!deletedAdvertiser) {
       return res.json({ message: "Advertiser not found" });
@@ -240,5 +253,5 @@ module.exports = {
   deleteAdvertiser,
   getAdvertiserActivities,
   acceptAdvertiser,
-  rejectAdvertiser
+  rejectAdvertiser,
 };

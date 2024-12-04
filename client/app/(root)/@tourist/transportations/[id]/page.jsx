@@ -60,7 +60,7 @@ export default async function TransportationDetailsPage({ params }) {
                     </div>
                 </div>
             </div>
-            <BookingForm transportId={transport._id} isAvailable={transport.availability} />
+            <BookingForm transportId={transport._id} isAvailable={transport.availability} pricePerDay={transport.pricePerDay} />
         </div>
     )
 }

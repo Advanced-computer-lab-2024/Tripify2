@@ -44,7 +44,7 @@ const checkoutMainPage = async () => {
 
     // return <CheckoutComponent params={params} />;
     return (
-      <div className="my-8 px-4">
+      <div className="p-6 px-14">
         <CheckoutComponent params={params} />
       </div>
     );

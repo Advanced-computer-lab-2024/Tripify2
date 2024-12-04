@@ -118,9 +118,12 @@ export default function Products() {
         <h2 className="mb-6 text-lg font-bold text-black">Filter</h2>
 
         <div className="mb-4">
-          <label htmlFor="priceRange" className="mb-2 font-bold text-black">
-            Price: {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
-            {currentMaxPrice.toFixed(2)}
+          <label htmlFor="priceRange" className="mb-2 text-black">
+            <span className="font-bold">Price: </span>
+            <span className="ml-2">
+              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+              {currentMaxPrice.toFixed(2)}
+            </span>
           </label>
           <input
             id="priceRange"
@@ -135,16 +138,20 @@ export default function Products() {
         </div>
 
         <div className="mb-4">
-          <label>Sort by Rating: </label>
-          <select
-            value={sortOption}
-            onChange={handleSortChange}
-            style={styles.dropdown}
-          >
-            <option value="none">None</option>
-            <option value="lowToHigh">Lowest to Highest</option>
-            <option value="highToLow">Highest to Lowest</option>
-          </select>
+          <label>
+            <span className="mb-2 text-black font-bold mr-2">Rating: </span>
+          </label>
+          <div>
+            <select
+              value={sortOption}
+              onChange={handleSortChange}
+              className="w-full p-2 mt-2 border border-gray-300 rounded"
+            >
+              <option value="none">None</option>
+              <option value="lowToHigh">Lowest to Highest</option>
+              <option value="highToLow">Highest to Lowest</option>
+            </select>
+          </div>
         </div>
       </div>
 

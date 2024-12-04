@@ -21,6 +21,11 @@ const BookingSchema = new Schema(
       type: String,
       required: true,
     },
+    PromoCode: {
+      type: Schema.Types.ObjectId,
+      ref: "PromoCode",
+      default: null
+    }
   },
   {
     timestamps: true,

@@ -35,6 +35,8 @@ const {
   getallActivityBookings,
   getItineraryBookingsById,
   getActivityBookingsById,
+  getItineraryBookingsByIdAndDate,
+  getActivityBookingsByIdAndDate,
 } = require("../controllers/bookingController");
 
 const bodyParser = require("body-parser");
@@ -117,5 +119,7 @@ router.route("/act/:id")
 .get(getActivityBookingsById)
 router.route("/itin/:id")
 .get(getItineraryBookingsById)
+router.route("/itin/:id/month/:month/year/:year").get(getItineraryBookingsByIdAndDate);
+router.route("/act/:id/month/:month/year/:year").get(getActivityBookingsByIdAndDate);
 
 module.exports = router;

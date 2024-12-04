@@ -21,6 +21,7 @@ import {
   UserIcon,
   MailIcon,
   LinkIcon,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
@@ -29,10 +30,16 @@ import { convertPrice } from "@/lib/utils";
 import { fetcher } from "@/lib/fetch-client";
 import { useSession } from "next-auth/react";
 import { RiBookmarkLine, RiBookmarkFill } from "@remixicon/react";
+import { Input } from "./InputForm";
 
 export default function ActivityDetails({ activity, bookmarked }) {
   const [numParticipants, setNumParticipants] = useState(1);
   const [error, setError] = useState("");
+  const [promoCode, setPromoCode] = useState('');
+  const [promoError, setPromoError] = useState('');
+  const [promoSuccess, setPromoSuccess] = useState('');
+  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [validatingPromo, setValidatingPromo] = useState(false);
   const router = useRouter();
 
   const session = useSession();
@@ -42,6 +49,46 @@ export default function ActivityDetails({ activity, bookmarked }) {
   const [bookmarkedActivities, setBookmarkedActivities] = useState(bookmarked);
 
   const isBookmarked = bookmarkedActivities.includes(activity._id);
+
+  const validatePromoCode = async () => {
+    if (!promoCode.trim()) {
+      setPromoError('Please enter a promo code');
+      return;
+    }
+
+    setValidatingPromo(true);
+    setPromoError('');
+    setPromoSuccess('');
+
+    try {
+      const response = await fetcher('/promo-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: promoCode,
+          amount: activity.Price * numParticipants * ((100 - activity.SpecialDiscounts) / 100)
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        setPromoError(error.message);
+        setDiscountedPrice(null);
+        return;
+      }
+
+      const data = await response.json();
+      setDiscountedPrice(data.discount);
+      setPromoSuccess(data.type === 'percentage'
+        ? `${data.value}% discount applied!`
+        : `${currency} ${convertPrice(data.value, currency)} discount applied!`);
+    } catch (error) {
+      setPromoError('Error validating promo code');
+      setDiscountedPrice(null);
+    } finally {
+      setValidatingPromo(false);
+    }
+  };
 
   if (!activity) {
     return (
@@ -104,6 +151,7 @@ export default function ActivityDetails({ activity, bookmarked }) {
           body: JSON.stringify({
             currency,
             Participants: numParticipants,
+            promoCode: promoCode || undefined
           }),
         }
       );
@@ -251,16 +299,16 @@ export default function ActivityDetails({ activity, bookmarked }) {
                     {currency === "USD"
                       ? "$"
                       : currency === "EUR"
-                      ? "€"
-                      : "EGP"}{" "}
+                        ? "€"
+                        : "EGP"}{" "}
                     {convertPrice(Price, currency)}
                   </span>
                   <span className="font-bold">
                     {currency === "USD"
                       ? "$"
                       : currency === "EUR"
-                      ? "€"
-                      : "EGP"}{" "}
+                        ? "€"
+                        : "EGP"}{" "}
                     {convertPrice(
                       Price * ((100 - SpecialDiscounts) / 100),
                       currency
@@ -377,6 +425,40 @@ export default function ActivityDetails({ activity, bookmarked }) {
                 ))}
               </select>
             </div>
+            <div>
+              <label
+                htmlFor="promoCode"
+                className="block mb-1 text-sm font-medium text-gray-700"
+              >
+                Promo Code
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="promoCode"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  placeholder="Enter promo code"
+                  className="uppercase"
+                />
+                <button
+                  onClick={validatePromoCode}
+                  disabled={validatingPromo}
+                  className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-blue-300"
+                >
+                  {validatingPromo ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Apply'
+                  )}
+                </button>
+              </div>
+              {promoError && (
+                <p className="mt-1 text-sm text-red-500">{promoError}</p>
+              )}
+              {promoSuccess && (
+                <p className="mt-1 text-sm text-green-500">{promoSuccess}</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -387,8 +469,8 @@ export default function ActivityDetails({ activity, bookmarked }) {
               {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
               {convertPrice(
                 activity.Price *
-                  numParticipants *
-                  ((100 - SpecialDiscounts) / 100),
+                numParticipants *
+                ((100 - SpecialDiscounts) / 100),
                 currency
               )}
             </p>

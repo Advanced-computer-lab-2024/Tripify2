@@ -40,9 +40,6 @@ export default function DashboardPage() {
 
             try {
                 const itinResponse = await fetcher(query2);
-
-   
-
                 if (itinResponse?.ok) {
                     const itinData = await itinResponse.json();
                     const itinerariesWithParticipants = await Promise.all(itinData.map(async (itin) => {

@@ -102,7 +102,7 @@ const HelperTouristsReport = ({ params }) => {
 
   return (
     <Tabs defaultValue="all">
-      <TabsContent value="all">
+      <TabsContent className="mt-0" value="all">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
             <CardTitle className="flex justify-between items-center">

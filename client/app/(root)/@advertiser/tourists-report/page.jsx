@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchAndSortData = async () => {
-            const query2 = `/itineraries?sort=createdAt&order=${sortOrder}`;
+            const query2 = `/activities?sort=createdAt&order=${sortOrder}`;
     
             try {
                 const itinResponse = await fetcher(query2);
@@ -43,7 +43,7 @@ export default function DashboardPage() {
                     const itinerariesWithParticipants = await Promise.all(
                         itinData.map(async (itin) => {
                             // Fetch all participants without filtering first
-                            const participantResponse = await fetcher(`/bookings/itin/${itin._id}`);
+                            const participantResponse = await fetcher(`/bookings/act/${itin._id}`);
                             const participants = participantResponse?.ok ? await participantResponse.json() : 0;
                             const totalParticipants = participants.Participants;
 
@@ -80,7 +80,7 @@ export default function DashboardPage() {
         const year = month.getFullYear();
         const monthNumber = month.getMonth() + 1;
     
-        const url = `/bookings/itin/${itinId}/month/${monthNumber}/year/${year}`;
+        const url = `/bookings/act/${itinId}/month/${monthNumber}/year/${year}`;
         // console.log(`Generated URL: ${url}`);
         
         try {
@@ -145,7 +145,7 @@ export default function DashboardPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Tourists Report</CardTitle>
-                        <CardDescription>View all Tourists who Used your Itineraries.</CardDescription>
+                        <CardDescription>View all Tourists who Used your Activities.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                             </TableHeader>
                             <TableBody>
                                 {itineraries
-                                    .filter((itin) => session?.data?.user?.id === itin?.TourGuide?._id)
+                                    .filter((itin) => session?.data?.user?.id === itin?.AdvertiserId?._id)
                                     .map((itin) =>
                                         itin?._id ? (
                                             <TableRow key={itin._id}>

@@ -106,39 +106,90 @@ const getallItineraryBookings = async (req, res) => {
     }
   };
   const getItineraryBookingsByIdAndDate = async (req, res) => {
-    const { id, createdAt } = req.params; // Itinerary ID and createdAt date in params
+    const { id, month, year } = req.params; // Itinerary ID, month, and year in params
   
     try {
-      // Parse the createdAt date from params
-      const createdAtDate = new Date(createdAt);
-  
-      // Validate the createdAt date
-      if (isNaN(createdAtDate.getTime())) {
-        return res.status(400).json({ msg: "Invalid date format in createdAt parameter" });
+      // Validate month and year parameters
+      const monthNum = parseInt(month, 10);
+      const yearNum = parseInt(year, 10);
+      if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+        return res.status(400).json({ msg: "Invalid month parameter" });
+      }
+      if (isNaN(yearNum) || yearNum < 1000 || yearNum > 9999) {
+        return res.status(400).json({ msg: "Invalid year parameter" });
       }
   
-      // Log the parsed createdAt date for debugging
-      console.log("Parsed createdAt date: ", createdAtDate);
+      // Calculate the start and end of the month
+      const startOfMonth = new Date(Date.UTC(yearNum, monthNum - 1, 1, 0, 0, 0)); // Month is 0-indexed
+      const endOfMonth = new Date(Date.UTC(yearNum, monthNum, 0, 23, 59, 59, 999)); // Last day of the month
   
-      // Define the start and end of the day for the given date
-      const startOfDay = new Date(Date.UTC(createdAtDate.getUTCFullYear(), createdAtDate.getUTCMonth(), createdAtDate.getUTCDate(), 0, 0, 0));
-      const endOfDay = new Date(Date.UTC(createdAtDate.getUTCFullYear(), createdAtDate.getUTCMonth(), createdAtDate.getUTCDate(), 23, 59, 59, 999));
+      // Log the start and end of the month for debugging
+      console.log("Start of month: ", startOfMonth);
+      console.log("End of month: ", endOfMonth);
   
-      // Log the start and end of the day for debugging
-      console.log("Start of day: ", startOfDay);
-      console.log("End of day: ", endOfDay);
-  
-      // Query for bookings with the specified ID, status, and date range
+      // Query for bookings with the specified ID, status, and date range within the month
       const bookings = await ItineraryBooking.find({
         "ItineraryId": id,
         Status: "Confirmed",
-        createdAt: { $gte: startOfDay, $lt: endOfDay }, // Filter for the entire day
+        createdAt: { $gte: startOfMonth, $lt: endOfMonth }, // Filter for the entire month
       }).populate('ItineraryId'); // Optional: Populate the ItineraryId if needed
   
       // If no bookings found, return 0 participants
       bookings.forEach(booking => {
         console.log("Booking Created At: ", booking.createdAt); // Print the createdAt field of each booking
-    });
+      });
+      if (!bookings || bookings.length === 0) {
+        return res.status(200).json({ Participants: 0 });
+      }
+  
+      // Calculate total participants
+      const Participants = bookings.reduce((sum, booking) => sum + (booking.Participants || 0), 0);
+  
+      // Return the total participants
+      res.status(200).json({
+        Participants,
+      });
+    } catch (err) {
+      // Log error for debugging
+      console.error("Error fetching bookings:", err.message);
+      
+      // Handle server errors
+      res.status(500).json({ msg: "Server error", error: err.message });
+    }
+  };
+  const getActivityBookingsByIdAndDate = async (req, res) => {
+    const { id, month, year } = req.params; // Itinerary ID, month, and year in params
+  
+    try {
+      // Validate month and year parameters
+      const monthNum = parseInt(month, 10);
+      const yearNum = parseInt(year, 10);
+      if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+        return res.status(400).json({ msg: "Invalid month parameter" });
+      }
+      if (isNaN(yearNum) || yearNum < 1000 || yearNum > 9999) {
+        return res.status(400).json({ msg: "Invalid year parameter" });
+      }
+  
+      // Calculate the start and end of the month
+      const startOfMonth = new Date(Date.UTC(yearNum, monthNum - 1, 1, 0, 0, 0)); // Month is 0-indexed
+      const endOfMonth = new Date(Date.UTC(yearNum, monthNum, 0, 23, 59, 59, 999)); // Last day of the month
+  
+      // Log the start and end of the month for debugging
+      console.log("Start of month: ", startOfMonth);
+      console.log("End of month: ", endOfMonth);
+  
+      // Query for bookings with the specified ID, status, and date range within the month
+      const bookings = await ActivityBooking.find({
+        "ActivityId": id,
+        Status: "Confirmed",
+        createdAt: { $gte: startOfMonth, $lt: endOfMonth }, // Filter for the entire month
+      }).populate('ActivityId'); // Optional: Populate the ItineraryId if needed
+  
+      // If no bookings found, return 0 participants
+      bookings.forEach(booking => {
+        console.log("Booking Created At: ", booking.createdAt); // Print the createdAt field of each booking
+      });
       if (!bookings || bookings.length === 0) {
         return res.status(200).json({ Participants: 0 });
       }
@@ -1696,4 +1747,5 @@ module.exports = {
   getItineraryBookingsById,
   getActivityBookingsById,
   getItineraryBookingsByIdAndDate,
+  getActivityBookingsByIdAndDate,
 };

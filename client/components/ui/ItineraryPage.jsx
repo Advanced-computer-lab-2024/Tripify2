@@ -8,6 +8,7 @@ import LocationViewer from "@/components/shared/LoactionViewer";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button"
 
 function ItineraryPage({ itinerary, params }) {
   const router = useRouter();
@@ -251,21 +252,22 @@ function ItineraryPage({ itinerary, params }) {
   }
 
   const dateandtimelist = itinerary.DatesAndTimes.map((date) => (
-    <li className="border rounded-md drop-shadow-md border-black w-fit min-w-48 p-2">
+    <li className="border shadow border-slate-300 rounded-lg w-60 h-20 flex justify-center items-center">
       {date}
     </li>
   ));
   const activitylist = itinerary.Activities.map((activity) => {
     count++;
     return (
-      <li className="border rounded-md drop-shadow-md border-black w-fit min-w-48 p-2">
+      <li  >
         <button
-          className="w-full h-full" /*onClick={() => activitiesClick(activity._id)}*/
+         className="border shadow border-slate-300 rounded-lg w-56 h-64 flex flex-col justify-start items-center"/*onClick={() => activitiesClick(activity._id)}*/
         >
-          <h2>Activity-{count}</h2>
+          <img className="w-56 h-40 rounded-lg" src="/images/placeholder.jpg" alt="" />
+          <h2 className="text-lg text-semibold mt-1">Activity-{count}</h2>
           <div>
-            <h2>Type: {activity.type}</h2>
-            <h2>Duration: {activity.duration}</h2>
+            <h2 className="text-slate-500">Type: {activity.type}</h2>
+            <h2 className="text-slate-500">{activity.duration>1 ? `Duration: ${activity.duration} Hours` : `Duration: ${activity.duration} Hour`}</h2>
           </div>
         </button>
       </li>
@@ -306,114 +308,108 @@ function ItineraryPage({ itinerary, params }) {
   }, []);
 
   const categorylist = readcategories.map((category) => (
-    <li>{category.Category}</li>
+    <li className="border shadow border-slate-300 rounded-lg min-w-48 w-auto h-20 flex justify-center items-center">{category.Category}</li>
   ));
-  const taglist = readtags.map((tag) => <li>{tag.Tag}</li>);
+  const taglist = readtags.map((tag) => <li className="border shadow border-slate-300 rounded-lg min-w-48 w-auto h-20 flex justify-center items-center">{tag.Tag}</li>);
   console.log(readtags+"hmmmm")
+
+  const [locationBool, setLocationBol] = useState(false);
 
   return (
     <>
       {mode == "Read" ? (
-        <div className="p-4 flex flex-col gap-2">
-          <h1 className="text-xl">
-            <strong>Itinerary Details</strong>
-          </h1>
-          <div>
-            <h2 className="mb-2 text-lg">
-              <strong>Activities</strong>
-            </h2>
-            <ul className="flex flex-col gap-2">{activitylist}</ul>
+        <div className="p-10 px-16 flex flex-col gap-2 border-2 border-slate-100 rounded-md m-12 ml-52 mr-52 ">
+          <div className="flex flex-row justify-between mb-2 ">
+            <div>
+              
+              <h2 className="text-3xl font-bold mb">{itinerary.Name}</h2>
+              <h1 className="text-lg mb-4 text-slate-400 font-medium">Itinerary Details</h1>
+              <div className="mb-2 flex flex-row gap-2 items-center">
+                <h2 className="text-lg font-semibold">Start Date:</h2>
+                <h3>{itinerary.StartDate}</h3>
+              </div>
+              <div className="mb-2 flex flex-row gap-2 items-center">
+                <h2 className="text-lg font-semibold">End Date:</h2>
+                <h3>{itinerary.EndDate}</h3>
+              </div>
+              <div className="mb-2 flex flex-row gap-2 items-center">
+                <h2 className="text-lg font-semibold">Language:</h2>
+                <h3>{itinerary.Language}</h3>
+              </div>
+              <div className="mb-2 flex flex-row gap-2 items-center">
+                <h2 className="text-lg font-semibold">Price:</h2>
+                <h3>${itinerary.Price}</h3>
+              </div>
+              <div className="mb-2 flex flex-row gap-2 items-center">
+                <h2 className="text-lg font-semibold">Pickup:</h2>
+                <h3>{itinerary.Pickup}</h3>
+              </div>
+              <div className="mb-2 flex flex-row gap-2 items-center">
+                <h2 className="text-lg font-semibold">Dropoff:</h2>
+                <h3>{itinerary.Dropoff}</h3>
+              </div>
+              <div className="mb-2 flex flex-row items-center gap-2">
+                <h2 className="text-lg font-semibold">Rating: {" "}</h2>
+                <div>
+                  <span className={itinerary.Rating >0 ?"text-amber-400": "text-neutral-500"}>&#9733;</span>
+                  <span className={itinerary.Rating >1 ?"text-amber-400": "text-neutral-500"}>&#9733;</span>
+                  <span className={itinerary.Rating >2 ?"text-amber-400": "text-neutral-500"}>&#9733;</span>
+                  <span className={itinerary.Rating >3 ?"text-amber-400": "text-neutral-500"}>&#9733;</span>
+                  <span className={itinerary.Rating >4 ?"text-amber-400": "text-neutral-500"}>&#9733;</span>
+                </div>
+              </div>
+              <div className="mb-2">
+                <h2 className="text-lg font-semibold">Accessibility: {itinerary.Accesibility ? "✔️" : "✖️"}</h2>
+              </div>
+              <h2 className="text-lg font-semibold">Inappropriate:{" "}
+                {itinerary.Inappropriate ? "✔️" : "✖️"}
+              </h2>
+            </div>
+            <img className="w-[440px] h-[380px] place-self-center mb-4 rounded-md border p-4" src={(itinerary?.Image.startsWith('http') || itinerary?.Image.startsWith('https') || itinerary?.Image.startsWith('www') || itinerary?.Image.startsWith('i.') || itinerary?.Image.startsWith('m.')) ? itinerary?.Image : `/images/placeholder.jpg`}/>
           </div>
-          <hr />
-          <div>
-            <h2>
-              <strong>Locations</strong>
-            </h2>
-            <li className="border rounded-md drop-shadow-md border-black w-fit min-w-48 p-2">
-              {itinerary.Location.type} & {itinerary.Location.coordinates}
-            </li>
+          <div className="mb-2">
+            <Button  onClick={()=> {setLocationBol(!locationBool)}}>{!locationBool?"View Location":"Close Location"}</Button>
+            {locationBool && <div className="pt-4 w-80 h-fit  "><LocationViewer location={itinerary?.Location} /></div>}
           </div>
-          <hr />
-          <h2>
-            <strong>Start Date:</strong> {itinerary.StartDate}
-          </h2>
-          <hr />
-          <h2>
-            <strong>End Date:</strong> {itinerary.EndDate}
-          </h2>
-          <hr />
-          <h2>
-            <strong>Language:</strong> {itinerary.Language}
-          </h2>
-          <hr />
-          <h2>
-            <strong>Price:</strong> {itinerary.Price}
-          </h2>
-          <hr />
           <div>
-            <h2>
-              <strong>Dates And Times</strong>
-            </h2>
-            <ul>{dateandtimelist}</ul>
-          </div>
-          <hr />
-          <h2>
-            <strong>Accessibility:</strong>{" "}
-            {itinerary.Accesibility ? "true" : "false"}
-          </h2>
-          <hr />
-          <h2>
-            <strong>Pickup:</strong> {itinerary.Pickup}
-          </h2>
-          <hr />
-          <h2>
-            <strong>Dropoff:</strong> {itinerary.Dropoff}
-          </h2>
-          <hr />
-          <div>
-            <h2>
-              <strong>Categories</strong>
-            </h2>
-            <ul>{categorylist}</ul>
-          </div>
+                <h2 className="text-lg font-semibold mb-2">Dates And Times</h2>
+                <ul className="flex flex-row gap-4 overflow-x-scroll mb-2">{dateandtimelist}</ul>
+              </div>
           <hr />
           <div>
-            <h2>
-              <strong>Tags</strong>
+            <h2 className="text-lg font-semibold mb-2 ">Categories
             </h2>
-            <ul>{taglist.length !== 0 ? taglist : <li>No Tags</li>}</ul>
+            <ul className="flex flex-row gap-4 overflow-x-scroll mb-2">{categorylist}</ul>
           </div>
           <hr />
-          <h2>
-            <strong>Inappropriate:</strong>{" "}
-            {itinerary.Inappropriate ? "true" : "false"}
-          </h2>
+          <div className="w-full" >
+            <h2 className="text-lg font-semibold mb-2">Tags
+            </h2>
+            <ul className="flex flex-row gap-4 overflow-x-scroll mb-2 w-full">{taglist.length !== 0 ? taglist : <li>No Tags</li>}</ul>
+          </div>
           <hr />
+          
           <div>
-            <h2>
-              <strong>Image:</strong>
-            </h2>
-            <img src={itinerary.Image} alt="" />
+          
+            <h2 className="text-lg font-semibold mb-2">Activities</h2>
+            <ul className="flex flex-row gap-4 overflow-x-scroll  mb-2">{activitylist}</ul>
           </div>
-          <hr />
-          <h2>
-            <strong>Rating:</strong> {itinerary.Rating}
-          </h2>
-          <button
-            className="bg-blue-500 text-white py-2 px-4 rounded"
+          <hr className=" mb-2"/>
+          <Button
+            
             onClick={() => setMode("Edit")}
           >
             Edit
-          </button>
-          <button
-            className="bg-blue-500 text-white py-2 px-4 rounded"
+          </Button>
+          <Button
+            className="bg-red-600 hover:bg-red-500"
             onClick={() => deleteitinerary()}
           >
             Delete
-          </button>
+          </Button>
         </div>
       ) : (
-        <div className="max-w-xl mx-auto p-6">
+        <div className="max-w-xl mx-auto p-6 border rounded my-4">
           <h1 className="text-2xl font-bold mb-4">Edit Itinerary</h1>
           {error && <div className="text-red-500 mb-4">{error}</div>}
           <form onSubmit={handleSubmit}>
@@ -425,7 +421,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="Name"
                 value={formData.Name}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2 rounded border-slate-400"
               />
             </label>
 
@@ -442,7 +438,7 @@ function ItineraryPage({ itinerary, params }) {
                       onChange={(e) =>
                         handleActivityChange(index, "type", e.target.value)
                       }
-                      className="block w-full border p-2"
+                      className="block w-full border p-2  rounded border-slate-400"
                       
                     />
                   </label>
@@ -454,7 +450,7 @@ function ItineraryPage({ itinerary, params }) {
                       onChange={(e) =>
                         handleActivityChange(index, "duration", e.target.value)
                       }
-                      className="block w-full border p-2"
+                      className="block w-full border p-2  rounded border-slate-400"
                       
                     />
                   </label>
@@ -469,13 +465,12 @@ function ItineraryPage({ itinerary, params }) {
                   )}
                 </div>
               ))}
-              <button
+              <Button
                 type="button"
                 onClick={addActivity}
-                className="bg-blue-500 text-white py-2 px-4 rounded"
               >
                 Add Activity
-              </button>
+              </Button>
             </div>
 
             {/* Location Picker */}
@@ -502,7 +497,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="StartDate"
                 value={formData.StartDate}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2  rounded border-slate-400"
                 required
               />
             </label>
@@ -515,7 +510,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="EndDate"
                 value={formData.EndDate}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2  rounded border-slate-400"
                 required
               />
             </label>
@@ -528,7 +523,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="Language"
                 value={formData.Language}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2  rounded border-slate-400"
                 
               />
             </label>
@@ -541,7 +536,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="Price"
                 value={formData.Price}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2  rounded border-slate-400"
                 
               />
             </label>
@@ -552,7 +547,7 @@ function ItineraryPage({ itinerary, params }) {
               <input
                 type="datetime-local"
                 onChange={handleDateChange}
-                className="block w-full border p-2 mb-2"
+                className="block w-full border p-2 mb-2 rounded border-slate-400"
                 required
               />
               {datesAndTimes.map((dateTime, index) => (
@@ -560,13 +555,13 @@ function ItineraryPage({ itinerary, params }) {
                   <span className="flex-1">
                     {new Date(dateTime).toLocaleString()}
                   </span>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeDateTime(index)}
                     className="text-red-500"
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -592,7 +587,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="Pickup"
                 value={formData.Pickup}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2  rounded border-slate-400"
                 
               />
             </label>
@@ -605,7 +600,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="Dropoff"
                 value={formData.Dropoff}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2  rounded border-slate-400"
                 
               />
             </label>
@@ -618,7 +613,7 @@ function ItineraryPage({ itinerary, params }) {
                 name="Image"
                 value={formData.Image}
                 onChange={handleInputChange}
-                className="block w-full border p-2"
+                className="block w-full border p-2  rounded border-slate-400"
                 
               />
             </label>
@@ -643,7 +638,7 @@ function ItineraryPage({ itinerary, params }) {
                   checked={selectedCategories.includes(category._id)}
                   //className="hidden" // Hide the default checkbox
                 />
-                {category.Category}
+                {" "}{category.Category}
               </label>
             ))}
           </div>
@@ -698,12 +693,12 @@ function ItineraryPage({ itinerary, params }) {
             </div>
 
             {/* Submit Button */}
-            <button
+            <Button
               type="submit"
-              className="bg-green-500 text-white py-2 px-4 rounded w-full"
+              className="text-white py-2 px-4 rounded w-full mt-2"
             >
               Edit Itinerary
-            </button>
+            </Button>
           </form>
         </div>
       )}

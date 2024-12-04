@@ -89,10 +89,10 @@ export default function Dashboard({ params }) {
       break;
     case "Tour Guide":
       dashboardElements = [
-        { name: "Account", link: `/account/${id}` },
-        { name: "My Tours", link: "/myTours" },
-        { name: "Schedule", link: "/schedule" },
-        { name: "Earnings", link: "/earnings" },
+        { name: "My Profile", link: "/myprofile" },
+        { name: "My Itineraries", link: "/myitineraries" },
+        { name: "Create Itinerary", link: "/createitinerary" },
+        { name: "Sales Report", link: "/sales-report" },
       ];
       break;
     case "Advertiser":

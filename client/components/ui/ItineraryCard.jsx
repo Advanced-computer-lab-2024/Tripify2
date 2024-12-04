@@ -2,37 +2,23 @@
 import React from "react";
 
 function ItineraryCard({
-  Activities,
+  Image,
+  Name,
   StartDate,
   EndDate,
-  redirect,
-  itineraryid,
+  Accessibility,
+  Price,
+  itinerary
 }) {
-  let counter = 0;
-  const activityList = Activities.map((Activity) => {
-    counter++;
-    return (
-      <li className="gap-1 flex flex-col items-start">
-        <h2>Activity-{counter}</h2>
-        <h2>Type: {Activity.type}</h2>
-        <h4>Duration: {Activity.duration}</h4>
-
-        {counter !== Activities.length && <hr className="w-full" />}
-      </li>
-    );
-  });
-
   return (
-    <button
-      onClick={() => redirect(itineraryid)}
-      className="rounded-md drop-shadow-md border border-black p-4 flex flex-row items-center gap-20"
-    >
-      <ul className="flex flex-col gap-2">{activityList}</ul>
-      <div>
-        <h3>Start Date: {StartDate}</h3>
-        <h3>End Date: {EndDate}</h3>
-      </div>
-    </button>
+    <ul className="grid grid-cols-[100px_300px_100px_300px_300px_100px] justify-items-start p-2 items-center">
+      <li className="w-16 h-16"><img src={(itinerary?.Image.startsWith('http') || itinerary?.Image.startsWith('https') || itinerary?.Image.startsWith('www') || itinerary?.Image.startsWith('i.') || itinerary?.Image.startsWith('m.')) ? itinerary?.Image : `/images/placeholder.jpg`}/></li>
+      <li>{Name}</li>
+      <li>${Price}</li>
+      <li>{StartDate}</li>
+      <li>{EndDate}</li>
+      <li className="justify-self-center">{Accessibility ? "✔️" : "✖️"}</li>
+    </ul>
   );
 }
 

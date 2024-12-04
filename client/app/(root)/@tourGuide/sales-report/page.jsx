@@ -120,35 +120,39 @@ export default function DashboardPage() {
 
 
     return (
-        <Tabs defaultValue="all">
-            <div className="flex items-center">
-                <div className="ml-auto flex items-center gap-2">
-                    <SalesReportBtnP />
-                    <button onClick={toggleSortOrder}>
-                        {sortOrder === "desc" ? "Sort: Newest to Oldest" : "Sort: Oldest to Newest"}
-                    </button>
+        <Tabs defaultValue="all" className="p-4 px-8">
+            <div className="flex flex-row justify-between">
+                <div className="flex gap-4 my-4">
+                    <div>
+                        <label className="mr-2">Start Date</label>
+                        <ReactDatePicker
+                            selected={startDate}
+                            onChange={(date) => setStartDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            className="rounded"
+                            placeholderText="Select Start Date"
+                        />
+                    </div>
+                    <div>
+                        <label className="mr-2">End Date</label>
+                        <ReactDatePicker
+                            selected={endDate}
+                            onChange={(date) => setEndDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            className="rounded"
+                            placeholderText="Select End Date"
+                        />
+                    </div>
                 </div>
-            </div>
-            <div className="flex gap-4 my-4">
-                <div>
-                    <label>Start Date</label>
-                    <ReactDatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="input"
-                        placeholderText="Select Start Date"
-                    />
-                </div>
-                <div>
-                    <label>End Date</label>
-                    <ReactDatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="input"
-                        placeholderText="Select End Date"
-                    />
+                <div className="flex items-center">
+                    <div className="ml-auto flex items-center gap-2">
+                        <SalesReportBtnP />
+                            <div className="mr-2">Sort</div>
+                            <select className="rounded" onChange={toggleSortOrder}>
+                                <option value="desc">Newest to Oldest</option>
+                                <option value="asc">Oldest to Newest</option>
+                            </select>
+                    </div>
                 </div>
             </div>
             <TabsContent value="all">
@@ -193,7 +197,7 @@ export default function DashboardPage() {
                                                 ${(booking.Price || 0) * (booking?.participants?.Participants || 0)}
                                             </TableCell>
                                             <TableCell>
-                                                ${(booking.Price || 0) * (booking?.participants?.Participants || 0) * 0.9}
+                                                ${((booking.Price || 0) * (booking?.participants?.Participants || 0) * 0.9).toFixed(2)}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 {new Date(booking?.createdAt).toLocaleDateString()}
@@ -212,10 +216,10 @@ export default function DashboardPage() {
                                         <strong>{totalSales2.totalSales}</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${totalSales2.totalRevenue}</strong>
+                                        <strong>${(totalSales2.totalRevenue).toFixed(2)}</strong>
                                     </TableCell>
                                     <TableCell>
-                                        <strong>${ totalSales2.discountedRevenue}</strong>
+                                        <strong>${ (totalSales2.discountedRevenue).toFixed(2)}</strong>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

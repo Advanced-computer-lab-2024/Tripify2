@@ -10,6 +10,8 @@ import Image from "next/image";
 import { UploadIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "./dialog";
 import { Button } from "./button";
+import { Badge } from "./badge";
+import { cn } from "@/lib/utils";
 
 function Tourguideprofile({ tourguide, tourguideid, role }) {
   console.log(tourguide)
@@ -21,6 +23,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
   const inputRef = useRef(null)
   const [requestOpen, setRequestOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [documentsBool, setDocumentsBool] = useState(false);
 
   const [resultTest, setResultTest] = useState([]);
   let num = 0;
@@ -47,9 +50,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
   const documentlist = tourguide.Documents.map((doc) => {
     num++;
     return (
-      <li>
-        {num}.{doc}
-      </li>
+      <iframe className='w-full h-[720px]' src={doc} />
     );
   });
 
@@ -92,8 +93,8 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
     itinerarylist = tourguide.Itineraries.map((itinerary) => {
       //   console.log(itinerary);
       return (
-        <li>
-          <h3>Name: {itinerary.Name}</h3>
+        <li className="border border-slate-500 shadow p-2 rounded-lg w-fit">
+          <h3>{itinerary.Name}</h3>
           {/* <h3>StartDate:{itinerary.StartDate}</h3>
             <h3>EndDate:{itinerary.EndDate}</h3> */}
         </li>
@@ -158,20 +159,45 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
       console.error("Failed to update a tour guide:", error);
     }
   };
+  
+  const imgSrcForNow =
+    "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg";
+
 
   return (
     <div className="flex flex-col justify-center items-center p-6 gap-4">
       {tourguide.Accepted && allitineraries && pagestate == "Read" ? (
-        <div className="border border-black rounded-md p-4 flex flex-col gap-4 min-w-96">
-          <h1 className="text-2xl">
-            <strong>My Profile</strong>
-          </h1>
+        <div className=" flex flex-col gap-4 w-2/3">
+          <div className="flex items-center justify-center w-full mb-4">
+        <img
+          src={imgSrcForNow}
+          alt="User Avatar"
+          className="w-24 h-24 mr-4 rounded-full"
+        />
+        <div className="flex flex-col p-4 justify-left items-left">
+          <div className="flex items-center gap-1">
+            <h1 className="text-2xl font-bold text-purple-600">{tourguide.UserId.UserName}</h1>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative w-full p-4 mt-8 bg-white border border-gray-300 rounded-md shadow-md">
+        <h2 className="absolute top-[-15px] left-[10%] transform -translate-x-0 bg-white px-2 text-lg font-semibold text-gray-700">
+          Information
+        </h2>
+        <div className="flex flex-col gap-4 p-4">
+
+        <div>
+            <strong>UserName:</strong>
+            <h2>{tourguide.UserId.UserName}</h2>
+          </div>
+
           <div>
             <strong>MobileNumber:</strong>
             <h2>{tourguide.MobileNumber}</h2>
           </div>
 
-          <hr />
+      
           <div>
             <strong>YearsOfExperience:</strong>
             <h2>
@@ -180,7 +206,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 : "No experience"}
             </h2>
           </div>
-          <hr />
+      
           <div>
             <strong>PreviousWork:</strong>
             <h2>
@@ -189,13 +215,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 : "No previous work"}
             </h2>
           </div>
-
-          <hr />
-          <div>
-            <strong>Documents:</strong>
-            <ul>{documentlist}</ul>
-          </div>
-          <hr />
+      
           <div>
             <strong>Email:</strong>
             <h2>
@@ -206,20 +226,26 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
           </div>
           <div>
             <strong>Itineraries:</strong>
-            <ul className="flex flex-col gap-2">{itinerarylist}</ul>
+            <ul className="flex flex-row gap-2 flex-wrap">{itinerarylist}</ul>
           </div>
-          <button
-            className="bg-blue-500 text-white py-2 px-4 rounded"
+
+          <div className="flex flex-col gap-4">
+            <Button className="w-36" onClick={()=>{setDocumentsBool(!documentsBool)}}>{!documentsBool?"Show Documents":"Hide Documents"}</Button>
+            {documentsBool && <ul>{documentlist}</ul>}
+          </div>
+
+          <Button
+            className="text-white"
             onClick={() => setPagestate("Edit")}
           >
             edit profile
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setRequestOpen(true)}
             className="bg-red-500 text-white px-4 rounded py-2"
           >
             Request Deletion
-          </button>
+          </Button>
 
           <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
             <DialogContent>
@@ -237,13 +263,19 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
+      </div>
       ) : tourguide.Accepted && pagestate == "Edit" ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="w-2/4">
           <h1 className="text-2xl">
             <strong>Edit Profile</strong>
           </h1>
-          <div>
+          <div className="relative w-full p-4 mt-8 bg-white border border-gray-300 rounded-md shadow-md ">
+            <h2 className="absolute top-[-15px] left-[10%] transform -translate-x-0 bg-white px-2 text-lg font-semibold text-gray-700">
+              Information
+            </h2>
+            <div>
             <label>
               <strong>Image:</strong>
               {image ? (
@@ -285,7 +317,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 name="MobileNumber"
                 value={formData.MobileNumber}
                 onChange={handleInputChange}
-                className="border p-2 w-full mb-4"
+                className="border border-slate-300 rounded-lg p-2 w-full mb-4"
                 placeholder={`old: ${tourguide.MobileNumber}`}
                 required
               />
@@ -299,7 +331,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 name="YearsOfExperience"
                 value={formData.YearsOfExperience}
                 onChange={handleInputChange}
-                className="border p-2 w-full mb-4"
+                className="border border-slate-300 rounded-lg p-2 w-full mb-4"
                 placeholder={`old: ${tourguide.YearsOfExperience}`}
                 required
               />
@@ -313,7 +345,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 name="PreviousWork"
                 value={formData.PreviousWork}
                 onChange={handleInputChange}
-                className="border p-2 w-full mb-4"
+                className="border border-slate-300 rounded-lg p-2 w-full mb-4"
                 placeholder={`old: ${tourguide.PreviousWork}`}
               />
             </label>
@@ -326,7 +358,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 name="Email"
                 value={formData.Email}
                 onChange={handleInputChange}
-                className="border p-2 w-full mb-4"
+                className="border border-slate-300 rounded-lg p-2 w-full mb-4"
                 placeholder={`old: ${tourguide.UserId.Email}`}
               />
             </label>
@@ -339,7 +371,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 name="OldPassword"
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                className="border p-2 w-full mb-4"
+                className="border border-slate-300 rounded-lg p-2 w-full mb-4"
               />
             </label>
           </div>
@@ -351,11 +383,10 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 name="NewPassword"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="border p-2 w-full mb-4"
+                className="border border-slate-300 rounded-lg p-2 w-full mb-4"
               />
             </label>
           </div>
-
           {role == "Admin" && (
             <div>
               <label>
@@ -365,19 +396,23 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                   name="Accepted"
                   value={formData.Accepted}
                   onChange={handleInputChange}
-                  className="border p-2 w-full mb-4"
+                  className="border border-slate-300 rounded-lg p-2 w-full mb-4"
                   required
                 />
               </label>
             </div>
           )}
-          <button
+          <Button
             type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded"
+            className="text-white w-28"
           >
             Edit
-          </button>
+          </Button>
+          </div>
+
+          
         </form>
+        
       ) : (
         <h1>You are NOT accepted by the system</h1>
       )}

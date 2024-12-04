@@ -4,6 +4,8 @@ import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
 import { useSession } from "next-auth/react";
 import { fetcher } from "@/lib/fetch-client";
+import { Button } from "@/components/ui/button";
+
 
 export default function CreateItinerary() {
   const session = useSession();
@@ -215,7 +217,7 @@ export default function CreateItinerary() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6">
+    <div className="max-w-xl mx-auto p-6 border border-slate-300 rounded m-4">
       <h1 className="text-2xl font-bold mb-4">Create Itinerary</h1>
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <form onSubmit={handleSubmit}>
@@ -228,15 +230,15 @@ export default function CreateItinerary() {
             value={formData.Name}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
         {/* Activities */}
         <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">Activities:</h3>
+          <h3 className="text-lg font-semibold mb-2 ">Activities:</h3>
           {formData.Activities.map((activity, index) => (
-            <div key={index} className="border p-4 mb-4">
+            <div key={index} className="border p-4 mb-4 rounded">
               <label className="block mb-2">
                 Activity Type:
                 <input
@@ -246,7 +248,7 @@ export default function CreateItinerary() {
                     handleActivityChange(index, "type", e.target.value)
                   }
                   required
-                  className="block w-full border p-2"
+                  className="border border-slate-300 rounded-lg p-2 w-full mb-4"
                 />
               </label>
               <label className="block mb-2">
@@ -258,7 +260,7 @@ export default function CreateItinerary() {
                     handleActivityChange(index, "duration", e.target.value)
                   }
                   required
-                  className="block w-full border p-2"
+                  className="border border-slate-300 rounded-lg p-2 w-full mb-4"
                 />
               </label>
               {formData.Activities.length > 1 && (
@@ -272,13 +274,13 @@ export default function CreateItinerary() {
               )}
             </div>
           ))}
-          <button
+          <Button
             type="button"
             onClick={addActivity}
-            className="bg-blue-500 text-white py-2 px-4 rounded"
+            className="text-white py-2 px-4 rounded"
           >
             Add Activity
-          </button>
+          </Button>
         </div>
 
         {/* Location Picker */}
@@ -304,7 +306,7 @@ export default function CreateItinerary() {
             value={formData.StartDate}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
@@ -317,7 +319,7 @@ export default function CreateItinerary() {
             value={formData.EndDate}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
@@ -330,7 +332,7 @@ export default function CreateItinerary() {
             value={formData.Language}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
@@ -343,7 +345,7 @@ export default function CreateItinerary() {
             value={formData.Price}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
@@ -353,7 +355,7 @@ export default function CreateItinerary() {
           <input
             type="datetime-local"
             onChange={handleDateChange}
-            className="block w-full border p-2 mb-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
           {datesAndTimes.map((dateTime, index) => (
             <div key={index} className="flex items-center mb-2">
@@ -392,7 +394,7 @@ export default function CreateItinerary() {
             value={formData.Pickup}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
@@ -405,7 +407,7 @@ export default function CreateItinerary() {
             value={formData.Dropoff}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
@@ -418,7 +420,7 @@ export default function CreateItinerary() {
             value={formData.Image}
             onChange={handleInputChange}
             required
-            className="block w-full border p-2"
+            className="border border-slate-300 rounded-lg p-2 w-full mb-4"
           />
         </label>
 
@@ -496,12 +498,12 @@ export default function CreateItinerary() {
         </div>
 
         {/* Submit Button */}
-        <button
+        <Button
           type="submit"
-          className="bg-green-500 text-white py-2 px-4 rounded w-full"
+          className="text-white py-2 px-4 rounded w-full mt-2"
         >
           Create Itinerary
-        </button>
+        </Button>
       </form>
     </div>
   );

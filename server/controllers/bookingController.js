@@ -629,6 +629,9 @@ const getMyCurrentProductBookings = async (req, res) => {
         },
       },
     });
+
+    console.log(bookings)
+
     res.status(200).json(bookings);
   } catch (e) {
     res.status(400).json({ msg: e.message });
@@ -1228,6 +1231,8 @@ const acceptBooking = async (req, res) => {
 
       const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
+      console.log("Products:", products)
+
       await ProductBooking.create({
         UserId: metadata.UserId,
         Status: "Confirmed",
@@ -1565,7 +1570,7 @@ const createProductBookingCart = async (req, res) => {
       }
 
       const booking = new ProductBooking({
-        UserId: touristId,
+        UserId: req._id,
         Status: "Confirmed",
         TotalPaid: totalPrice * 100,
         Currency: currency,
@@ -1651,7 +1656,7 @@ const createProductBookingCart = async (req, res) => {
       }
 
       const booking = new ProductBooking({
-        UserId: touristId,
+        UserId: req._id,
         Status: "Pending",
         TotalPaid: totalPrice * 100,
         Currency: currency,

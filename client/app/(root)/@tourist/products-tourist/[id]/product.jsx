@@ -1,18 +1,25 @@
 "use client";
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { Star, ShoppingBag, User, Loader2, Tag } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useRouter } from 'next/navigation'
-import { fetcher } from '@/lib/fetch-client'
-import { useCurrencyStore } from '@/providers/CurrencyProvider'
-import { convertPrice } from '@/lib/utils'
-import { useSession } from 'next-auth/react'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Star, ShoppingBag, User, Loader2, Tag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Heart } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
+import { fetcher } from "@/lib/fetch-client";
+import { useCurrencyStore } from "@/providers/CurrencyProvider";
+import { convertPrice } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 export default function ProductPage({ product, cart }) {
   const { currency } = useCurrencyStore();
 
@@ -22,9 +29,9 @@ export default function ProductPage({ product, cart }) {
   const [loading, setLoading] = useState(false);
   const [WishList2, setWishList] = useState([]);
   const { data: session, status } = useSession();
-  const [promoCode, setPromoCode] = useState('');
-  const [promoError, setPromoError] = useState('');
-  const [promoSuccess, setPromoSuccess] = useState('');
+  const [promoCode, setPromoCode] = useState("");
+  const [promoError, setPromoError] = useState("");
+  const [promoSuccess, setPromoSuccess] = useState("");
   const [discountedPrice, setDiscountedPrice] = useState(null);
   const [validatingPromo, setValidatingPromo] = useState(false);
   const [getWishList, setGetWishList] = useState(true);
@@ -32,22 +39,22 @@ export default function ProductPage({ product, cart }) {
 
   const validatePromoCode = async () => {
     if (!promoCode.trim()) {
-      setPromoError('Please enter a promo code');
+      setPromoError("Please enter a promo code");
       return;
     }
 
     setValidatingPromo(true);
-    setPromoError('');
-    setPromoSuccess('');
+    setPromoError("");
+    setPromoSuccess("");
 
     try {
-      const response = await fetcher('/promo-codes/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetcher("/promo-codes/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: promoCode,
-          amount: product.Price * quantity
-        })
+          amount: product.Price * quantity,
+        }),
       });
 
       if (!response.ok) {
@@ -58,12 +65,21 @@ export default function ProductPage({ product, cart }) {
       }
 
       const data = await response.json();
-      setDiscountedPrice(data.type === 'percentage' ? (((100 - data.value) / 100) * product.Price) * quantity : ((product.Price * quantity) - data.value));
-      setPromoSuccess(data.type === 'percentage'
-        ? `${data.value}% discount applied!`
-        : `${currency} ${convertPrice(data.value, currency)} discount applied!`);
+      setDiscountedPrice(
+        data.type === "percentage"
+          ? ((100 - data.value) / 100) * product.Price * quantity
+          : product.Price * quantity - data.value
+      );
+      setPromoSuccess(
+        data.type === "percentage"
+          ? `${data.value}% discount applied!`
+          : `${currency} ${convertPrice(
+              data.value,
+              currency
+            )} discount applied!`
+      );
     } catch (error) {
-      setPromoError('Error validating promo code');
+      setPromoError("Error validating promo code");
       setDiscountedPrice(null);
     } finally {
       setValidatingPromo(false);
@@ -154,7 +170,7 @@ export default function ProductPage({ product, cart }) {
           body: JSON.stringify({
             currency,
             Quantity: quantity,
-            promoCode: promoCode || undefined
+            promoCode: promoCode || undefined,
           }),
         }
       );
@@ -190,8 +206,8 @@ export default function ProductPage({ product, cart }) {
   const addToCart = async () => {
     let newcart = [].concat(Cart);
     let flag = false;
-    console.log(newcart)
-    console.log(newcart.length)
+    console.log(newcart);
+    console.log(newcart.length);
     for (let i = 0; i < newcart.length; i++) {
       if (product._id == newcart[i].product) {
         flag = true;
@@ -199,7 +215,7 @@ export default function ProductPage({ product, cart }) {
       }
     }
     if (!flag) {
-      newcart.push({ product: product._id, quantity: quantity })
+      newcart.push({ product: product._id, quantity: quantity });
     }
     try {
       const touristRes = await fetcher(`/tourists/${session.user.id}`, {
@@ -217,9 +233,9 @@ export default function ProductPage({ product, cart }) {
     } catch (error) {
       console.error("Error updating cart:", error);
     }
-    alert(`${quantity} ${product.Name} added`)
-    setCart(newcart)
-  }
+    alert(`${quantity} ${product.Name} added`);
+    setCart(newcart);
+  };
 
   return (
     <div className="container px-4 py-8 mx-auto">
@@ -240,10 +256,11 @@ export default function ProductPage({ product, cart }) {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-5 h-5 ${i < Math.floor(product.Rating)
-                    ? "text-yellow-400 fill-current"
-                    : "text-gray-300"
-                    }`}
+                  className={`w-5 h-5 ${
+                    i < Math.floor(product.Rating)
+                      ? "text-yellow-400 fill-current"
+                      : "text-gray-300"
+                  }`}
                 />
               ))}
             </div>
@@ -328,10 +345,11 @@ export default function ProductPage({ product, cart }) {
           <div className="flex items-center mb-6 space-x-4">
             <Button
               variant={WishList2.includes(product._id) ? "solid" : "outline"}
-              className={`transition-all duration-200 ease-in-out ${WishList2.includes(product._id)
-                ? "bg-red-500 text-white hover:bg-red-600"
-                : "bg-gray-200 hover:bg-gray-300"
-                }`}
+              className={`transition-all duration-200 ease-in-out ${
+                WishList2.includes(product._id)
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
               onClick={() => toggleWishlist(product._id)}
             >
               {WishList2.includes(product._id) ? (
@@ -399,10 +417,11 @@ export default function ProductPage({ product, cart }) {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-4 h-4 ${i < review.Rating
-                              ? "text-yellow-400 fill-current"
-                              : "text-gray-300"
-                              }`}
+                            className={`w-4 h-4 ${
+                              i < review.Rating
+                                ? "text-yellow-400 fill-current"
+                                : "text-gray-300"
+                            }`}
                           />
                         ))}
                       </div>

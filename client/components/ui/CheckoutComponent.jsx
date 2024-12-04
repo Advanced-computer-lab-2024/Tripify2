@@ -145,8 +145,7 @@ const CheckoutComponent = ({ params }) => {
       //       paymentMethod: paymentMethod,
       //     })
       //   );
-      //   console.log(parseInt(wallet) < totalPrice);
-      if (paymentMethod === "wallet" && parseInt(wallet) < totalPrice) {
+      if (paymentMethod === "wallet" && parseFloat(wallet) < totalPrice) {
         setMessageAboveButton("Insufficient balance in wallet");
         setTimeout(() => {
           setMessageAboveButton("");

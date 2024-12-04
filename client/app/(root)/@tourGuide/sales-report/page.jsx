@@ -28,9 +28,7 @@ import { useSession } from "next-auth/react";
 
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
-    const [products, setProducts] = useState([]);
     const [itineraries, setItineraries] = useState([]);
-    const [acts, setActs] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState(null); 
     const session=useSession()
     useEffect(() => {

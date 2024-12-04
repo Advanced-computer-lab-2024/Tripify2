@@ -28,8 +28,8 @@ import { fetcher } from "@/lib/fetch-client";
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
     const [itineraries, setItineraries] = useState([]);
-    const [startDate, setStartDate] = useState(null); // Start date for filtering
-    const [endDate, setEndDate] = useState(null); // End date for filtering
+    const [selectedMonth, setSelectedMonth] = useState(null); 
+
 
     useEffect(() => {
         const fetchAndSortData = async () => {
@@ -49,7 +49,7 @@ export default function DashboardPage() {
                     }));
     
                     setItineraries(
-                        filterByDateRange(sortByCreatedAt(itinerariesWithParticipants, "ItineraryId", sortOrder), startDate, endDate)
+                        filterByDateRange(sortByCreatedAt(itinerariesWithParticipants, "ItineraryId", sortOrder), selectedMonth)
                     );
                     // console.log(itinerariesWithParticipants)
                 }
@@ -61,7 +61,7 @@ export default function DashboardPage() {
         };
 
         fetchAndSortData();
-    }, [sortOrder, startDate, endDate]); // Refetch and filter data when date range or sort order changes
+    }, [sortOrder, selectedMonth]); // Refetch and filter data when date range or sort order changes
 
     // Helper function to sort by createdAt for both flat and nested structures
     const sortByCreatedAt = (data, nestedKey, order) => {
@@ -73,21 +73,29 @@ export default function DashboardPage() {
     };
 
     // Helper function to filter data by a specific date range
-    const filterByDateRange = (data, start, end) => {
+    const filterByDateRange = (data, selectedMonth) => {
+        if (!selectedMonth) return data; 
+      
+        const selectedYear = selectedMonth.getFullYear();
+        const selectedMonthIndex = selectedMonth.getMonth(); 
+      
         return data.filter((item) => {
-            const createdAt = new Date(
-                item?.ItineraryId?.createdAt 
-            );
-
-            const normalizedStart = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
-            const normalizedEnd = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
-
-            const isAfterStart = normalizedStart ? createdAt >= normalizedStart : true;
-            const isBeforeEnd = normalizedEnd ? createdAt <= normalizedEnd : true;
-
-            return isAfterStart && isBeforeEnd;
+          const createdAt = new Date(
+            item?.ItineraryId?.createdAt ||
+            item?.ActivityId?.createdAt ||
+            item?.createdAt
+          );
+      
+          console.log(`created at: ${createdAt.getFullYear}`)
+          console.log(`created at: ${createdAt.getMonth}`)
+          console.log(selectedYear)
+          console.log(selectedMonth)
+          return (
+            createdAt.getFullYear() === selectedYear &&
+            createdAt.getMonth() === selectedMonthIndex
+          );
         });
-    };
+      };
 
     const toggleSortOrder = () => {
         setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"));
@@ -120,25 +128,15 @@ export default function DashboardPage() {
                 </div>
             </div>
             <div className="flex gap-4 my-4">
-                <div>
-                    <label>Start Date</label>
-                    <ReactDatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="input"
-                        placeholderText="Select Start Date"
-                    />
-                </div>
-                <div>
-                    <label>End Date</label>
-                    <ReactDatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="input"
-                        placeholderText="Select End Date"
-                    />
+            <div>
+                  <ReactDatePicker
+                    selected={selectedMonth} 
+                    onChange={(date) => setSelectedMonth(date)}
+                    dateFormat="MMMM yyyy" 
+                    showMonthYearPicker 
+                    className="input rounded-md"
+                    placeholderText="Select Month"
+                  />
                 </div>
             </div>
             <TabsContent value="all">

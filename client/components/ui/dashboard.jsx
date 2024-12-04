@@ -56,10 +56,6 @@ export default function Dashboard({ params }) {
           sublinks: [
             { name: "All Itineraries", link: "/itinerary" },
             { name: "My Itineraries", link: "/itinerary/my-itineraries" },
-            {
-              name: "Upcoming Itineraries",
-              link: "/itinerary/upcoming-itineraries",
-            },
           ],
         },
         {
@@ -135,21 +131,7 @@ export default function Dashboard({ params }) {
       dashboardElements = [
         { name: "Sign in", link: "/sign-in" },
         { name: "Sign up", link: "/sign-up" },
-        {
-          name: "Itineraries",
-          link: "/itineraries-guest",
-          sublinks: [
-            { name: "All Itineraries", link: "/itineraries-guest" },
-            {
-              name: "My Itineraries",
-              link: "/itineraries-guest/my-itineraries",
-            },
-            {
-              name: "Upcoming Itineraries",
-              link: "/itineraries-guest/upcoming-itineraries",
-            },
-          ],
-        },
+        { name: "Itineraries", link: "/itineraries-guest" },
         { name: "Products", link: "/products-guest" },
         // {
         //   name: "Upcoming",

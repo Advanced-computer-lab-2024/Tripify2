@@ -105,71 +105,79 @@ export default function CurrentProducts({ productBookings, touristId }) {
         Your Pending Purchases and Purchases that have not yet Delivered
       </h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {bookings.map((booking) => (
-          <Card key={booking._id}>
-            <CardHeader className="flex justify-between items-center">
-              <CardTitle>Order: {formatDate(booking.createdAt)}</CardTitle>
-              <div className="flex items-center">
-                <span
-                  className={`font-bold ${
-                    booking.Status === "Confirmed"
-                      ? "text-green-500"
-                      : "text-yellow-500"
-                  }`}
-                >
-                  {booking.Status}
-                </span>
-                <Button
-                  className="ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                  onClick={() => debounceSendFetchRequest(booking._id)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {booking.Products.map((product) => (
-                <div key={product._id} className="mb-6">
-                  <div className="relative mb-4 aspect-square">
-                    <Image
-                      src={product.ProductId.Image || "/placeholder.svg"}
-                      alt={product.ProductId.Name}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-                  <p className="mb-2 text-lg font-semibold">
-                    {product.ProductId.Name}
-                  </p>
-                  <p className="mb-2 text-sm text-gray-500">
-                    Quantity: {product.Quantity}
-                  </p>
-                  <p className="mb-4 text-sm text-gray-500">
-                    Price:{" "}
-                    {currency === "USD"
-                      ? "$"
-                      : currency === "EUR"
-                      ? "€"
-                      : "EGP"}{" "}
-                    {convertPrice(
-                      (product.ProductId.Price * product.Quantity).toFixed(2),
-                      currency
-                    )}
-                  </p>
-                  <Button
-                    className="w-full mb-4"
-                    onClick={() =>
-                      router.push(`/products-tourist/${product.ProductId._id}`)
-                    }
+        {bookings.length ? (
+          bookings.map((booking) => (
+            <Card key={booking._id}>
+              <CardHeader className="flex justify-between items-center">
+                <CardTitle>Order: {formatDate(booking.createdAt)}</CardTitle>
+                <div className="flex items-center">
+                  <span
+                    className={`font-bold ${
+                      booking.Status === "Confirmed"
+                        ? "text-green-500"
+                        : "text-yellow-500"
+                    }`}
                   >
-                    <MessageSquare className="w-4 h-4 mr-2" />
-                    Details
+                    {booking.Status}
+                  </span>
+                  <Button
+                    className="ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    onClick={() => debounceSendFetchRequest(booking._id)}
+                  >
+                    Cancel
                   </Button>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        ))}
+              </CardHeader>
+              <CardContent>
+                {booking.Products.map((product) => (
+                  <div key={product._id} className="mb-6">
+                    <div className="relative mb-4 aspect-square">
+                      <Image
+                        src={product.ProductId.Image || "/placeholder.svg"}
+                        alt={product.ProductId.Name}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                    <p className="mb-2 text-lg font-semibold">
+                      {product.ProductId.Name}
+                    </p>
+                    <p className="mb-2 text-sm text-gray-500">
+                      Quantity: {product.Quantity}
+                    </p>
+                    <p className="mb-4 text-sm text-gray-500">
+                      Price:{" "}
+                      {currency === "USD"
+                        ? "$"
+                        : currency === "EUR"
+                        ? "€"
+                        : "EGP"}{" "}
+                      {convertPrice(
+                        (product.ProductId.Price * product.Quantity).toFixed(2),
+                        currency
+                      )}
+                    </p>
+                    <Button
+                      className="w-full mb-4"
+                      onClick={() =>
+                        router.push(
+                          `/products-tourist/${product.ProductId._id}`
+                        )
+                      }
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Details
+                    </Button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <p className="text-gray-600 text-center">
+            No orders have yet to be delivered
+          </p>
+        )}
       </div>
     </div>
   );

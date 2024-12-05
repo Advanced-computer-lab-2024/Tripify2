@@ -41,16 +41,22 @@ export default function ExploreGuest({ params }) {
         place.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
-  const filteredItineraries = itineraries.length
+  const filteredItinerariesBefore = itineraries.length
     ? itineraries.filter((itinerary) =>
         itinerary.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
-  const filteredActivities = activities.length
+  const filteredItineraries = filteredItinerariesBefore.filter(
+    (itinerary) => !itinerary?.Inappropriate
+  );
+  const filteredActivitiesBefore = activities.length
     ? activities.filter((activity) =>
         activity.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
+  const filteredActivities = filteredActivitiesBefore.filter(
+    (activity) => !activity?.Inappropriate
+  );
 
   const updateRecordsToShow = () => {
     const width = window.innerWidth;

@@ -46,16 +46,31 @@ export default function Explore({ params }) {
         place.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
-  const filteredItineraries = itineraries.length
+  //console.log(`filteredPlaces[0]: ${JSON.stringify(filteredPlaces[0])}`);
+  const filteredItinerariesBefore = itineraries.length
     ? itineraries.filter((itinerary) =>
         itinerary.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
-  const filteredActivities = activities.length
+  //console.log(
+  //  `filteredItineraries[0]: ${JSON.stringify(filteredItineraries[0])}`
+  //);
+  //Inappropriate
+  const filteredItineraries = filteredItinerariesBefore.filter(
+    (itinerary) => !itinerary?.Inappropriate
+  );
+  const filteredActivitiesBefore = activities.length
     ? activities.filter((activity) =>
         activity.Name.toLowerCase().includes(search.toLowerCase())
       )
     : [];
+  //console.log(
+  //  `filteredActivities[0]: ${JSON.stringify(filteredActivities[0])}`
+  //);
+  //Inappropriate
+  const filteredActivities = filteredActivitiesBefore.filter(
+    (activity) => !activity?.Inappropriate
+  );
 
   const updateRecordsToShow = () => {
     const width = window.innerWidth;

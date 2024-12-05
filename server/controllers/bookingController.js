@@ -1441,9 +1441,10 @@ const cancelOrderProductBooking = async (req, res) => {
         .json({ message: `Order with id: ${orderId} not found` });
     //console.log("second 404");
 
-    if (order.Status === "Confirmed") {
+    if (order.Status === "Confirmed" || order.Status === "Pending") {
       //raga3 el feloos fel wallet, zawed el products' availablequantity we raga3 el totalsales
       for (const product of order.Products) {
+        //console.log(`product: ${JSON.stringify(product)}`);
         const productInDb = await ProductModel.findById(product.ProductId._id);
 
         if (!productInDb)
@@ -1461,7 +1462,8 @@ const cancelOrderProductBooking = async (req, res) => {
       //console.log(`tourist: ${tourist}`);
       //console.log(`tourist.Wallet: ${tourist.Wallet}`);
       //console.log(`order.TotalPaid: ${order.TotalPaid}`);
-      tourist.Wallet = parseFloat(tourist.Wallet) + order.TotalPaid / 100;
+      if (order.Status === "Confirmed")
+        tourist.Wallet = parseFloat(tourist.Wallet) + order.TotalPaid / 100;
       await tourist.save();
     }
 

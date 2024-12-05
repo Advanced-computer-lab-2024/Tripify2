@@ -13,8 +13,8 @@ class BirthdayService {
       const currentMonth = today.getMonth() + 1;
       const currentDay = today.getDate();
 
-      console.log(`currentDay: ${currentDay}`);
-      console.log(`currentMonth: ${currentMonth}`);
+      //console.log(`currentDay: ${currentDay}`);
+      //console.log(`currentMonth: ${currentMonth}`);
 
       const birthdayTourists = await Tourist.find({
         $expr: {

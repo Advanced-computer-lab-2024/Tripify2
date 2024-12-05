@@ -23,15 +23,19 @@ const HelperTouristsReport = ({ params }) => {
   const { itinerariesWithBookings, itinerariesWithoutBookings } = params;
 
   const [itineraries, setItineraries] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [sorted, setSorted] = useState(false);
 
   useEffect(() => {
-    const itinerariesWithBookingsToShow = selectedMonth
+    const itinerariesWithBookingsToShow = selectedDate
       ? itinerariesWithBookings.filter((booking) => {
           const date = new Date(booking?.createdAt);
           const theMonth = date.getMonth();
-          return theMonth === selectedMonth.getMonth();
+          const theYear = date.getFullYear();
+          return (
+            theMonth === selectedDate.getMonth() &&
+            theYear === selectedDate.getFullYear()
+          );
         })
       : itinerariesWithBookings;
 
@@ -78,7 +82,7 @@ const HelperTouristsReport = ({ params }) => {
         return accumulating;
       }, []),
     ]);
-  }, [selectedMonth, itinerariesWithBookings, itinerariesWithoutBookings]);
+  }, [selectedDate, itinerariesWithBookings, itinerariesWithoutBookings]);
 
   const sortItineraries = () => {
     const sortedItineraries = [...itineraries].sort((a, b) => {
@@ -103,8 +107,8 @@ const HelperTouristsReport = ({ params }) => {
               <div>Itineraries Activity Report</div>
               <div className="flex gap-4 font-normal text-base">
                 <DatePicker
-                  selected={selectedMonth}
-                  onChange={(date) => setSelectedMonth(date)}
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
                   dateFormat="MM/yyyy"
                   showMonthYearPicker
                   placeholderText="Select a month"

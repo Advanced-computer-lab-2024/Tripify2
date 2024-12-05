@@ -23,16 +23,18 @@ const HelperTouristsReport = ({ params }) => {
   const { activitiesWithBookings, activitiesWithoutBookings } = params;
 
   const [activities, setActivities] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(null); 
+  const [selectedDate, setSelectedDate] = useState(null);
   const [sorted, setSorted] = useState(false);
 
   useEffect(() => {
-    const activitiesWithBookingsToShow = selectedMonth
+    const activitiesWithBookingsToShow = selectedDate
       ? activitiesWithBookings.filter((booking) => {
           const date = new Date(booking?.createdAt);
+          const theMonth = date.getMonth();
+          const theYear = date.getFullYear();
           return (
-            date.getFullYear() === selectedMonth.getFullYear() &&
-            date.getMonth() === selectedMonth.getMonth()
+            theMonth === selectedDate.getMonth() &&
+            theYear === selectedDate.getFullYear()
           );
         })
       : activitiesWithBookings;
@@ -80,7 +82,7 @@ const HelperTouristsReport = ({ params }) => {
         return accumulating;
       }, []),
     ]);
-  }, [selectedMonth, activitiesWithBookings, activitiesWithoutBookings]);
+  }, [selectedDate, activitiesWithBookings, activitiesWithoutBookings]);
 
   const sortActivities = () => {
     const sortedActivities = [...activities].sort((a, b) => {
@@ -105,8 +107,8 @@ const HelperTouristsReport = ({ params }) => {
               <div>Activities Activity Report</div>
               <div className="flex gap-4 font-normal text-base">
                 <ReactDatePicker
-                  selected={selectedMonth}
-                  onChange={(date) => setSelectedMonth(date)}
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
                   dateFormat="MMMM yyyy"
                   showMonthYearPicker
                   className="input rounded-md"

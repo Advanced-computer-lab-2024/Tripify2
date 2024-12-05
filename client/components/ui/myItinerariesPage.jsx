@@ -12,19 +12,23 @@ function MyItinerariesPage({ Itineraries }) {
 
   const cards = AllItineraries.map((itinerary) => (
     <>
-    <hr/>
-    <button className="w-full hover:bg-slate-50" onClick={() => redirectitinerary(itinerary._id)}>
-    <ItineraryCard
-      itineraryid={itinerary._id}
-      Name={itinerary.Name}
-      Accessibility={itinerary.Accessibility}
-      Image={itinerary.Image}
-      StartDate={itinerary.StartDate}
-      EndDate={itinerary.EndDate}
-      Price={itinerary.Price}
-      itinerary={itinerary}
-    />
-    </button>
+      <hr />
+      <button
+        className="w-full hover:bg-slate-50"
+        onClick={() => redirectitinerary(itinerary._id)}
+        key={itinerary._id}
+      >
+        <ItineraryCard
+          itineraryid={itinerary._id}
+          Name={itinerary.Name}
+          Accessibility={itinerary.Accessibility}
+          Image={itinerary.Image}
+          StartDate={itinerary.StartDate}
+          EndDate={itinerary.EndDate}
+          Price={itinerary.Price}
+          itinerary={itinerary}
+        />
+      </button>
     </>
   ));
   return (

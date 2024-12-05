@@ -85,10 +85,9 @@ export default function AdvertiserProfile({ Activities }) {
           <li className="justify-self-center">
             {activity?.Inappropriate ? "✔️" : "✖️"}
           </li>
-
           <RiDeleteBin5Line
             size={18}
-            className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer"
+            className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer justify-self-end"
             onClick={(e) => handleDeleteClick(e, activity._id)}
           />
         </ul>

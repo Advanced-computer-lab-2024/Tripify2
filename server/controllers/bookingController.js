@@ -1528,6 +1528,8 @@ const createProductBookingCart = async (req, res) => {
       });
     }
 
+    const totalBeforeDiscount = totalPrice
+
     if (promoCode) {
       totalPrice = await calculatePriceAfterPromo(
         totalPrice,
@@ -1535,6 +1537,8 @@ const createProductBookingCart = async (req, res) => {
         tourist.UserId._id.toString()
       );
     }
+
+    console.log("Total Price: ", totalPrice);
 
     //console.log("stops here test 1");
 
@@ -1606,6 +1610,9 @@ const createProductBookingCart = async (req, res) => {
 
     if (paymentMethod === "credit-card") {
       //console.log("inside CARDDDDDDDDDDDDDDDDDDDDD");
+      const discountedPrice = totalBeforeDiscount - totalPrice;
+      const discountPerItem = discountedPrice / productDetails?.reduce((acc, { Quantity }) => acc + Quantity, 0);
+      console.log("Discount per item: ", discountPerItem);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: productDetails.map(({ Name, Price, Quantity }) => ({
@@ -1614,7 +1621,7 @@ const createProductBookingCart = async (req, res) => {
             product_data: {
               name: Name,
             },
-            unit_amount: Math.round(Price * 100),
+            unit_amount: Math.round((Price - discountPerItem) * 100),
           },
           quantity: Quantity,
         })),

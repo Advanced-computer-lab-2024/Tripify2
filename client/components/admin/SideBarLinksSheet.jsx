@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Binoculars, Container, FileUser, MessageCircleWarning, Package, ShieldHalf, Tags, Users } from "lucide-react";
+import { Binoculars, Container, FerrisWheel, FileUser, Gem, MessageCircleWarning, Package, ShieldHalf, Tags, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function SideBarLinks() {
@@ -38,6 +38,13 @@ export default function SideBarLinks() {
                 Itineraries
             </Link>
             <Link
+                href="/activities"
+                className={cn("flex items-center rounded-[4px] gap-4 px-2.5 py-2.5 hover:text-foreground", pathname.includes("/activities") ? "bg-muted text-black" : "text-muted-foreground")}
+            >
+                <FerrisWheel className="w-5 h-5" />
+                Activities
+            </Link>
+            <Link
                 href="/categories"
                 className={cn("flex items-center rounded-[4px] gap-4 px-2.5 py-2.5 hover:text-foreground", pathname.includes("/categories") ? "bg-muted text-black" : "text-muted-foreground")}
             >
@@ -71,6 +78,13 @@ export default function SideBarLinks() {
             >
                 <MessageCircleWarning className="w-5 h-5" />
                 Complaints
+            </Link>
+            <Link
+                href="/promo-codes"
+                className={cn("flex items-center rounded-[4px] gap-4 px-2.5 py-2.5 hover:text-foreground", pathname.includes("/promo-codes") ? "bg-muted text-black" : "text-muted-foreground")}
+            >
+                <Gem className="w-5 h-5" />
+                Promo Codes
             </Link>
         </>
     )

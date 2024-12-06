@@ -85,7 +85,8 @@ const ItinerarySchema = new Schema(
     },
     Rating: {
       type: String,
-      required: true,
+      required: false,
+      default: 0,
     },
     RemainingBookings: {
       type: Number,

@@ -26,6 +26,7 @@ const createItinerary = async (req, res) => {
     Tag,
     Image,
     Rating,
+    RemainingBookings
   } = req.body;
 
   const tourGuide = await tourGuideModel.findOne({ UserId: req._id }, "UserId");
@@ -70,6 +71,7 @@ const createItinerary = async (req, res) => {
       Tag,
       Image,
       Rating,
+      RemainingBookings
     });
     await tourGuideModel.findOneAndUpdate(
       { UserId: req._id },
@@ -167,6 +169,7 @@ const updateItinerary = async (req, res) => {
     Tag,
     Image,
     Rating,
+    RemainingBookings
   } = req.body;
 
   const tourGuide = await tourGuideModel.findOne(
@@ -212,6 +215,7 @@ const updateItinerary = async (req, res) => {
         // Tag,
         Image, //
         Rating, //
+        RemainingBookings
       },
       {
         new: true,

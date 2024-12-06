@@ -186,7 +186,7 @@ export default function ItineraryDetails({ itinerary, bookmarked }) {
             <Badge
               key={index}
               variant="neutral"
-              className="text-black bg-white"
+              className="text-black bg-white mr-2"
             >
               {tag.Tag}
             </Badge>
@@ -237,7 +237,7 @@ export default function ItineraryDetails({ itinerary, bookmarked }) {
             <span className="text-gray-700">
               Duration:{" "}
               {itinerary.Activities.reduce((acc, act) => acc + act.duration, 0)}{" "}
-              minutes
+              hours
             </span>
           </div>
           <div className="flex items-center space-x-3">
@@ -264,7 +264,7 @@ export default function ItineraryDetails({ itinerary, bookmarked }) {
             {itinerary.Activities.map((activity, index) => (
               <div key={index} className="p-4 bg-gray-100 rounded-lg shadow">
                 <h3 className="mb-2 text-lg font-semibold">{activity.type}</h3>
-                <p className="text-gray-600">{activity.duration} minutes</p>
+                <p className="text-gray-600">{activity.duration} hours</p>
               </div>
             ))}
           </div>

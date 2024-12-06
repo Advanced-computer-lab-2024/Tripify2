@@ -97,8 +97,9 @@ export default function Dashboard({ params }) {
       break;
     case "Advertiser":
       dashboardElements = [
-        { name: "My Profile", link: "/profile" },
+        { name: "Account", link: "/profile" },
         { name: "My Activities", link: "/my-activities" },
+        { name: "Create Activity", link: "/my-activities/createActivity" },
         { name: "Sales Report", link: "/sales-report" },
         { name: "Tourists Report", link: "/tourists-report" },
       ];

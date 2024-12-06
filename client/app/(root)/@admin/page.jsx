@@ -34,8 +34,8 @@ export default function DashboardPage() {
     const [sellers, setSellers] = useState([]);
     const [tourismGovernors, setTourismGovernors] = useState([]);
 
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [selectedMonth, setSelectedMonth] = useState(null); 
+
 
     useEffect(() => {
         const fetchAndSortData = async () => {
@@ -52,7 +52,7 @@ export default function DashboardPage() {
                     const response = await fetcher(url);
                     if (response?.ok) {
                         const data = await response.json();
-                        const filteredData = filterByDateRange(data, startDate, endDate);
+                        const filteredData = filterByDateRange(data, selectedMonth);
                         setter(filteredData);
                     }
                 }
@@ -62,30 +62,20 @@ export default function DashboardPage() {
         };
 
         fetchAndSortData();
-    }, [startDate, endDate]);
-    const filterByDateRange = (data, start, end) => {
+    }, [selectedMonth]);
+    const filterByDateRange = (data,selectedMonth ) => {
         return data.filter((item) => {
-            // Use item.UserId or item directly to get createdAt
+            if (!selectedMonth) return data; 
+  
+            const selectedYear = selectedMonth.getFullYear();
+            const selectedMonthIndex = selectedMonth.getMonth();
             const createdAt = new Date(item?.UserId?.createdAt || item?.createdAt);
-    
-            if (!createdAt) return false;
-    
-            const normalizedStart = start ? new Date(start) : null;
-            const normalizedEnd = end ? new Date(end) : null;
-    
-            if (normalizedStart) {
-                normalizedStart.setHours(0, 0, 0, 0);
-            }
-            if (normalizedEnd) {
-                normalizedEnd.setHours(23, 59, 59, 999);
-            }
-    
-            const isAfterStart = normalizedStart ? createdAt >= normalizedStart : true;
-            const isBeforeEnd = normalizedEnd ? createdAt <= normalizedEnd : true;
-    
-            return isAfterStart && isBeforeEnd;
-        });
-    };
+            return (
+                createdAt.getFullYear() === selectedYear &&
+                createdAt.getMonth() === selectedMonthIndex
+              );
+            });
+          };
 
     const allUsers = [...advertisers, ...tourists, ...tourguides, ...sellers, ...tourismGovernors];
     const totalUsers = allUsers.length;
@@ -103,24 +93,14 @@ export default function DashboardPage() {
                 </TabsList>
                 <div className="ml-auto flex items-center gap-2">
                 <div>
-                    <label>Start Date</label>
-                    <ReactDatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="input"
-                        placeholderText="Select Start Date"
-                    />
-                </div>
-                <div>
-                    <label>End Date</label>
-                    <ReactDatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="input"
-                        placeholderText="Select End Date"
-                    />
+                  <ReactDatePicker
+                    selected={selectedMonth} 
+                    onChange={(date) => setSelectedMonth(date)}
+                    dateFormat="MMMM yyyy" 
+                    showMonthYearPicker 
+                    className="input rounded-md"
+                    placeholderText="Select Month"
+                  />
                 </div>
   
                 </div>

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   Card,
@@ -22,15 +23,19 @@ const HelperTouristsReport = ({ params }) => {
   const { itinerariesWithBookings, itinerariesWithoutBookings } = params;
 
   const [itineraries, setItineraries] = useState([]);
-  const [month, setMonth] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
   const [sorted, setSorted] = useState(false);
 
   useEffect(() => {
-    const itinerariesWithBookingsToShow = month
+    const itinerariesWithBookingsToShow = selectedDate
       ? itinerariesWithBookings.filter((booking) => {
           const date = new Date(booking?.createdAt);
           const theMonth = date.getMonth();
-          return theMonth === parseInt(month) - 1;
+          const theYear = date.getFullYear();
+          return (
+            theMonth === selectedDate.getMonth() &&
+            theYear === selectedDate.getFullYear()
+          );
         })
       : itinerariesWithBookings;
 
@@ -42,8 +47,7 @@ const HelperTouristsReport = ({ params }) => {
 
         const isNotInShown = !itinerariesWithBookingsToShow.some(
           (shownBooking) =>
-            /* shownBooking?._id === booking?._id */ shownBooking?.ItineraryId
-              ?._id === booking?.ItineraryId?._id
+            shownBooking?.ItineraryId?._id === booking?.ItineraryId?._id
         );
 
         const isItineraryUnique = !uniqueItineraryIds.has(itineraryId);
@@ -78,13 +82,7 @@ const HelperTouristsReport = ({ params }) => {
         return accumulating;
       }, []),
     ]);
-  }, [month, itinerariesWithBookings, itinerariesWithoutBookings]);
-
-  const handleMonthChange = (e) => {
-    if (parseInt(e.target.value) > 12 || parseInt(e.target.value) < 1)
-      alert("Please enter a valid month");
-    else setMonth(e.target.value);
-  };
+  }, [selectedDate, itinerariesWithBookings, itinerariesWithoutBookings]);
 
   const sortItineraries = () => {
     const sortedItineraries = [...itineraries].sort((a, b) => {
@@ -108,10 +106,12 @@ const HelperTouristsReport = ({ params }) => {
             <CardTitle className="flex justify-between items-center">
               <div>Itineraries Activity Report</div>
               <div className="flex gap-4 font-normal text-base">
-                <input
-                  value={month}
-                  onChange={handleMonthChange}
-                  placeholder="Enter a month (1-12)"
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  dateFormat="MM/yyyy"
+                  showMonthYearPicker
+                  placeholderText="Select a month"
                   className="input rounded-md"
                 />
                 <button

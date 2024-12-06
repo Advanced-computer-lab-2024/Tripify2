@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   Card,
@@ -22,15 +23,19 @@ const HelperTouristsReport = ({ params }) => {
   const { activitiesWithBookings, activitiesWithoutBookings } = params;
 
   const [activities, setActivities] = useState([]);
-  const [month, setMonth] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
   const [sorted, setSorted] = useState(false);
 
   useEffect(() => {
-    const activitiesWithBookingsToShow = month
+    const activitiesWithBookingsToShow = selectedDate
       ? activitiesWithBookings.filter((booking) => {
           const date = new Date(booking?.createdAt);
           const theMonth = date.getMonth();
-          return theMonth === parseInt(month) - 1;
+          const theYear = date.getFullYear();
+          return (
+            theMonth === selectedDate.getMonth() &&
+            theYear === selectedDate.getFullYear()
+          );
         })
       : activitiesWithBookings;
 
@@ -42,8 +47,7 @@ const HelperTouristsReport = ({ params }) => {
 
         const isNotInShown = !activitiesWithBookingsToShow.some(
           (shownBooking) =>
-            /* shownBooking?._id === booking?._id */ shownBooking?.ActivityId
-              ?._id === booking?.ActivityId?._id
+            shownBooking?.ActivityId?._id === booking?.ActivityId?._id
         );
 
         const isActivityUnique = !uniqueActivityIds.has(activityId);
@@ -78,13 +82,7 @@ const HelperTouristsReport = ({ params }) => {
         return accumulating;
       }, []),
     ]);
-  }, [month, activitiesWithBookings, activitiesWithoutBookings]);
-
-  const handleMonthChange = (e) => {
-    if (parseInt(e.target.value) > 12 || parseInt(e.target.value) < 1)
-      alert("Please enter a valid month");
-    else setMonth(e.target.value);
-  };
+  }, [selectedDate, activitiesWithBookings, activitiesWithoutBookings]);
 
   const sortActivities = () => {
     const sortedActivities = [...activities].sort((a, b) => {
@@ -108,11 +106,13 @@ const HelperTouristsReport = ({ params }) => {
             <CardTitle className="flex justify-between items-center">
               <div>Activities Activity Report</div>
               <div className="flex gap-4 font-normal text-base">
-                <input
-                  value={month}
-                  onChange={handleMonthChange}
-                  placeholder="Enter a month (1-12)"
+                <ReactDatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  dateFormat="MMMM yyyy"
+                  showMonthYearPicker
                   className="input rounded-md"
+                  placeholderText="Select Month"
                 />
                 <button
                   onClick={sortActivities}
@@ -142,8 +142,8 @@ const HelperTouristsReport = ({ params }) => {
                     <strong>Activities</strong>
                   </TableCell>
                 </TableRow>
-                {activities.map((booking) => (
-                  <TableRow key={booking._id}>
+                {activities.map((booking, index) => (
+                  <TableRow key={index}>
                     <TableCell className="hidden sm:table-cell">
                       {booking.name}
                     </TableCell>

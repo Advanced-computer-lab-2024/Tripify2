@@ -630,7 +630,7 @@ const getMyCurrentProductBookings = async (req, res) => {
       },
     });
 
-    console.log(bookings)
+    console.log(bookings);
 
     res.status(200).json(bookings);
   } catch (e) {
@@ -767,8 +767,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-            ? "Silver"
-            : "Bronze";
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -867,8 +867,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-            ? "Silver"
-            : "Bronze";
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -965,8 +965,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-            ? "Silver"
-            : "Bronze";
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1033,8 +1033,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-            ? "Silver"
-            : "Bronze";
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1103,8 +1103,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-            ? "Silver"
-            : "Bronze";
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1183,8 +1183,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-            ? "Silver"
-            : "Bronze";
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1231,7 +1231,7 @@ const acceptBooking = async (req, res) => {
 
       const promoCodeId = await getPromoCodeId(metadata.promoCode);
 
-      console.log("Products:", products)
+      console.log("Products:", products);
 
       await ProductBooking.create({
         UserId: metadata.UserId,
@@ -1299,8 +1299,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-            ? "Silver"
-            : "Bronze";
+          ? "Silver"
+          : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1422,7 +1422,7 @@ const cancelOrderProductBooking = async (req, res) => {
   //console.log(touristId);
 
   try {
-    const tourist = await TouristModel.findOne({ _id: touristId }, "Wallet");
+    const tourist = await TouristModel.findOne({ UserId: touristId }, "Wallet");
 
     if (!tourist)
       return res
@@ -1441,9 +1441,10 @@ const cancelOrderProductBooking = async (req, res) => {
         .json({ message: `Order with id: ${orderId} not found` });
     //console.log("second 404");
 
-    if (order.Status === "Confirmed") {
+    if (order.Status === "Confirmed" || order.Status === "Pending") {
       //raga3 el feloos fel wallet, zawed el products' availablequantity we raga3 el totalsales
       for (const product of order.Products) {
+        //console.log(`product: ${JSON.stringify(product)}`);
         const productInDb = await ProductModel.findById(product.ProductId._id);
 
         if (!productInDb)
@@ -1459,9 +1460,10 @@ const cancelOrderProductBooking = async (req, res) => {
       }
 
       //console.log(`tourist: ${tourist}`);
-      //console.log(typeof tourist.Wallet);
-      //console.log(typeof order.TotalPaid);
-      tourist.Wallet = parseFloat(tourist.Wallet) + order.TotalPaid / 100;
+      //console.log(`tourist.Wallet: ${tourist.Wallet}`);
+      //console.log(`order.TotalPaid: ${order.TotalPaid}`);
+      if (order.Status === "Confirmed")
+        tourist.Wallet = parseFloat(tourist.Wallet) + order.TotalPaid / 100;
       await tourist.save();
     }
 
@@ -1472,6 +1474,10 @@ const cancelOrderProductBooking = async (req, res) => {
       },
       { new: true }
     );
+    //console.log(`tourist.Wallet: ${tourist.Wallet}`);
+    //console.log(`order.TotalPaid: ${order.TotalPaid}`);
+    tourist.Wallet = parseFloat(tourist.Wallet) + order.TotalPaid / 100;
+    await tourist.save();
 
     res.status(200).json({
       message: `Order ${orderId} cancelled successfully`,
@@ -1544,7 +1550,7 @@ const createProductBookingCart = async (req, res) => {
 
     if (paymentMethod === "wallet") {
       const walletBalance = convertPrice(
-        parseInt(tourist.Wallet) || 0,
+        parseFloat(tourist.Wallet) || 0,
         currency
       );
 
@@ -1558,7 +1564,8 @@ const createProductBookingCart = async (req, res) => {
         return res.status(400).json({ message: "Insufficient wallet balance" });
       //console.log("stops here 3");
 
-      tourist.Wallet = parseInt(tourist.Wallet) - totalPrice;
+      tourist.Wallet = parseFloat(tourist.Wallet) - totalPrice;
+      if (tourist.Wallet < 0) tourist.Wallet = 0;
 
       for (const { ProductId, Quantity } of products) {
         await ProductModel.findByIdAndUpdate(
@@ -1566,8 +1573,8 @@ const createProductBookingCart = async (req, res) => {
           {
             $inc: {
               AvailableQuantity: -Quantity,
-              TotalSales: Quantity
-            }
+              TotalSales: Quantity,
+            },
           },
           { new: true }
         );
@@ -1655,8 +1662,8 @@ const createProductBookingCart = async (req, res) => {
           {
             $inc: {
               AvailableQuantity: -Quantity,
-              TotalSales: Quantity
-            }
+              TotalSales: Quantity,
+            },
           },
           { new: true }
         );

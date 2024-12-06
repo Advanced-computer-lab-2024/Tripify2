@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function AllproductsTourist({
   products,
@@ -83,12 +84,16 @@ export default function AllproductsTourist({
       Number(convertPrice(product.Price, currency)) <= currentMaxPrice
     )
   );
-  const filteredProducts = products?.filter(
+  const filteredProductsBefore = products?.filter(
     (product) =>
-      product.Name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      // product.Price.toString().includes(searchQuery)
-      Number(convertPrice(product.Price, currency)) <= currentMaxPrice
+      product.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.Price.toString().includes(searchQuery)
   );
+
+  const filteredProducts = filteredProductsBefore.filter(
+    (product) => !product?.Archived
+  );
+  //console.log(`filteredProducts[0]: ${JSON.stringify(filteredProducts[0])}`);
 
   if (!filteredProducts || filteredProducts.length === 0) {
     return <h2>No products found.</h2>;
@@ -112,8 +117,8 @@ export default function AllproductsTourist({
   const addToCart = async (productId, availablequantity) => {
     let newcart = [].concat(Cart);
     let flag = false;
-    console.log("before");
-    console.log(newcart);
+    //console.log("before");
+    //console.log(newcart);
     let currentquantity = 1;
     for (let i = 0; i < newcart.length; i++) {
       if (productId == newcart[i].product) {
@@ -154,7 +159,7 @@ export default function AllproductsTourist({
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-6">
+    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
       {filteredProducts.map((eachproduct) => (
         <Card
           key={eachproduct._id}
@@ -162,6 +167,11 @@ export default function AllproductsTourist({
           onClick={() => handleViewDetails(eachproduct._id)}
         >
           <CardHeader className="flex-grow justify-between relative">
+            {!eachproduct?.AvailableQuantity && (
+              <Badge className="absolute top-2 right-2 bg-red-600 text-white">
+                Out of Stock
+              </Badge>
+            )}
             <img
               src={eachproduct.Image}
               alt={eachproduct.Name}
@@ -204,7 +214,12 @@ export default function AllproductsTourist({
           </CardContent>
           <div className="p-4 flex flex-col space-y-3 mt-auto item-center">
             <button
-              className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition flex items-center justify-center"
+              className={`px-4 py-2 rounded-md transition flex items-center justify-center ${
+                eachproduct.AvailableQuantity === 0
+                  ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  : "bg-black text-white hover:bg-gray-800"
+              }`}
+              disabled={!eachproduct?.AvailableQuantity}
               onClick={(e) => {
                 e.stopPropagation();
                 addToCart(eachproduct._id, eachproduct.AvailableQuantity);

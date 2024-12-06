@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
+
 import {
   Card,
   CardContent,
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function AllproductsGuest({ products, searchQuery }) {
   const { currency } = useCurrencyStore();
@@ -17,11 +19,21 @@ export default function AllproductsGuest({ products, searchQuery }) {
 
   // console.log(products);
 
-  const filteredProducts = products?.filter(
+  const filteredProductsBefore = products?.filter(
     (product) =>
       product.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.Price.toString().includes(searchQuery)
   );
+  //const checkingBefore = filteredProductsBefore.filter(
+  //  (product) => product?.Archived
+  //);
+  //console.log(`checkingBefore: ${JSON.stringify(checkingBefore)}`);
+
+  const filteredProducts = filteredProductsBefore.filter(
+    (product) => !product?.Archived
+  );
+  //const checkingAfter = filteredProducts.filter((product) => product?.Archived);
+  //console.log(`checkingAfter: ${JSON.stringify(checkingAfter)}`);
 
   if (!filteredProducts || filteredProducts.length === 0) {
     return <h2>No products found.</h2>;
@@ -32,7 +44,7 @@ export default function AllproductsGuest({ products, searchQuery }) {
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-6">
+    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
       {filteredProducts.map((eachproduct) => (
         <Card
           key={eachproduct._id}
@@ -40,6 +52,11 @@ export default function AllproductsGuest({ products, searchQuery }) {
           onClick={() => handleViewDetails(eachproduct._id)}
         >
           <CardHeader className="flex-grow justify-between relative">
+            {!eachproduct?.AvailableQuantity && (
+              <Badge className="absolute top-2 right-2 bg-red-600 text-white">
+                Out of Stock
+              </Badge>
+            )}
             <img
               src={eachproduct.Image}
               alt={eachproduct.Name}

@@ -28,11 +28,8 @@ import { useSession } from "next-auth/react";
 
 export default function DashboardPage() {
     const [sortOrder, setSortOrder] = useState("desc"); // default is descending (newest first)
-    const [products, setProducts] = useState([]);
     const [itineraries, setItineraries] = useState([]);
-    const [acts, setActs] = useState([]);
-    const [startDate, setStartDate] = useState(null); // Start date for filtering
-    const [endDate, setEndDate] = useState(null); // End date for filtering
+    const [selectedMonth, setSelectedMonth] = useState(null); 
     const session=useSession()
     useEffect(() => {
         const fetchAndSortData = async () => {
@@ -51,7 +48,7 @@ export default function DashboardPage() {
                     }));
     
                     setItineraries(
-                        filterByDateRange(sortByCreatedAt(itinerariesWithParticipants, "ItineraryId", sortOrder), startDate, endDate)
+                        filterByDateRange(sortByCreatedAt(itinerariesWithParticipants, "ItineraryId", sortOrder), selectedMonth )
                     );
                     // console.log(itinerariesWithParticipants)
                 }
@@ -63,7 +60,7 @@ export default function DashboardPage() {
         };
 
         fetchAndSortData();
-    }, [sortOrder, startDate, endDate]); // Refetch and filter data when date range or sort order changes
+    }, [sortOrder, selectedMonth]); // Refetch and filter data when date range or sort order changes
 
     // Helper function to sort by createdAt for both flat and nested structures
     const sortByCreatedAt = (data, nestedKey, order) => {
@@ -75,23 +72,29 @@ export default function DashboardPage() {
     };
 
     // Helper function to filter data by a specific date range
-    const filterByDateRange = (data, start, end) => {
+    const filterByDateRange = (data, selectedMonth) => {
+        if (!selectedMonth) return data; 
+      
+        const selectedYear = selectedMonth.getFullYear();
+        const selectedMonthIndex = selectedMonth.getMonth(); 
+      
         return data.filter((item) => {
-            const createdAt = new Date(
-                item?.ItineraryId?.createdAt ||
-                item?.ActivityId?.createdAt ||
-                item?.createdAt
-            );
-
-            const normalizedStart = start ? new Date(start.setHours(0, 0, 0, 0)) : null;
-            const normalizedEnd = end ? new Date(end.setHours(23, 59, 59, 999)) : null;
-
-            const isAfterStart = normalizedStart ? createdAt >= normalizedStart : true;
-            const isBeforeEnd = normalizedEnd ? createdAt <= normalizedEnd : true;
-
-            return isAfterStart && isBeforeEnd;
+          const createdAt = new Date(
+            item?.ItineraryId?.createdAt ||
+            item?.ActivityId?.createdAt ||
+            item?.createdAt
+          );
+      
+          console.log(`created at: ${createdAt.getFullYear}`)
+          console.log(`created at: ${createdAt.getMonth}`)
+          console.log(selectedYear)
+          console.log(selectedMonth)
+          return (
+            createdAt.getFullYear() === selectedYear &&
+            createdAt.getMonth() === selectedMonthIndex
+          );
         });
-    };
+      };
 
     const toggleSortOrder = () => {
         setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"));
@@ -120,29 +123,20 @@ export default function DashboardPage() {
         <Tabs defaultValue="all" className="p-4 px-8">
             <div className="flex flex-row justify-between">
                 <div className="flex gap-4 my-4">
-                    <div>
-                        <label className="mr-2">Start Date</label>
-                        <ReactDatePicker
-                            selected={startDate}
-                            onChange={(date) => setStartDate(date)}
-                            dateFormat="yyyy-MM-dd"
-                            className="rounded"
-                            placeholderText="Select Start Date"
-                        />
-                    </div>
-                    <div>
-                        <label className="mr-2">End Date</label>
-                        <ReactDatePicker
-                            selected={endDate}
-                            onChange={(date) => setEndDate(date)}
-                            dateFormat="yyyy-MM-dd"
-                            className="rounded"
-                            placeholderText="Select End Date"
-                        />
-                    </div>
+
                 </div>
                 <div className="flex items-center">
                     <div className="ml-auto flex items-center gap-2">
+                    <div>
+                  <ReactDatePicker
+                    selected={selectedMonth} 
+                    onChange={(date) => setSelectedMonth(date)}
+                    dateFormat="MMMM yyyy" 
+                    showMonthYearPicker 
+                    className="input rounded-md"
+                    placeholderText="Select Month"
+                  />
+                </div>
                         <SalesReportBtnP />
                             <div className="mr-2">Sort</div>
                             <select className="rounded" onChange={toggleSortOrder}>
@@ -156,7 +150,7 @@ export default function DashboardPage() {
                 <Card x-chunk="dashboard-06-chunk-0">
                     <CardHeader>
                         <CardTitle>Sales Report</CardTitle>
-                        <CardDescription>View all Revenue Streams.</CardDescription>
+                        <CardDescription>View Itinerary Revenue Streams.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>

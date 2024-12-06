@@ -181,7 +181,7 @@ const CheckoutComponent = ({ params }) => {
   const handleBuy = async () => {
     try {
       setIsLoading(true);
-      if (paymentMethod === "wallet" && parseInt(wallet) < (discountedPrice || totalPrice)) {
+      if (paymentMethod === "wallet" && parseFloat(wallet) < (discountedPrice || totalPrice)) {
         setMessageAboveButton("Insufficient balance in wallet");
         setTimeout(() => {
           setMessageAboveButton("");
@@ -446,8 +446,8 @@ const CheckoutComponent = ({ params }) => {
         <button
           onClick={() => setPaymentMethod("cash-on-delivery")}
           className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${paymentMethod === "cash-on-delivery"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
         >
           <DollarSignIcon className="w-6 h-6" />
@@ -457,8 +457,8 @@ const CheckoutComponent = ({ params }) => {
         <button
           onClick={() => setPaymentMethod("wallet")}
           className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${paymentMethod === "wallet"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
         >
           <WalletIcon className="w-6 h-6" />
@@ -468,8 +468,8 @@ const CheckoutComponent = ({ params }) => {
         <button
           onClick={() => setPaymentMethod("credit-card")}
           className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${paymentMethod === "credit-card"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
         >
           <CreditCardIcon className="w-6 h-6" />
@@ -481,8 +481,8 @@ const CheckoutComponent = ({ params }) => {
         onClick={handleBuy}
         disabled={!paymentMethod || !willBeUsedAddress || isLoading}
         className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 mt-8 ${!paymentMethod || !willBeUsedAddress || isLoading
-            ? "opacity-50 cursor-not-allowed"
-            : ""
+          ? "opacity-50 cursor-not-allowed"
+          : ""
           }`}
       >
         {isLoading ? (

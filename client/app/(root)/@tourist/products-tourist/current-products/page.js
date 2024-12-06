@@ -5,7 +5,7 @@ import { getSession } from "@/lib/session";
 export default async function MyProductsPage() {
   const session = await getSession();
 
-  const userId = session?.user?.id;
+  const userId = session?.user?.userId;
 
   if (!userId) return <div>Error fetching user</div>;
 

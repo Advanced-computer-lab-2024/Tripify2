@@ -19,6 +19,12 @@ const nextConfig = {
             },
             {
                 hostname: 'www.mtours.gr'
+            },
+            {
+                hostname: 'cdn.pixabay.com'
+            },
+            {
+                hostname: 'media.istockphoto.com'
             }
         ]
     }

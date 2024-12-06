@@ -3,6 +3,20 @@ const advertiserModel = require("../models/Advertiser.js");
 const TagModel = require("../models/Tag");
 const CategoryModel = require("../models/Category");
 const Advertiser = require("../models/Advertiser.js");
+const NotificationService = require('../config/notification.service');
+const notificationService = new NotificationService();
+
+const getActivityAdmin = async (req, res) => {
+  const activities = await activityModel.find({}).populate({
+    path: 'AdvertiserId',
+    populate: {
+      path: 'UserId',
+      select: 'UserName'
+    }
+  });
+  res.status(200).json(activities);
+};
+
 const createActivity = async (req, res) => {
   const {
     Name,
@@ -269,6 +283,44 @@ const deleteActivity = async (req, res) => {
     res.status(500).json({ message: "Error deleting activity", error });
   }
 };
+
+const flagActivity = async (req, res) => {
+  const { id } = req.params;
+
+
+  try {
+    const activity = await activityModel.findById(id)
+    activity.Inappropriate = !activity.Inappropriate
+
+    await activity.save()
+
+    if (activity.Inappropriate) {
+      const advertiser = await advertiserModel.findById(activity.AdvertiserId, "UserId").populate("UserId");
+      console.log(advertiser)
+
+      await Promise.all([
+        notificationService.createNotification({
+          Message: "The Activity ''" + activity.Name + "'' has been flagged as inappropriate",
+          TargetRoute: '/my-activities/' + id,
+          Type: 'error',
+          UserId: advertiser.UserId._id.toString()
+        }),
+        notificationService.sendEmail({
+          recipientEmail: advertiser.UserId.Email,
+          subject: "Tripify: Inappropriate Activity Flagged",
+          content: "The Activity '" + activity.Name + "' has been flagged as inappropriate"
+        })
+      ])
+    }
+    // const activity = await ActivityModel.findByIdAndUpdate(id, { Inappropriate: true }, { new: true });
+
+    if (!activity) return res.status(404).json({ msg: `Cannot find any Activity with id ${id}` });
+    return res.status(200).json("Activity flagged successfully");
+  }
+  catch (e) {
+    res.status(400).json({ msg: "Operation Failed" });
+  }
+}
 // const deletAll = async (req, res) => {
 //   try {
 //     await activityModel.deleteMany({});
@@ -301,4 +353,6 @@ module.exports = {
   getActivityById,
   updateActivity,
   deleteActivity,
+  getActivityAdmin,
+  flagActivity
 };

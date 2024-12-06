@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Binoculars, Container, DeleteIcon, FileUser, MessageCircleWarning, Package, ShieldHalf, Tags, TramFront, Users, Table, Gem } from "lucide-react";
+import { Binoculars, Container, DeleteIcon, FileUser, MessageCircleWarning, Package, ShieldHalf, Tags, TramFront, Users, Table, Gem, FerrisWheel } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function SideBarLinks() {
@@ -39,6 +39,13 @@ export default function SideBarLinks() {
                 Itineraries{" "}
             </Link>
             <Link
+                href="/activities"
+                className={cn("flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-black", pathname.includes("/activities") ? "bg-muted text-black" : "text-muted-foreground")}
+            >
+                <FerrisWheel className="w-4 h-4" />
+                Activities{" "}
+            </Link>
+            <Link
                 href="/categories"
                 className={cn("flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-black", pathname.includes("/categories") ? "bg-muted text-black" : "text-muted-foreground")}
             >
@@ -73,7 +80,7 @@ export default function SideBarLinks() {
                 <Table className="w-4 h-4" />
                 Sales Report
             </Link>
-           
+
             <Link
                 href="/complaints"
                 className={cn("flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-black", pathname.includes("/complaints") ? "bg-muted text-black" : "text-muted-foreground")}

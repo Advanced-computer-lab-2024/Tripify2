@@ -114,10 +114,10 @@ export default function Dashboard({ params }) {
       break;
     case "Tourism Governor":
       dashboardElements = [
-        { name: "Account", link: `/account/${id}` },
-        { name: "Regulations", link: "/regulations" },
-        { name: "Reports", link: "/reports" },
-        { name: "Approvals", link: "/approvals" },
+        { name: "Change Password", link: "/change-password" },
+        { name: "Create Place", link: "/create-place" },
+        { name: "Create Tag", link: "/create-tag" },
+        { name: "My Places", link: "/my-places" },
       ];
       break;
     case "Admin":

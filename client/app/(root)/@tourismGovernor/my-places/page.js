@@ -1,6 +1,6 @@
 import { fetcher } from "@/lib/fetch-client";
 import { getSession } from "@/lib/session";
-import MyPlaces from "./my-places/showPage";
+import MyPlaces from "./showPage";
 
 const Page = async () => {
   const session = await getSession();

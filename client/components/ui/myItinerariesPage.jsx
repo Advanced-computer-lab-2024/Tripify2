@@ -45,7 +45,6 @@ function MyItinerariesPage({ Itineraries }) {
             <li className="text-slate-600">Price</li>
             <li className="text-slate-600">Start Date</li>
             <li className="text-slate-600">End Date</li>
-            <li className="justify-self-center text-slate-600">Accessibilty</li>
           </ul>
           {cards}
         </div>

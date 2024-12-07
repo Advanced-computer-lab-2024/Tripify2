@@ -61,6 +61,7 @@ export default function AdvertiserProfile({ Activities }) {
       <button
         className="w-full hover:bg-slate-50"
         onClick={() => redirectActivity(activity._id)}
+        key={activity._id}
       >
         <ul className="grid grid-cols-[100px_300px_100px_300px_300px_100px] justify-items-start p-2 items-center">
           <li className="w-16 h-16">

@@ -7,6 +7,8 @@ import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
 import { format } from "date-fns";
 
+import { Button } from "@/components/ui/button";
+
 export default function EditActivity() {
   const [formData, setFormData] = useState({
     Name: "",
@@ -32,8 +34,8 @@ export default function EditActivity() {
         const response = await fetcher(`/activities/${id}`);
         if (response.ok) {
           const data = await response.json();
-
-          setFormData({
+  
+          const newFormData = {
             Name: data.activity.Name,
             Date: data.activity.Date.split("T")[0], // Extracting just the date part
             Time: data.activity.Time,
@@ -46,7 +48,13 @@ export default function EditActivity() {
             CategoryId: data.activity.CategoryId.map(
               (category) => category._id
             ),
-          });
+          };
+  
+          setFormData(newFormData);
+  
+          // Set selectedTags and selectedCategories after formData is updated
+          setSelectedTags(newFormData.Tags);
+          setSelectedCategories(newFormData.CategoryId);
         } else {
           alert("Failed to fetch the activity.");
         }
@@ -54,8 +62,12 @@ export default function EditActivity() {
         console.error("Error fetching activity:", error);
       }
     };
+  
     fetchActivity();
   }, [id]);
+  
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);  
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -111,6 +123,44 @@ export default function EditActivity() {
     });
   };
 
+  const handleTagChangeTwo = (tagId) => {
+    setSelectedTags((prevSelected) => {
+      if (prevSelected.includes(tagId)) {
+        // If already selected, remove it
+        return prevSelected.filter((id) => id !== tagId);
+      } else {
+        // Otherwise, add it
+        return [...prevSelected, tagId];
+      }
+    });
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      Tags: selectedTags.includes(tagId)
+        ? selectedTags.filter((id) => id !== tagId)
+        : [...selectedTags, tagId],
+    }));
+  };
+
+  const handleCategoryChangeTwo = (categoryId) => {
+    setSelectedCategories((prevSelected) => {
+      if (prevSelected.includes(categoryId)) {
+        // If already selected, remove it
+        return prevSelected.filter((id) => id !== categoryId);
+      } else {
+        // Otherwise, add it
+        return [...prevSelected, categoryId];
+      }
+    });
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      Categories: selectedCategories.includes(categoryId)
+        ? selectedCategories.filter((id) => id !== categoryId)
+        : [...selectedCategories, categoryId],
+    }));
+  };
+
   // Handle tag selection
   const handleTagChange = (e) => {
     const { value, checked } = e.target;
@@ -155,7 +205,7 @@ export default function EditActivity() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
+    <div className="max-w-4xl mx-auto p-6 rounded m-4">
       <h1 className="text-2xl font-bold mb-4">Edit Activity</h1>
       <form onSubmit={handleSubmit}>
         <div>
@@ -166,7 +216,7 @@ export default function EditActivity() {
               name="Name"
               value={formData.Name}
               onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
+              className="border border-slate-300 rounded-lg p-2 w-full mb-4"
               required
             />
           </label>
@@ -183,7 +233,7 @@ export default function EditActivity() {
                   : ""
               }
               onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
+              className="border border-slate-300 rounded-lg p-2 w-full mb-4"
               required
             />
           </label>
@@ -200,7 +250,7 @@ export default function EditActivity() {
                   : ""
               }
               onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
+              className="border border-slate-300 rounded-lg p-2 w-full mb-4"
               required
             />
           </label>
@@ -225,7 +275,7 @@ export default function EditActivity() {
               name="Price"
               value={formData.Price}
               onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
+              className="border border-slate-300 rounded-lg p-2 w-full mb-4"
               required
             />
           </label>
@@ -238,7 +288,7 @@ export default function EditActivity() {
               name="SpecialDiscounts"
               value={formData.SpecialDiscounts}
               onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
+              className="border border-slate-300 rounded-lg p-2 w-full mb-4"
             />
           </label>
         </div>
@@ -250,7 +300,7 @@ export default function EditActivity() {
               name="Duration"
               value={formData.Duration}
               onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
+              className="border border-slate-300 rounded-lg p-2 w-full mb-4"
               required
             />
           </label>
@@ -263,57 +313,67 @@ export default function EditActivity() {
               name="Image"
               value={formData.Image}
               onChange={handleInputChange}
-              className="border p-2 w-full mb-4"
+              className="border border-slate-300 rounded-lg p-2 w-full mb-4"
             />
           </label>
           <img src={formData.Image} alt="Image" className="w-[300px] p-3"></img>
         </div>
 
-        <div>
-          <strong>Categories:</strong>
-          {categories.map((category) => (
-            <div key={category._id}>
-              <label>
+        <div className="block mb-4">
+          <span className="block mb-2 font-bold">Categories:</span>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <label
+                key={category._id}
+                className={`cursor-pointer p-2 border rounded ${
+                  selectedCategories.includes(category._id)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
                 <input
                   type="checkbox"
                   value={category._id}
-                  checked={
-                    formData.CategoryId
-                      ? formData.CategoryId.includes(category._id)
-                      : false
-                  }
-                  onChange={handleCategoryChange}
+                  onChange={() => handleCategoryChangeTwo(category._id)}
+                  checked={selectedCategories.includes(category._id)}
+                  className="hidden" // Hide the default checkbox
                 />
                 {category.Category}
               </label>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-        <div>
-          <strong>Tags:</strong>
-          {tags.map((tag) => (
-            <div key={tag._id}>
-              <label>
+        <div className="block mb-4">
+          <span className="block mb-2 font-bold">Tags:</span>
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <label
+                key={tag._id}
+                className={`cursor-pointer p-2 border rounded ${
+                  selectedTags.includes(tag._id)
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
                 <input
                   type="checkbox"
                   value={tag._id}
-                  checked={
-                    formData.Tags ? formData.Tags.includes(tag._id) : false
-                  }
-                  onChange={handleTagChange}
+                  onChange={() => handleTagChangeTwo(tag._id)}
+                  checked={selectedTags.includes(tag._id)}
+                  className="hidden" // Hide the default checkbox
                 />
                 {tag.Tag}
               </label>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        <button
+        <Button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded w-full mt-5"
         >
           Save
-        </button>
+        </Button>
       </form>
     </div>
   );

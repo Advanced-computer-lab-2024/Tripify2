@@ -165,7 +165,7 @@ const updateAdvertiser = async (req, res) => {
       { new: true }
     );
 
-    console.log("Image: ", Image);
+    //console.log("Image: ", Image);
 
     const updatedAdvertiser = await advertiserModel.findByIdAndUpdate(
       id,

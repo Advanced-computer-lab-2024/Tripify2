@@ -213,7 +213,7 @@ export default function CreateItinerary() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 border border-slate-300 rounded m-4">
+    <div className="max-w-4xl mx-auto p-6 rounded m-4">
       <h1 className="text-2xl font-bold mb-4">Create Itinerary</h1>
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <form onSubmit={handleSubmit}>

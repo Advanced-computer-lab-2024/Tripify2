@@ -244,11 +244,10 @@ export default function MyPlaces() {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8 bg-white">
       <h1 className="text-2xl font-bold text-gray-800">
-        My Created Museums and Historical Places
+        Create Museums and Historical Places
       </h1>
 
       <div>
-        <h2 className="text-xl font-bold text-gray-700">Create a New Place</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <input
             type="text"

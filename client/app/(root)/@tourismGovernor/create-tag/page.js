@@ -49,8 +49,8 @@ const Page = () => {
   };
 
   return (
-    <section className="font-poppins px-8 md:px-24 items-center justify-center w-full flex flex-col h-screen gap-12 bg-gray-50">
-      <h1 className="text-3xl font-semibold text-gray-800">Create Tag</h1>
+    <section className="font-poppins px-8 md:px-24 items-center justify-center w-full flex flex-col h-screen gap-12">
+      <h1 className="text-3xl font-semibold">Create Tag</h1>
 
       <form
         onSubmit={(e) => {

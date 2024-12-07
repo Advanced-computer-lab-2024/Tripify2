@@ -1,6 +1,15 @@
 import localFont from "next/font/local";
 import Dashboard from "@/components/ui/dashboard";
 import Footer from "@/components/shared/Footer";
+import Link from "next/link"
+
+import { Plane, PanelLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+import TourismGovernorSides from "./TourismGovernorSides";
+import TourismGovernorSides2 from "./TourismGovernorSides2";
+import AccountTourismGovernor from "./AccountTourismGovernor";
 
 import { getSession } from "@/lib/session";
 
@@ -16,17 +25,67 @@ export default async function RootLayout({ children }) {
   const Session = await getSession();
 
   return (
+    <html lang="en">
       <body className={geistSans.className}>
-        <header>
-          <Dashboard
-            params={{
-              role: "Tourism Governor",
-              /*id: "67001e91b4ba61e78487b585"*/ id: Session?.user?.id,
-            }}
-          />
-        </header>
-        {children}
-        <Footer />
+        <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+          <div className="hidden border-r bg-muted/40 md:block">
+            <div className="flex h-full max-h-screen flex-col gap-2">
+              <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 font-semibold"
+                >
+                  <Plane className="h-6 w-6" />
+                  <span className="">Tripify</span>
+                </Link>
+              </div>
+              <div className="flex-1">
+                <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+                  <TourismGovernorSides />
+                </nav>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button size="icon" variant="outline" className="sm:hidden">
+                    <PanelLeft className="h-5 w-5" />
+                    <span className="sr-only">Toggle Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="sm:max-w-xs">
+                  <nav className="grid gap-2 mt-6 text-lg font-medium">
+                    <TourismGovernorSides2 />
+                  </nav>
+                </SheetContent>
+              </Sheet>
+              <div className="flex items-center justify-end w-full gap-2">
+                <AccountTourismGovernor />
+              </div>
+            </header>
+            <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+              {children}
+            </main>
+          </div>
+        </div>
       </body>
+    </html>
   );
+
+  // return (
+  //     <body className={geistSans.className}>
+  //       <header>
+  //         <Dashboard
+  //           params={{
+  //             role: "Tourism Governor",
+  //             /*id: "67001e91b4ba61e78487b585"*/ id: Session?.user?.id,
+  //           }}
+  //         />
+  //       </header>
+  //       {children}
+  //       <Footer />
+  //     </body>
+  // );
 }

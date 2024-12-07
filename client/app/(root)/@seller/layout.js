@@ -5,7 +5,7 @@ import { Plane, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import localFont from "next/font/local";
-import AccountAdmin from "@/components/admin/AccountAdmin"
+import AccountAdmin from "@/components/admin/AccountAdmin";
 
 import Footer from "@/components/shared/Footer";
 
@@ -36,7 +36,6 @@ export default function RootLayout({ children }) {
               <div className="flex-1">
                 <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                   <Sellersides />
-                
                 </nav>
               </div>
             </div>
@@ -45,11 +44,7 @@ export default function RootLayout({ children }) {
             <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="sm:hidden"
-                  >
+                  <Button size="icon" variant="outline" className="sm:hidden">
                     <PanelLeft className="h-5 w-5" />
                     <span className="sr-only">Toggle Menu</span>
                   </Button>
@@ -60,17 +55,15 @@ export default function RootLayout({ children }) {
                   </nav>
                 </SheetContent>
               </Sheet>
-              <div className='flex items-center justify-end w-full gap-2'>
-              <AccountAdmin />
+              <div className="flex items-center justify-end w-full gap-2">
+                <AccountAdmin />
               </div>
-
             </header>
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
               {children}
             </main>
           </div>
         </div>
-        <footer/>
       </body>
     </html>
   );

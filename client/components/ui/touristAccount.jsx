@@ -6,7 +6,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "./dialog";
 import { Button } from "./button";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
-import { Coins } from "lucide-react";
+import { Coins, Loader2, Trash2, Edit } from "lucide-react";
 import { Badge } from "./badge";
 import { cn, convertPrice, convertToUSD } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,6 @@ import { Callout } from "./Callout";
 import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
 import { RiDeleteBin5Line } from "@remixicon/react";
-
 
 export default function TouristAccount({ params }) {
   const { touristInfo } = params;
@@ -110,6 +109,8 @@ export default function TouristAccount({ params }) {
       Address: addresses,
       UserId: newUserId,
     };
+
+    setLoading(true);
     try {
       const usersResponse = await fetcher("/users", {
         method: "GET",
@@ -177,6 +178,8 @@ export default function TouristAccount({ params }) {
       }
     } catch (error) {
       console.error("Error updating data:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -523,23 +526,33 @@ export default function TouristAccount({ params }) {
         )}
 
         <div className="flex justify-center gap-4 mt-4">
-          <button
-            onClick={handleEdit}
-            disabled={!hasChanges}
-            className={`px-4 py-2 rounded-md transition duration-200 ${
-              hasChanges
-                ? "bg-purple-600 text-white hover:bg-purple-700"
-                : "bg-gray-300 text-gray-600 cursor-not-allowed"
-            }`}
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => setRequestOpen(true)}
-            className="px-4 text-white bg-red-500 rounded"
-          >
-            Request Deletion
-          </button>
+          <div className="w-full flex justify-between gap-4">
+            <button
+              onClick={handleEdit}
+              disabled={!hasChanges}
+              className={`px-6 py-3 rounded-md transition duration-200 flex items-center justify-center space-x-2 ${
+                hasChanges
+                  ? "bg-purple-600 text-white hover:bg-purple-700"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              } w-1/2`}
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => setRequestOpen(true)}
+              className="px-6 py-3 text-white bg-red-500 rounded-md w-1/2 hover:bg-red-600 transition duration-200 flex items-center justify-center space-x-2"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Request Deletion
+            </button>
+          </div>
 
           <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
             <DialogContent>

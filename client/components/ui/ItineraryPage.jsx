@@ -28,6 +28,7 @@ function ItineraryPage({ itinerary, params }) {
     EndDate: itinerary.EndDate,
     Language: itinerary.Language,
     Price: itinerary.Price,
+    RemainingBookings: itinerary.RemainingBookings,
     DatesAndTimes: itinerary.DatesAndTimes,
     Accesibility: itinerary.Accesibility,
     Pickup: itinerary.Pickup,
@@ -205,6 +206,7 @@ function ItineraryPage({ itinerary, params }) {
           EndDate: itineraryData.EndDate,
           Language: itineraryData.Language,
           Price: itineraryData.Price,
+          RemainingBookings: itineraryData.RemainingBookings,
           DatesAndTimes: itineraryData.DatesAndTimes,
           Accesibility: itineraryData.Accesibility,
           Pickup: itineraryData.Pickup,
@@ -250,7 +252,7 @@ function ItineraryPage({ itinerary, params }) {
   }
 
   const dateandtimelist = itinerary.DatesAndTimes.map((date) => (
-    <li className="border shadow border-slate-300 rounded-lg w-60 h-20 flex justify-center items-center">
+    <li className="border shadow border-slate-300 rounded-lg min-w-60 h-20 flex justify-center items-center p-2">
       {date}
     </li>
   ));
@@ -314,7 +316,7 @@ function ItineraryPage({ itinerary, params }) {
   }, []);
 
   const categorylist = readcategories.map((category) => (
-    <li className="border shadow border-slate-300 rounded-lg min-w-48 w-auto h-20 flex justify-center items-center">
+    <li className="border shadow border-slate-300 rounded-lg min-w-48 w-auto h-20 p-2 flex justify-center items-center">
       {category.Category}
     </li>
   ));
@@ -330,7 +332,7 @@ function ItineraryPage({ itinerary, params }) {
   return (
     <>
       {mode == "Read" ? (
-        <div className="p-10 px-16 flex flex-col gap-2 border-2 border-slate-100 rounded-md m-12 ml-52 mr-52 ">
+        <div className="p-10 px-16 flex flex-col gap-2 border-2 border-slate-100 rounded-md m-12 ml-56 mr-56 ">
           <div className="flex flex-row justify-between mb-2 ">
             <div>
               <h2 className="text-3xl font-bold mb">{itinerary.Name}</h2>
@@ -352,6 +354,10 @@ function ItineraryPage({ itinerary, params }) {
               <div className="mb-2 flex flex-row gap-2 items-center">
                 <h2 className="text-lg font-semibold">Price:</h2>
                 <h3>${itinerary.Price}</h3>
+              </div>
+              <div className="mb-2 flex flex-row gap-2 items-center">
+                <h2 className="text-lg font-semibold">Remaining Bookings:</h2>
+                <h3>{itinerary.RemainingBookings}</h3>
               </div>
               <div className="mb-2 flex flex-row gap-2 items-center">
                 <h2 className="text-lg font-semibold">Pickup:</h2>
@@ -442,7 +448,7 @@ function ItineraryPage({ itinerary, params }) {
               {!locationBool ? "View Location" : "Close Location"}
             </Button>
             {locationBool && (
-              <div className="pt-4 w-80 h-fit  ">
+              <div className="pt-4 w-full h-auto ">
                 <LocationViewer location={itinerary?.Location} />
               </div>
             )}
@@ -485,7 +491,7 @@ function ItineraryPage({ itinerary, params }) {
           </Button>
         </div>
       ) : (
-        <div className="max-w-xl mx-auto p-6 border rounded my-4">
+        <div className="max-w-2xl mx-auto p-6 border rounded my-4">
           <h1 className="text-2xl font-bold mb-4">Edit Itinerary</h1>
           {error && <div className="text-red-500 mb-4">{error}</div>}
           <form onSubmit={handleSubmit}>
@@ -610,6 +616,20 @@ function ItineraryPage({ itinerary, params }) {
               />
             </label>
 
+             {/*Booking Slots*/}
+            <label className="block mb-4">
+              Remaining Bookings:
+              <input 
+                type="number" 
+                name="RemainingBookings" 
+                value={formData.RemainingBookings}
+                onChange={handleInputChange}
+                className="block w-full border p-2  rounded border-slate-400"
+                min="1" 
+                required/>
+            </label>
+
+
             {/* Dates and Times */}
             <div className="mb-4">
               <h3 className="text-lg font-semibold mb-2">Dates and Times:</h3>
@@ -701,7 +721,7 @@ function ItineraryPage({ itinerary, params }) {
                       value={category._id}
                       onChange={() => handleCategoryChange(category._id)}
                       checked={selectedCategories.includes(category._id)}
-                      //className="hidden" // Hide the default checkbox
+                      className="hidden" // Hide the default checkbox
                     />{" "}
                     {category.Category}
                   </label>
@@ -735,27 +755,6 @@ function ItineraryPage({ itinerary, params }) {
               </div>
             </div>
 
-            <div>
-              <h2 className="text-lg font-semibold mb-2">Rate Us (0 to 5)</h2>
-              <div className="mb-4">
-                {/* Create radio buttons for each rating option */}
-                {[0, 1, 2, 3, 4, 5].map((value) => (
-                  <label key={value} className="block mb-2">
-                    <input
-                      type="radio"
-                      value={value}
-                      checked={rating === value} // Check if the value is the selected rating
-                      onChange={handleRatingChange} // Update state on change
-                      className="mr-2" // Add margin for spacing
-                      required
-                    />
-                    {value}
-                  </label>
-                ))}
-              </div>
-              <p className="text-sm">Your rating: {rating}</p>{" "}
-              {/* Display the selected rating */}
-            </div>
 
             {/* Submit Button */}
             <Button

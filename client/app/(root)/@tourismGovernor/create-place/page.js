@@ -24,21 +24,41 @@ export default function MyPlaces() {
     Description: "",
     Categories: [],
     Tags: [],
+    Type: "",
     TicketPrices: {},
+    OpeningHours: "",
     location: null,
+    Pictures: [],
   });
   const [tags, setTags] = useState([]);
   const session = useSession();
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
 
+  const [wrongType, setWrongType] = useState();
+  const [buttonClicked, setButtonClicked] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+
   const disableButton =
     !newPlace?.Name.trim() ||
     !newPlace?.Description.trim() ||
     !newPlace?.Categories.length ||
     !newPlace?.Tags.length ||
+    !newPlace?.Type.trim() ||
     !Object.keys(newPlace?.TicketPrices || {}).length ||
     !newPlace?.location;
+
+  useEffect(() => {
+    if (buttonClicked && !wrongType) {
+      setShowMessage(true);
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+        setButtonClicked(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [buttonClicked, wrongType]);
 
   useEffect(() => {
     const fetchTagsAndCategories = async () => {
@@ -127,25 +147,36 @@ export default function MyPlaces() {
   }, []);
 
   const createPlace = async () => {
-    try {
-      const response = await fetcher("/places", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...newPlace,
-          TourismGovernor: session?.data?.user?.id,
-          Location: newPlace.location,
-        }),
-      });
+    setButtonClicked(true);
 
-      const data = await response.json();
-      setPlaces([...places, data]); // Update the places list with the new place
-      setNewPlace({ Name: "", Description: "", Categories: [], Tags: [] }); // Reset the newPlace state
-      router.push("/");
-    } catch (err) {
-      setError(err.message);
+    let typeValid =
+      newPlace?.Type.trim().toLowerCase() === "museum" ||
+      newPlace?.Type.trim().toLowerCase() === "historical place";
+
+    setWrongType(typeValid);
+
+    if (typeValid) {
+      try {
+        const response = await fetcher("/places", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...newPlace,
+            TourismGovernor: session?.data?.user?.id,
+            Location: newPlace.location,
+          }),
+        });
+
+        const data = await response.json();
+
+        //setPlaces([...places, data]); // Update the places list with the new place
+        setNewPlace({ Name: "", Description: "", Categories: [], Tags: [] }); // Reset the newPlace state
+        router.push("/");
+      } catch (err) {
+        setError(err.message);
+      }
     }
   };
 
@@ -384,6 +415,12 @@ export default function MyPlaces() {
       >
         Create Place
       </Button>
+
+      {buttonClicked && !wrongType && showMessage && (
+        <p className="text-red-500 mt-2 text-center">
+          Please pick a type from "Historical Place" or "Museum"
+        </p>
+      )}
     </div>
   );
 

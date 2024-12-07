@@ -540,8 +540,16 @@ const updateQuantityProductAndStatus = async (req, res) => {
         .status(404)
         .json({ message: `Tourist with id ${touristId} not found!` });
 
+    const theTourist = await TouristModel.findOne({ UserId: touristId });
+    if (!theTourist)
+      return res
+        .status(404)
+        .json({ message: `No user found with id: ${touristId}` });
+
+    const theTouristId = theTourist?._id;
+
     await TouristModel.findByIdAndUpdate(
-      touristId,
+      theTouristId,
       {
         Cart: [],
       },
@@ -1534,7 +1542,7 @@ const createProductBookingCart = async (req, res) => {
       });
     }
 
-    const totalBeforeDiscount = totalPrice
+    const totalBeforeDiscount = totalPrice;
 
     if (promoCode) {
       totalPrice = await calculatePriceAfterPromo(
@@ -1618,7 +1626,9 @@ const createProductBookingCart = async (req, res) => {
     if (paymentMethod === "credit-card") {
       //console.log("inside CARDDDDDDDDDDDDDDDDDDDDD");
       const discountedPrice = totalBeforeDiscount - totalPrice;
-      const discountPerItem = discountedPrice / productDetails?.reduce((acc, { Quantity }) => acc + Quantity, 0);
+      const discountPerItem =
+        discountedPrice /
+        productDetails?.reduce((acc, { Quantity }) => acc + Quantity, 0);
       console.log("Discount per item: ", discountPerItem);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],

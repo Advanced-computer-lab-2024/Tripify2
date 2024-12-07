@@ -19,6 +19,7 @@ const MyPlaces = ({ myPlaces }) => {
 
   const handleDeleteClick = async (e, id) => {
     e.preventDefault();
+    e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this place?")) {
       setLoadingDelete(true);
       try {
@@ -33,6 +34,7 @@ const MyPlaces = ({ myPlaces }) => {
         setError(err.message);
       } finally {
         setLoadingDelete(false);
+        router.refresh();
       }
     }
   };
@@ -65,6 +67,7 @@ const MyPlaces = ({ myPlaces }) => {
                       ? place?.Pictures[0]
                       : `/images/placeholder.jpg`
                   }
+                  className="w-16 h-16"
                 />
               </li>
               <li>{place?.Name}</li>

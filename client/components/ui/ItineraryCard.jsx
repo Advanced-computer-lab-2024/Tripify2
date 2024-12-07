@@ -14,7 +14,6 @@ function ItineraryCard({
   const { currency } = useCurrencyStore();
 
   const dateStartDate = new Date(StartDate);
-  console.log(`dateStartDate: ${dateStartDate}`)
   const formattedStartDate = dateStartDate.toISOString().split("T")[0];
 
   const dateEndDate = new Date(EndDate);
@@ -33,6 +32,7 @@ function ItineraryCard({
               ? itinerary?.Image
               : `/images/placeholder.jpg`
           }
+          className= "w-16 h-16"
         />
       </li>
       <li>{Name}</li>

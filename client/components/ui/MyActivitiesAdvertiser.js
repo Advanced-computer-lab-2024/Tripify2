@@ -74,6 +74,7 @@ export default function AdvertiserProfile({ Activities }) {
                   ? activity?.Image
                   : `/images/placeholder.jpg`
               }
+              className= "w-16 h-16"
             />
           </li>
           <li>{activity?.Name}</li>

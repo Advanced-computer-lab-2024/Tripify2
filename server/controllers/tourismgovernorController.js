@@ -1,19 +1,20 @@
 const TourismGovernor = require("../models/TourismGovernor");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const Tags = require("../models/Tag");
 
 const addTourismgovernor = async (req, res) => {
   const { UserName, Email, Password } = req.body;
 
-  if(!Email || !Password || !UserName) return res.status(400).json({'message': 'All Fields Must Be Given!'})
-  
+  if (!Email || !Password || !UserName) return res.status(400).json({ 'message': 'All Fields Must Be Given!' })
+
   try {
     const duplicateEmail = await User.findOne({ Email }, "_id").lean().exec();
 
-    if(duplicateEmail) return res.status(400).json({'message': 'Email Already Exists!'})
+    if (duplicateEmail) return res.status(400).json({ 'message': 'Email Already Exists!' })
 
     const duplicateUserName = await User.findOne({ UserName }, "_id").lean().exec();
-    if(duplicateUserName) return res.status(400).json({'message': 'UserName Already Exists!'})
+    if (duplicateUserName) return res.status(400).json({ 'message': 'UserName Already Exists!' })
 
     const hashedPwd = await bcrypt.hash(Password, 10);
 
@@ -53,31 +54,27 @@ const getTourismgovernor = async (req, res) => {
 };
 
 const getTourismGovernorPlaces = async (req, res) => {
-  if(!req._id) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+  if (!req._id) return res.status(400).json({ 'message': 'Unauthorized TourismGovernor!' })
 
-  try 
-  {
+  try {
     const places = await TourismGovernor.findOne({ UserId: req._id }, "AddedPlaces").lean().populate("AddedPlaces");
     if (!places) return res.status(400).json({ message: "No Places where found!" });
     return res.status(200).json(places);
-  } 
-  catch (error) 
-  {
+  }
+  catch (error) {
     return res.status(500).json({ message: error.message });
   }
 }
 
 const getTourismGovernorTags = async (req, res) => {
-  if(!req._id) return res.status(400).json({'message': 'Unauthorized TourismGovernor!'})
+  if (!req._id) return res.status(400).json({ 'message': 'Unauthorized TourismGovernor!' })
 
-  try 
-  {
-    const tags = await TourismGovernor.findOne({ UserId: req._id }, "AddedTags").lean().populate("AddedTags");
+  try {
+    const tags = await Tags.find({ UserId: req._id }).lean().exec();
     if (!tags) return res.status(400).json({ message: "No Tags where found!" });
     return res.status(200).json(tags);
-  } 
-  catch (error) 
-  {
+  }
+  catch (error) {
     return res.status(500).json({ message: error.message });
   }
 }
@@ -96,7 +93,7 @@ const deleteTourismGovernor = async (req, res) => {
     if (!deletedUser) {
       return res.json({ message: "User not found" });
     }
-    
+
     res.status(200).json({ message: "Tourism Governor deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting tourism governor", error });

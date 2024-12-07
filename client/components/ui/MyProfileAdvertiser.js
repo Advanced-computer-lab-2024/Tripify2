@@ -290,7 +290,7 @@ export default function AdvertiserProfile({ advertiser }) {
     activityList = theActivities.map((activity, index) => (
       <li
         key={activity?._id}
-        className="border border-slate-500 shadow p-2 rounded-lg w-fit"
+        className="p-2 border rounded-lg shadow border-slate-500 w-fit"
       >
         <h3>{activity?.Name}</h3>
       </li>
@@ -306,11 +306,35 @@ export default function AdvertiserProfile({ advertiser }) {
   return (
     <div className="flex flex-col items-center p-4 my-10">
       <div className="flex flex-col items-center mb-8">
-        <img
-          src={image}
-          alt="User Avatar"
-          className="w-24 h-24 rounded-full mb-4"
-        />
+        {image ? (
+          <div className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer'>
+            <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+            <input
+              type="file"
+              accept="image/*"
+              ref={inputRef}
+              name="Image"
+              onChange={(e) => {
+                setImage(e.target.files[0])
+              }}
+              className="hidden w-full h-full"
+            />
+          </div>
+        ) : (
+          <div className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer'>
+            <UploadIcon size={24} />
+            <input
+              type="file"
+              accept="image/*"
+              ref={inputRef}
+              name="Image"
+              onChange={(e) => {
+                setImage(e.target.files[0])
+              }}
+              className="hidden w-full h-full"
+            />
+          </div>
+        )}
         <h1 className="text-2xl font-bold text-purple-600">
           {formData.UserName}
         </h1>
@@ -338,7 +362,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="UserName"
                       value={formData.UserName}
                       onChange={handleInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                 </div>
@@ -350,7 +374,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Email"
                       value={formData.Email}
                       onChange={handleInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                 </div>
@@ -362,7 +386,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Hotline"
                       value={formData.Hotline}
                       onChange={handleInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                 </div>
@@ -374,7 +398,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Website"
                       value={formData.Website}
                       onChange={handleInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                 </div>
@@ -385,7 +409,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       type="password"
                       value={oldPassword}
                       onChange={(e) => setOldPassword(e.target.value)}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                 </div>
@@ -396,21 +420,21 @@ export default function AdvertiserProfile({ advertiser }) {
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                 </div>
                 <Button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 w-full"
+                  className="w-full bg-purple-600 hover:bg-purple-700"
                 >
-                  <Edit className="mr-2 h-4 w-4" /> Edit
+                  <Edit className="w-4 h-4 mr-2" /> Edit
                 </Button>
               </form>
             ) : (
               <div className="py-5 space-y-6">
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <User className="w-5 h-5" />
                     <span>Username:</span>
                   </div>
@@ -420,7 +444,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Mail className="w-5 h-5" />
                     <span>Email:</span>
                   </div>
@@ -430,7 +454,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Phone className="w-5 h-5" />
                     <span>Hotline:</span>
                   </div>
@@ -444,7 +468,7 @@ export default function AdvertiserProfile({ advertiser }) {
                   <h2>{formData.Website ? formData.Website : "No Website"}</h2>
                 </div>
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Network className="w-5 h-5" />
                     <span>Website:</span>
                   </div>
@@ -454,11 +478,11 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div>
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2 mb-2">
+                  <div className="flex items-center mb-2 space-x-2 font-semibold text-gray-600">
                     <FerrisWheel className="w-5 h-5" />
                     <span>Activities:</span>
                   </div>
-                  <ul className="flex flex-row gap-2 flex-wrap">
+                  <ul className="flex flex-row flex-wrap gap-2">
                     {activityList}
                   </ul>
                 </div>
@@ -475,21 +499,21 @@ export default function AdvertiserProfile({ advertiser }) {
                   {documentsBool && <ul>{documentlist}</ul>}
                 </div>
 
-                <div className="flex flex-row justify-center items-center gap-4 m-auto mt-4">
-                  <div className="flex justify-center mt-4 w-1/2">
+                <div className="flex flex-row items-center justify-center gap-4 m-auto mt-4">
+                  <div className="flex justify-center w-1/2 mt-4">
                     <Button
-                      className="bg-purple-600 hover:bg-purple-700 w-full"
+                      className="w-full bg-purple-600 hover:bg-purple-700"
                       onClick={handleEditClick}
                     >
-                      <Edit className="mr-2 h-4 w-4" /> Edit
+                      <Edit className="w-4 h-4 mr-2" /> Edit
                     </Button>
                   </div>
-                  <div className="flex justify-center mt-4  w-1/2">
+                  <div className="flex justify-center w-1/2 mt-4">
                     <Button
                       onClick={() => setRequestOpen(true)}
-                      className="bg-red-500 hover:bg-red-600 w-full"
+                      className="w-full bg-red-500 hover:bg-red-600"
                     >
-                      <Trash2 className="mr-2 h-4 w-4" />
+                      <Trash2 className="w-4 h-4 mr-2" />
                       Request Deletion
                     </Button>
                   </div>
@@ -533,7 +557,7 @@ export default function AdvertiserProfile({ advertiser }) {
 
           <TabsContent value="company">
             {(formData?.CompanyProfile && isProfileEditMode) ||
-            (!formData?.CompanyProfile && isProfileCreateMode) ? (
+              (!formData?.CompanyProfile && isProfileCreateMode) ? (
               <form onSubmit={handleProfileSubmit}>
                 <div>
                   <label>
@@ -543,7 +567,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Name"
                       value={profileformData.Name}
                       onChange={handleProfileInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                   <label>
@@ -553,7 +577,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Industry"
                       value={profileformData.Industry}
                       onChange={handleProfileInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                   <label>
@@ -564,13 +588,13 @@ export default function AdvertiserProfile({ advertiser }) {
                       value={
                         profileformData.FoundedDate
                           ? format(
-                              new Date(profileformData.FoundedDate),
-                              "yyyy-MM-dd"
-                            )
+                            new Date(profileformData.FoundedDate),
+                            "yyyy-MM-dd"
+                          )
                           : ""
                       }
                       onChange={handleProfileInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                       required
                     />
                   </label>
@@ -581,7 +605,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Headquarters"
                       value={profileformData.Headquarters}
                       onChange={handleProfileInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                   <label>
@@ -591,7 +615,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Description"
                       value={profileformData.Description}
                       onChange={handleProfileInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                   <label>
@@ -601,7 +625,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Website"
                       value={profileformData.Website}
                       onChange={handleProfileInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                   <label>
@@ -611,21 +635,21 @@ export default function AdvertiserProfile({ advertiser }) {
                       name="Email"
                       value={profileformData.Email}
                       onChange={handleProfileInputChange}
-                      className="border border-slate-300 rounded-lg p-2 w-full mb-4"
+                      className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
                 </div>
                 <Button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 w-full"
+                  className="w-full bg-purple-600 hover:bg-purple-700"
                 >
-                  <Edit className="mr-2 h-4 w-4" /> Edit
+                  <Edit className="w-4 h-4 mr-2" /> Edit
                 </Button>
               </form>
             ) : (
               <div className="py-5 space-y-6">
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Building2 className="w-5 h-5" />
                     <span>Company Name:</span>
                   </div>
@@ -635,7 +659,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Factory className="w-5 h-5" />
                     <span>Industry:</span>
                   </div>
@@ -645,7 +669,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <CalendarFold className="w-5 h-5" />
                     <span>Founded Date:</span>
                   </div>
@@ -656,7 +680,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <House className="w-5 h-5" />
                     <span>Headquarters:</span>
                   </div>
@@ -668,7 +692,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <FileText className="w-5 h-5" />
                     <span>Description:</span>
                   </div>
@@ -680,7 +704,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Network className="w-5 h-5" />
                     <span>Website:</span>
                   </div>
@@ -692,7 +716,7 @@ export default function AdvertiserProfile({ advertiser }) {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                  <div className="font-semibold text-gray-600 flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Mail className="w-5 h-5" />
                     <span>Email:</span>
                   </div>
@@ -704,9 +728,9 @@ export default function AdvertiserProfile({ advertiser }) {
                 <div className="flex justify-center mt-4">
                   <Button
                     onClick={handleEditCompanyProfileClick}
-                    className="bg-purple-600 hover:bg-purple-700 w-full"
+                    className="w-full bg-purple-600 hover:bg-purple-700"
                   >
-                    <Edit className="mr-2 h-4 w-4" /> Edit
+                    <Edit className="w-4 h-4 mr-2" /> Edit
                   </Button>
                 </div>
               </div>
@@ -724,7 +748,7 @@ export default function AdvertiserProfile({ advertiser }) {
                   name="UserName"
                   value={formData.UserName}
                   onChange={handleInputChange}
-                  className="border p-2 w-full"
+                  className="w-full p-2 border"
                 />
               </label>
             </div>
@@ -732,7 +756,7 @@ export default function AdvertiserProfile({ advertiser }) {
               <label>
                 <strong>Image:</strong>
                 {image ? (
-                  <div className="relative w-16 h-16 cursor-pointer rounded-full overflow-hidden">
+                  <div className="relative w-16 h-16 overflow-hidden rounded-full cursor-pointer">
                     <Image
                       width={64}
                       height={64}
@@ -755,7 +779,7 @@ export default function AdvertiserProfile({ advertiser }) {
                     />
                   </div>
                 ) : (
-                  <div className="relative flex items-center justify-center cursor-pointer bg-gray-300 w-16 h-16 rounded-full overflow-hidden">
+                  <div className="relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer">
                     <UploadIcon size={24} />
                     <input
                       type="file"
@@ -779,7 +803,7 @@ export default function AdvertiserProfile({ advertiser }) {
                   name="Email"
                   value={formData.Email}
                   onChange={handleInputChange}
-                  className="border p-2 w-full"
+                  className="w-full p-2 border"
                 />
               </label>
             </div>
@@ -791,7 +815,7 @@ export default function AdvertiserProfile({ advertiser }) {
                   name="Website"
                   value={formData.Website}
                   onChange={handleInputChange}
-                  className="border p-2 w-full"
+                  className="w-full p-2 border"
                 />
               </label>
             </div>
@@ -803,7 +827,7 @@ export default function AdvertiserProfile({ advertiser }) {
                   name="Hotline"
                   value={formData.Hotline}
                   onChange={handleInputChange}
-                  className="border p-2 w-full"
+                  className="w-full p-2 border"
                 />
               </label>
             </div>
@@ -815,7 +839,7 @@ export default function AdvertiserProfile({ advertiser }) {
                   type="password"
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
-                  className="border p-2 w-full"
+                  className="w-full p-2 border"
                 />
               </label>
             </div>
@@ -826,13 +850,13 @@ export default function AdvertiserProfile({ advertiser }) {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="border p-2 w-full"
+                  className="w-full p-2 border"
                 />
               </label>
             </div>
             <button
               type="submit"
-              className="bg-blue-500 text-white py-2 px-4 mt-4 rounded"
+              className="px-4 py-2 mt-4 text-white bg-blue-500 rounded"
             >
               Save
             </button>

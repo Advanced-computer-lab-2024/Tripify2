@@ -9,6 +9,7 @@ import {
   UserCircle,
   Castle,
   CirclePlus,
+  Tags,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +42,18 @@ export default function Sellersides() {
       >
         <CirclePlus className="w-4 h-4" />
         Create Place
+      </Link>
+      <Link
+        href="/my-tags"
+        className={cn(
+          "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-black",
+          pathname.includes("/create-tag")
+            ? "bg-muted text-black"
+            : "text-muted-foreground"
+        )}
+      >
+        <Tags className="w-4 h-4" />
+        My Tags
       </Link>
       <Link
         href="/create-tag"

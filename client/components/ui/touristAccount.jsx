@@ -398,7 +398,7 @@ export default function TouristAccount({ params }) {
               ))}
             </select>
           </div>
-          <div className="relative block w-full">
+          {/* <div className="relative block w-full">
             <span className="block font-medium text-gray-700">
               Old Password
             </span>
@@ -419,7 +419,7 @@ export default function TouristAccount({ params }) {
               onChange={handleChange("newPassword")}
               className="block w-full p-2 mt-1 transition duration-200 ease-in-out border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 hover:border-purple-500 hover:ring-2"
             />
-          </div>
+          </div> */}
           <div className="block w-full">
             <span className="block font-medium text-gray-700">
               Saved Addresses

@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Callout } from "@/components/ui/Callout";
 
 const CheckoutComponent = ({ params }) => {
   const { touristId, cart, products, address, wallet } = params;
@@ -65,6 +66,7 @@ const CheckoutComponent = ({ params }) => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [messageAboveButton, setMessageAboveButton] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState("");
   const [promoSuccess, setPromoSuccess] = useState("");
@@ -227,11 +229,16 @@ const CheckoutComponent = ({ params }) => {
       }
 
       if (paymentMethod === "credit-card") router.push(data.url);
-      else alert("Booking successful!");
+      //else alert("Booking successful!");
     } catch (error) {
       console.log(error);
     } finally {
-      setIsLoading(false);
+      setIsSuccess(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        router.push("/");
+      }, 2500);
+      return () => clearTimeout(timer);
     }
   };
 
@@ -497,7 +504,7 @@ const CheckoutComponent = ({ params }) => {
       <button
         onClick={handleBuy}
         disabled={!paymentMethod || !willBeUsedAddress || isLoading}
-        className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 z-[5] mt-8 ${
+        className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 z-[5] mt-8 flex justify-center items-center space-x-2 ${
           !paymentMethod || !willBeUsedAddress || isLoading
             ? "opacity-50 cursor-not-allowed"
             : ""
@@ -505,13 +512,20 @@ const CheckoutComponent = ({ params }) => {
       >
         {isLoading ? (
           <>
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            Processing...
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Processing...</span>
           </>
         ) : (
           "Buy"
         )}
       </button>
+
+      {isSuccess && (
+        <Callout variant="success" title="Purchase successful" className="mt-2">
+          Redirecting to home page...
+        </Callout>
+      )}
+
       {messageAboveButton && (
         <p className="mt-2 text-sm text-center text-red-500">
           {messageAboveButton}

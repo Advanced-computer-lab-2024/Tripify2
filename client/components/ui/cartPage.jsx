@@ -12,11 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Loader2 } from "lucide-react";
 
 function cartPage({ Cart, touristId }) {
   const { currency } = useCurrencyStore();
 
   const [cart, setCart] = useState(Cart);
+
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   //console.log(cart);
   let sum = 0;
@@ -69,13 +73,19 @@ function cartPage({ Cart, touristId }) {
           </div>
           <button
             onClick={() => {
+              setLoading(true);
               router.push("/checkout");
             }}
+            disabled={loading}
             className={
               "w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 mt-8"
             }
           >
-            Checkout
+            {loading ? (
+              <Loader2 size={16} className="text-white animate-spin mx-auto" />
+            ) : (
+              "Checkout"
+            )}
           </button>
         </>
       ) : (

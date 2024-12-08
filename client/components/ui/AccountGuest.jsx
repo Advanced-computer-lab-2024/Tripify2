@@ -8,16 +8,13 @@ import {
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Lock, LogOut, CircleUser } from "lucide-react";
+import { LogIn, UserPlus, CircleUser } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Notifications from "@/components/shared/Notifications";
 
-export default function AccountTourist({ theId }) {
+export default function AccountGuest({ theId }) {
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await signOut({ redirect: true, callbackUrl: "/" });
-  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="ml-auto">
@@ -38,24 +35,17 @@ export default function AccountTourist({ theId }) {
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           className="gap-1 cursor-pointer"
-          onClick={() => router.push(`/account/${theId}`)}
+          onClick={() => router.push("/sign-in")}
         >
-          <CircleUser size={16} />
-          Account
+          <LogIn size={16} />
+          Sign in
         </DropdownMenuItem>
         <DropdownMenuItem
           className="gap-1 cursor-pointer"
-          onClick={() => router.push("/changePassword")}
+          onClick={() => router.push("/sign-up")}
         >
-          <Lock size={16} />
-          Change Password
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className="gap-1 cursor-pointer"
-          onClick={handleLogout}
-        >
-          <LogOut size={16} />
-          Logout
+          <UserPlus size={16} />
+          Sign up
         </DropdownMenuItem>
       </DropdownMenuContent>
       {/* <Notifications/> */}

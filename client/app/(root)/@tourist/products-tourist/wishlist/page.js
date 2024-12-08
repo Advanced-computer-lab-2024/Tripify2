@@ -173,69 +173,72 @@ export default function wishlistProducts() {
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-6 p-10">
-      {wishlistProducts.map((eachproduct) => (
-        <Card
-          key={eachproduct._id}
-          className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100 flex flex-col"
-          onClick={() => handleViewDetails(eachproduct._id)}
-        >
-          <CardHeader className="flex-grow justify-between relative">
-            <img
-              src={eachproduct.Image}
-              alt={eachproduct.Name}
-              className="object-cover w-full h-48 mb-2 rounded-lg"
-            />
-          </CardHeader>
-          <CardContent>
-            <CardTitle className="text-lg font-bold">
-              {eachproduct.Name}
-            </CardTitle>
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center">
-                <span className="mr-1">{eachproduct.Rating}</span>
+    <div className="p-6 px-14">
+      <h1 className="text-2xl font-bold">My Wishlist</h1>
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 p-10">
+        {wishlistProducts.map((eachproduct) => (
+          <Card
+            key={eachproduct._id}
+            className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100 flex flex-col"
+            onClick={() => handleViewDetails(eachproduct._id)}
+          >
+            <CardHeader className="flex-grow justify-between relative">
+              <img
+                src={eachproduct.Image}
+                alt={eachproduct.Name}
+                className="object-cover w-full h-48 mb-2 rounded-lg"
+              />
+            </CardHeader>
+            <CardContent>
+              <CardTitle className="text-lg font-bold">
+                {eachproduct.Name}
+              </CardTitle>
+              <div className="flex justify-between items-center mb-2">
+                <div className="flex items-center">
+                  <span className="mr-1">{eachproduct.Rating}</span>
+                </div>
+                <div
+                  className="text-2xl cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation(); //prevent parent click
+                    toggleWishlist(eachproduct._id);
+                  }}
+                >
+                  <Heart
+                    size={23}
+                    className={
+                      WishList1.includes(eachproduct._id)
+                        ? "text-red-500"
+                        : "text-gray-600"
+                    }
+                    fill={
+                      WishList1.includes(eachproduct._id)
+                        ? "currentColor"
+                        : "none"
+                    }
+                  />
+                </div>
               </div>
-              <div
-                className="text-2xl cursor-pointer"
+              <CardDescription className="text-sm text-black-600">
+                Price:{" "}
+                {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
+                {convertPrice(eachproduct.Price, currency)}
+              </CardDescription>
+            </CardContent>
+            <div className="p-4 flex flex-col space-y-3 mt-auto item-center">
+              <button
+                className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition flex items-center justify-center"
                 onClick={(e) => {
-                  e.stopPropagation(); //prevent parent click
-                  toggleWishlist(eachproduct._id);
+                  e.stopPropagation();
+                  addToCart(eachproduct._id, eachproduct.AvailableQuantity);
                 }}
               >
-                <Heart
-                  size={23}
-                  className={
-                    WishList1.includes(eachproduct._id)
-                      ? "text-red-500"
-                      : "text-gray-600"
-                  }
-                  fill={
-                    WishList1.includes(eachproduct._id)
-                      ? "currentColor"
-                      : "none"
-                  }
-                />
-              </div>
+                <ShoppingCart className="h-5 w-5 mr-2" /> Add to Cart
+              </button>
             </div>
-            <CardDescription className="text-sm text-black-600">
-              Price:{" "}
-              {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}
-              {convertPrice(eachproduct.Price, currency)}
-            </CardDescription>
-          </CardContent>
-          <div className="p-4 flex flex-col space-y-3 mt-auto item-center">
-            <button
-              className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition flex items-center justify-center"
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(eachproduct._id, eachproduct.AvailableQuantity);
-              }}
-            >
-              <ShoppingCart className="h-5 w-5 mr-2" /> Add to Cart
-            </button>
-          </div>
-        </Card>
-      ))}
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

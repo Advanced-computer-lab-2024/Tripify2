@@ -7,6 +7,7 @@ import Link from "next/link";
 import LogoutBtn from "@/components/ui/LogoutBtn";
 import Notifications from "@/components/shared/Notifications";
 import AccountTourist from "@/components/ui/AccountTourist";
+import AccountGuest from "@/components/ui/AccountGuest";
 
 import localFont from "next/font/local";
 
@@ -27,7 +28,6 @@ export default function Dashboard({ params }) {
   switch (role) {
     case "Tourist":
       dashboardElements = [
-        { name: "Account", link: `/account/${id}` },
         {
           name: "Products",
           link: "/products-tourist",
@@ -131,8 +131,6 @@ export default function Dashboard({ params }) {
       break;
     default:
       dashboardElements = [
-        { name: "Sign in", link: "/sign-in" },
-        { name: "Sign up", link: "/sign-up" },
         { name: "Itineraries", link: "/itineraries-guest" },
         { name: "Products", link: "/products-guest" },
         // {
@@ -283,7 +281,13 @@ export default function Dashboard({ params }) {
                   </div>
                 );
               })}
-              {role === "Tourist" ? <AccountTourist /> : ""}
+              {role === "Tourist" ? (
+                <AccountTourist theId={id} />
+              ) : role === "Guest" ? (
+                <AccountGuest />
+              ) : (
+                ""
+              )}
             </nav>
           </div>
         )}
@@ -331,7 +335,13 @@ export default function Dashboard({ params }) {
               )}
             </div>
           ))}
-          {role === "Tourist" ? <AccountTourist /> : ""}
+          {role === "Tourist" ? (
+            <AccountTourist theId={id} />
+          ) : role === "Guest" ? (
+            <AccountGuest />
+          ) : (
+            ""
+          )}
         </nav>
       </div>
     </div>

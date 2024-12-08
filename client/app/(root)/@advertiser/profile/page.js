@@ -1,4 +1,4 @@
-import MyProfileAdvertiser from "@/components/ui/MyProfileAdvertiser.js";
+import MyProfileAdvertiser from "@/components/ui/MyProfileAdvertiser";
 import { getSession } from "@/lib/session";
 import { fetcher } from "@/lib/fetch-client";
 export default async function MyProfile() {

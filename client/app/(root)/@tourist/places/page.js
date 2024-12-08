@@ -81,6 +81,11 @@ const PlacesPage = () => {
     return tag ? tag.Tag : "";
   };
 
+  const getCategoryById = (categoryId) => {
+    const category = categories.find((category) => category._id === categoryId);
+    return category ? category.Category : "";
+  };
+
   const handleTagChange = (tagId) => {
     setSelectedTags((prev) =>
       prev.includes(tagId)
@@ -98,6 +103,11 @@ const PlacesPage = () => {
       place.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       place.Tags.some((tagId) =>
         getTagNameById(tagId).toLowerCase().includes(searchTerm.toLowerCase())
+      ) ||
+      place.Categories.some((categoryId) =>
+        getCategoryById(categoryId)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
       );
 
     return matchesTag && matchesSearch;
@@ -175,6 +185,20 @@ const PlacesPage = () => {
                           className="text-white bg-blue-500 mr-2"
                         >
                           {foundTag.Tag}
+                        </Badge>
+                      ) : null;
+                    })}
+                    {place.Categories.map((categoryId) => {
+                      const foundCategory = categories.find(
+                        (actualCategory) => actualCategory._id === categoryId
+                      );
+                      return foundCategory ? (
+                        <Badge
+                          key={foundCategory._id}
+                          variant="neutral"
+                          className="text-white bg-blue-600 mr-2"
+                        >
+                          {foundCategory.Category}
                         </Badge>
                       ) : null;
                     })}

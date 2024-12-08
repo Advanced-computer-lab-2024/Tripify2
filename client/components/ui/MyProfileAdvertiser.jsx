@@ -39,7 +39,7 @@ export default function AdvertiserProfile({ advertiser }) {
   const [originalImage, setOriginalImage] = useState(
     advertiser.advertiser?.Image ?? null
   );
-  //console.log(advertiser);
+  console.log(`advertiser: ${JSON.stringify(advertiser)}`);
   const { startUpload } = useUploadThing("imageUploader");
   const inputRef = useRef(null);
   const [requestOpen, setRequestOpen] = useState(false);
@@ -307,21 +307,28 @@ export default function AdvertiserProfile({ advertiser }) {
     <div className="flex flex-col items-center p-4 my-10">
       <div className="flex flex-col items-center mb-8">
         {image ? (
-          <div className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer'>
-            <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+          <div className="relative w-16 h-16 overflow-hidden rounded-full cursor-pointer">
+            <Image
+              width={64}
+              height={64}
+              src={
+                typeof image === "string" ? image : URL.createObjectURL(image)
+              }
+              alt="tourguide image"
+            />
             <input
               type="file"
               accept="image/*"
               ref={inputRef}
               name="Image"
               onChange={(e) => {
-                setImage(e.target.files[0])
+                setImage(e.target.files[0]);
               }}
               className="hidden w-full h-full"
             />
           </div>
         ) : (
-          <div className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer'>
+          <div className="relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer">
             <UploadIcon size={24} />
             <input
               type="file"
@@ -329,7 +336,7 @@ export default function AdvertiserProfile({ advertiser }) {
               ref={inputRef}
               name="Image"
               onChange={(e) => {
-                setImage(e.target.files[0])
+                setImage(e.target.files[0]);
               }}
               className="hidden w-full h-full"
             />
@@ -463,10 +470,6 @@ export default function AdvertiserProfile({ advertiser }) {
                   </div>
                 </div>
 
-                <div>
-                  <strong>Website</strong>
-                  <h2>{formData.Website ? formData.Website : "No Website"}</h2>
-                </div>
                 <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
                   <div className="flex items-center space-x-2 font-semibold text-gray-600">
                     <Network className="w-5 h-5" />
@@ -557,7 +560,7 @@ export default function AdvertiserProfile({ advertiser }) {
 
           <TabsContent value="company">
             {(formData?.CompanyProfile && isProfileEditMode) ||
-              (!formData?.CompanyProfile && isProfileCreateMode) ? (
+            (!formData?.CompanyProfile && isProfileCreateMode) ? (
               <form onSubmit={handleProfileSubmit}>
                 <div>
                   <label>
@@ -588,9 +591,9 @@ export default function AdvertiserProfile({ advertiser }) {
                       value={
                         profileformData.FoundedDate
                           ? format(
-                            new Date(profileformData.FoundedDate),
-                            "yyyy-MM-dd"
-                          )
+                              new Date(profileformData.FoundedDate),
+                              "yyyy-MM-dd"
+                            )
                           : ""
                       }
                       onChange={handleProfileInputChange}
@@ -674,7 +677,7 @@ export default function AdvertiserProfile({ advertiser }) {
                     <span>Founded Date:</span>
                   </div>
                   <div className="text-base text-gray-900">
-                    {profileformData.FoundedDate.split("T")[0] ||
+                    {profileformData?.FoundedDate?.split("T")[0] ||
                       "Not provided"}
                   </div>
                 </div>
@@ -685,8 +688,8 @@ export default function AdvertiserProfile({ advertiser }) {
                     <span>Headquarters:</span>
                   </div>
                   <div className="text-base text-gray-900">
-                    {profileformData.Headquarters
-                      ? profileformData.Headquarters
+                    {profileformData?.Headquarters
+                      ? profileformData?.Headquarters
                       : "No Headquarters"}
                   </div>
                 </div>

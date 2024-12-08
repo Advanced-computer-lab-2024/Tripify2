@@ -331,6 +331,7 @@ export default function Dashboard({ params }) {
               )}
             </div>
           ))}
+          {role === "Tourist" ? <AccountTourist /> : ""}
         </nav>
       </div>
     </div>

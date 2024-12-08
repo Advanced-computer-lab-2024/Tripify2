@@ -692,6 +692,323 @@ EMAIL_PASSWORD= your-password
 
 ## API Refrences
 
+
+## API Reference
+
+```http
+  Activity Routes
+```
+
+| Endpoint | Method     | Description                |
+| :-------- | :------- | :------------------------- |
+| `/activities/get-all` | `GET` | Gets all activities |
+| `/activities`        |   `GET`       | Gets all non-archived activities                       |
+| `/activities`        | `POST`         | Advertiser can create an activity                            |
+| `/activities/flag/:id`        |   `PATCH`       |     Admin can flag an activity                       |
+| `/activities/:id`        |   `GET`       |           Gets a certain activity                 |
+| `/activities/:id`        |      `DELETE`    |                  Deletes a certain activity          |
+| `/activities/:id`         |     `PATCH`     |            Updates a certain activity                |
+
+```http
+  Admin Routes
+```
+
+| Endpoint | Method     | Description                |
+| :-------- | :------- | :------------------------- |
+| `/admins`        |   `POST`       | Creates an admin |
+| `/admins` | `GET` | Gets all admins |
+| `/admins/:id`        | `GET`         | Gets a certain admin |
+| `/admins/get-all/my-products`        |   `GET`       | Gets all products for a certain admin |
+
+```http
+  Advertiser Routes
+```
+
+| Endpoint | Method     | Description                |
+| :-------- | :------- | :------------------------- |
+| `/advertisers`        |   `GET`       | Gets all advertisers |
+| `/advertisers` | `POST` | Creates an advertiser |
+| `/advertisers/:id`        | `GET`         | Gets a certain advertiser |
+| `/advertisers/:id`        |   `PATCH`       | Updates a certain advertiser |
+| `/advertisers/:id`        | `DELETE`         | Deletes a certain advertiser |
+| `/advertisers/get-all/my-activities`        | `GET`         | Gets all activities for a certain advertiser |
+| `/advertisers/accept/:id`        | `POST`         | Admin can accept an advertiser |
+| `/advertisers/reject/:id`        | `POST`         | Admin can reject and advertiser |
+
+```http
+  Auth Routes
+```
+
+| Endpoint | Method     | Description                |
+| :-------- | :------- | :------------------------- |
+| `/auth/login`        |   `POST`       | Logs in using credentials |
+| `/auth/refresh` | `GET` | Recreates a new access token |
+| `/auth/logout`        | `POST`         | Logs out |
+
+```http
+  Booking Routes
+```
+
+| Endpoint | Method     | Description                |
+| :-------- | :------- | :------------------------- |
+| `/bookings/itineraries/create-booking/:id`        |   `POST`       | Books an itinerary |
+| `/bookings/itineraries` | `GET` | Gets all itinerary bookings |
+| `/bookings/itineraries/:id` | `GET` | Gets a certain itinerary booking |
+| `/bookings/itineraries/cancel-booking/:id` | `POST` | Cancels a certain itinerary booking |
+| `/bookings/activities/create-booking/:id`        |   `POST`       | Books an activity |
+| `/bookings/activities` | `GET` | Gets all activity bookings |
+| `/bookings/activities/:id` | `GET` | Gets a certain activity booking |
+| `/bookings/activities/cancel-booking/:id` | `POST` | Cancels a certain activity booking |
+| `/bookings/products/create-booking/:id` | `POST` | Books a specific product by its ID. |
+| `/bookings/products/create-booking` | `POST` | Books products from the cart. |
+| `/bookings/products` | `GET` | Retrieves all product bookings for the user. |
+| `/bookings/products/current` | `GET` | Retrieves the current product bookings for the user. |
+| `/bookings/products/:id` | `DELETE` | Deletes a specific product booking by its ID. |
+| `/bookings/products` | `PATCH` | Cancels a product booking. |
+| `/bookings/products/updateQuantityAndStatus` | `PATCH` | Updates the quantity and status of a product booking. |
+| `/bookings/flights/create-booking/:id` | `POST` | Books a specific flight by its ID. |
+| `/bookings/flights` | `GET` | Retrieves all flight bookings for the user. |
+| `/bookings/hotels/create-booking/:id` | `POST` | Books a specific hotel by its ID. |
+| `/bookings/hotels` | `GET` | Retrieves all hotel bookings for the user. |
+| `/bookings/transportations/create-booking/:id` | `POST` | Books specific transportation by its ID. |
+| `/bookings/transportations` | `GET` | Retrieves all transportation bookings for the user. |
+| `/bookings/callback` | `POST` | Accepts a booking callback using raw JSON data. |
+| `/bookings/itin` | `GET` | Retrieves all itinerary bookings. |
+| `/bookings/itin/:id` | `GET` | Retrieves a specific itinerary booking by its ID. |
+| `/bookings/itin/:id/created-at/:createdAt` | `GET` | Retrieves an itinerary booking by its ID and creation date. |
+| `/bookings/all-itineraries/booked-tourguide/:id` | `GET` | Retrieves all itineraries booked for a specific tour guide. |
+| `/bookings/activ` | `GET` | Retrieves all activity bookings. |
+| `/bookings/act` | `GET` | Retrieves all activity bookings (alternative endpoint). |
+| `/bookings/act/:id` | `GET` | Retrieves a specific activity booking by its ID. |
+| `/bookings/activities-booked-for/:id` | `GET` | Retrieves all activities booked for a specific advertiser. |
+| `/bookings/products/for/seller/:id` | `GET` | Retrieves all products bought from a specific seller. |
+
+```http
+  Category Routes
+```
+
+| Endpoint          | Method | Description                                        |
+|-------------------|--------|----------------------------------------------------|
+| `/categories`     | `GET`  | Retrieves all categories.                         |
+| `/categories`     | `POST` | Creates a new category (admin-only access).       |
+| `/categories/:id` | `GET`  | Retrieves a specific category by its ID.          |
+| `/categories/:id` | `PATCH`| Updates a specific category (admin-only access).  |
+| `/categories/:id` | `DELETE` | Deletes a specific category (admin-only access). |
+
+```http
+  Complaint Routes
+````
+
+| Endpoint              | Method  | Description                                      |
+|-----------------------|---------|--------------------------------------------------|
+| `/complaints`         | `GET`   | Retrieves all complaints (accessible by admin and tourists). |
+| `/complaints`         | `POST`  | Creates a new complaint (accessible by tourists). |
+| `/complaints/reply/:id` | `POST` | Creates a reply to a specific complaint (admin-only access). |
+| `/complaints/update-status/:id` | `PATCH` | Updates the status of a specific complaint (admin-only access). |
+
+
+```http
+  Flight Routes
+```
+
+| Endpoint      | Method | Description                             |
+|---------------|--------|-----------------------------------------|
+| `/flights`    | `GET`  | Retrieves all available flights.        |
+| `/flights/:id` | `GET`  | Retrieves details of a specific flight by its ID. |
+
+```http
+  Hotel Routes
+```
+
+| Endpoint      | Method | Description                             |
+|---------------|--------|-----------------------------------------|
+| `/hotels`     | `GET`  | Retrieves all available hotels.         |
+| `/hotels/:id` | `GET`  | Retrieves details of a specific hotel by its ID. |
+
+```http
+  Itinerary Routes
+```
+
+| Endpoint                      | Method  | Description                                                             |
+|-------------------------------|---------|-------------------------------------------------------------------------|
+| `/itineraries`                | `GET`   | Retrieves all itineraries.                                              |
+| `/itineraries`                | `POST`  | Creates a new itinerary (accessible by tour guides only).               |
+| `/itineraries/:id`            | `GET`   | Retrieves details of a specific itinerary by its ID.                    |
+| `/itineraries/:id`            | `PATCH` | Updates a specific itinerary (accessible by tour guides only).          |
+| `/itineraries/:id`            | `DELETE`| Deletes a specific itinerary (accessible by tour guides only).          |
+| `/itineraries/get-all/my-itineraries` | `GET`   | Retrieves all itineraries created by the logged-in tour guide.          |
+| `/itineraries/flag/:id`       | `PATCH` | Flags a specific itinerary (admin-only access).                         |
+
+```http
+  Notification Routes
+```
+
+| Endpoint             | Method  | Description                                   |
+|----------------------|---------|-----------------------------------------------|
+| `/notifications`     | `GET`   | Retrieves all notifications for the user.     |
+| `/notifications/:id` | `PATCH` | Marks a specific notification as read.        |
+
+```http
+  Place Routes
+```
+
+| Endpoint              | Method  | Description                                                       |
+|-----------------------|---------|-------------------------------------------------------------------|
+| `/places`             | `GET`   | Retrieves all places.                                             |
+| `/places`             | `POST`  | Adds a new place (accessible by tourism governors only).         |
+| `/places/:id`         | `GET`   | Retrieves details of a specific place by its ID.                  |
+| `/places/:id`         | `PATCH` | Updates a specific place (accessible by tourism governors only).  |
+| `/places/:id`         | `DELETE`| Deletes a specific place (accessible by tourism governors only).  |
+
+```http
+  Product Routes
+```
+
+| Endpoint              | Method  | Description                                                           |
+|-----------------------|---------|-----------------------------------------------------------------------|
+| `/products`           | `GET`   | Retrieves all products.                                               |
+| `/products`           | `POST`  | Creates a new product (accessible by sellers only).                   |
+| `/products/:id`       | `GET`   | Retrieves details of a specific product by its ID.                    |
+| `/products/:id`       | `PATCH` | Updates a specific product (accessible by sellers only).              |
+| `/products/:id`       | `DELETE`| Deletes a specific product (accessible by sellers only).              |
+
+```http
+  Company Profile Routes
+```
+
+| Endpoint                  | Method  | Description                                                          |
+|---------------------------|---------|----------------------------------------------------------------------|
+| `/profile`       | `GET`   | Retrieves all company profiles.                                      |
+| `/profile`       | `POST`  | Creates a new company profile (accessible by advertisers only).      |
+| `/profile`       | `PATCH` | Updates a company profile (accessible by advertisers only).          |
+| `/profile`       | `DELETE`| Deletes a company profile (accessible by advertisers only).          |
+| `/profile/:id`   | `GET`   | Retrieves a specific company profile by its ID.                      |
+
+```http
+  Promocode Routes
+```
+
+| Endpoint                  | Method  | Description                                                      |
+|---------------------------|---------|------------------------------------------------------------------|
+| `/promo-codes`            | `POST`  | Creates a new promo code (accessible by admins only).            |
+| `/promo-codes/all`        | `GET`   | Retrieves all promo codes (accessible by admins only).           |
+| `/promo-codes/:id`        | `DELETE`| Deletes a specific promo code by its ID (accessible by admins only). |
+| `/promo-codes/:id`        | `PATCH` | Updates a specific promo code by its ID (accessible by admins only). |
+| `/promo-codes/validate`   | `POST`  | Validates a promo code (accessible by users with a valid JWT).   |
+| `/promo-codes/:id`        | `GET`   | Retrieves a specific promo code by its ID (accessible by users with a valid JWT). |
+
+```http
+  Review Routes
+```
+
+Here’s the updated documentation for the review-related routes with the `/reviews` path for itineraries, tour guides, activities, and products:
+
+### Review Routes
+
+#### Itinerary Reviews
+
+| Endpoint                        | Method  | Description                                                   |
+|----------------------------------|---------|---------------------------------------------------------------|
+| `/reviews/itineraries/:id`       | `POST`  | Adds a review for a specific itinerary (accessible by tourists).
+| `/reviews/tourguides/:id`        | `POST`  | Adds a review for a specific tour guide (accessible by tourists).
+| `/reviews/activities/:id`        | `POST`  | Adds a review for a specific activity (accessible by tourists).
+| `/reviews/products/:id`          | `POST`  | Adds a review for a specific product (accessible by tourists). |
+
+```http
+  Seller Routes
+```
+
+| Endpoint                          | Method  | Description                                                     |
+|-----------------------------------|---------|-----------------------------------------------------------------|
+| `/sellers`                        | `POST`  | Creates a new seller (accessible by admins only).               |
+| `/sellers`                        | `GET`   | Retrieves all sellers (accessible by admins only).              |
+| `/sellers/:id`                    | `GET`   | Retrieves a specific seller by their ID.                        |
+| `/sellers/:id`                    | `PATCH` | Updates a specific seller (accessible by the seller themselves).|
+| `/sellers/:id`                    | `DELETE`| Deletes a specific seller (accessible by admins only).          |
+| `/sellers/accept/:id`             | `POST`  | Accepts a seller (accessible by admins only).                   |
+| `/sellers/reject/:id`             | `POST`  | Rejects a seller (accessible by admins only).                   |
+| `/sellers/get-all/my-products`    | `GET`   | Retrieves all products of a specific seller (accessible by the seller themselves). |
+| `/sellers/user/:id`               | `GET`   | Retrieves the user associated with a specific seller.           |
+
+```http
+  Tag Routes
+```
+
+| Endpoint                 | Method  | Description                                                     |
+|--------------------------|---------|-----------------------------------------------------------------|
+| `/tags`                   | `GET`   | Retrieves all tags.                                             |
+| `/tags`                   | `POST`  | Creates a new tag (accessible by tourism governor only).        |
+| `/tags/:id`               | `GET`   | Retrieves a specific tag by its ID.                              |
+| `/tags/:id`               | `PATCH` | Updates a specific tag (accessible by tourism governor only).   |
+| `/tags/:id`               | `DELETE`| Deletes a specific tag (accessible by tourism governor only).   |
+
+```http
+  Tourguide Routes
+```
+
+| Endpoint                        | Method  | Description                                                   |
+|----------------------------------|---------|---------------------------------------------------------------|
+| `/tourguides`                    | `POST`  | Creates a new tour guide profile (accessible by admins).       |
+| `/tourguides`                    | `GET`   | Retrieves all tour guide profiles.                             |
+| `/tourguides/:id`                | `GET`   | Retrieves a specific tour guide profile by their ID.          |
+| `/tourguides/:id`                | `PATCH` | Updates a specific tour guide profile (accessible by the tour guide themselves). |
+| `/tourguides/:id`                | `DELETE`| Deletes a specific tour guide profile (accessible by admins only). |
+| `/tourguides/get-all/my-itineraries` | `GET` | Retrieves all itineraries for a specific tour guide (accessible by the tour guide themselves). |
+| `/tourguides/accept/:id`         | `POST`  | Accepts a tour guide profile (accessible by admins only).     |
+| `/tourguides/reject/:id`         | `POST`  | Rejects a tour guide profile (accessible by admins only).     |
+
+```http
+  Tourism Governor Routes
+```
+
+| Endpoint                           | Method  | Description                                                    |
+|-------------------------------------|---------|----------------------------------------------------------------|
+| `/tourism-governors`                 | `POST`  | Adds a new tourism governor profile (accessible by admin only). |
+| `/tourism-governors`                 | `GET`   | Retrieves all tourism governors.                               |
+| `/tourism-governors/:id`             | `DELETE`| Deletes a specific tourism governor profile (accessible by admin only). |
+| `/tourism-governors/get-all/my-places` | `GET`   | Retrieves all places associated with a specific tourism governor. |
+| `/tourism-governors/get-all/my-tags`   | `GET`   | Retrieves all tags associated with a specific tourism governor. |
+
+```http
+  Tourist Routes
+```
+
+| Endpoint                          | Method  | Description                                                   |
+|------------------------------------|---------|---------------------------------------------------------------|
+| `/tourists`                        | `POST`  | Creates a new tourist profile.                                |
+| `/tourists`                        | `GET`   | Retrieves all tourist profiles.                               |
+| `/tourists/:id`                    | `GET`   | Retrieves a specific tourist profile by their ID.             |
+| `/tourists/:id`                    | `PATCH` | Updates a specific tourist profile (accessible by the tourist themselves). |
+| `/tourists/:id`                    | `DELETE`| Deletes a specific tourist profile (accessible by the tourist themselves). |
+| `/tourists/points/redeem`          | `POST`  | Allows a tourist to redeem points (accessible by tourists only). |
+| `/tourists/getcart/:id`            | `GET`   | Retrieves the cart for a specific tourist by their ID.        |
+
+```http
+  Transportation Routes
+```
+
+| Endpoint                | Method  | Description                                        |
+|-------------------------|---------|----------------------------------------------------|
+| `/transportations`       | `GET`   | Retrieves all available transportations (requires JWT verification). |
+| `/transportations/:id`   | `GET`   | Retrieves a specific transportation by ID (requires JWT verification). |
+
+```http
+  User Routes
+```
+
+| Endpoint                           | Method  | Description                                                   |
+|-------------------------------------|---------|---------------------------------------------------------------|
+| `/users`                            | `POST`  | Creates a new user profile.                                   |
+| `/users`                            | `GET`   | Retrieves all users (requires admin privileges).              |
+| `/users/:id`                        | `GET`   | Retrieves a specific user profile by their ID.                |
+| `/users/:id`                        | `PATCH` | Updates a specific user profile (requires verification).      |
+| `/users/:id`                        | `DELETE`| Deletes a specific user profile (requires admin privileges).  |
+| `/users/change-password/:id`        | `PATCH` | Allows a user to change their password (requires verification). |
+| `/users/forgot-password`            | `POST`  | Sends an OTP for password reset.                              |
+| `/users/reset-password`             | `POST`  | Resets the user’s password using the OTP.                     |
+| `/users/request-deletion/:id`       | `POST`  | Allows a user to request account deletion (requires verification). |
+| `/users/get-all/delete-requests`    | `GET`   | Retrieves all deletion requests (requires admin privileges).  |
+
 ## Tests
 
 ## How to use

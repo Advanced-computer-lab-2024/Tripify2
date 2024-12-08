@@ -109,29 +109,32 @@ export default function AdvertiserProfile({ advertiser }) {
     try {
       console.log(session?.data?.user?.id);
       if (oldPassword !== "" && newPassword !== "") {
-        const changePasswordRes = await fetcher(`/users/change-password/${session?.data?.user?.userId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ oldPassword, newPassword }),
-        })
+        const changePasswordRes = await fetcher(
+          `/users/change-password/${session?.data?.user?.userId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ oldPassword, newPassword }),
+          }
+        );
 
         if (!changePasswordRes.ok) {
-          alert("Failed to change password")
-          return
+          alert("Failed to change password");
+          return;
         }
       }
 
-      let Image = ''
+      let Image = "";
 
       if (image) {
-        const imageUploadResult = await startUpload([image])
+        const imageUploadResult = await startUpload([image]);
         if (imageUploadResult?.length) {
           Image = imageUploadResult[0].url;
         } else Image = image;
       }
-      console.log("Image: ", Image)
+      console.log("Image: ", Image);
 
       const response = await fetcher(
         `/advertisers/${session?.data?.user?.id}`,
@@ -293,8 +296,18 @@ export default function AdvertiserProfile({ advertiser }) {
     <div className="flex flex-col items-center p-4 my-10">
       <div className="flex flex-col items-center mb-8">
         {image ? (
-          <div className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer' onClick={() => inputRef.current.click()}>
-            <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+          <div
+            className="relative w-16 h-16 overflow-hidden rounded-full cursor-pointer"
+            onClick={() => inputRef.current.click()}
+          >
+            <Image
+              width={64}
+              height={64}
+              src={
+                typeof image === "string" ? image : URL.createObjectURL(image)
+              }
+              alt="tourguide image"
+            />
             <input
               type="file"
               accept="image/*"
@@ -304,7 +317,10 @@ export default function AdvertiserProfile({ advertiser }) {
             />
           </div>
         ) : (
-          <div className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer' onClick={() => inputRef.current.click()}>
+          <div
+            className="relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer"
+            onClick={() => inputRef.current.click()}
+          >
             <UploadIcon size={24} />
             <input
               type="file"
@@ -382,7 +398,7 @@ export default function AdvertiserProfile({ advertiser }) {
                     />
                   </label>
                 </div>
-                <div>
+                {/* <div>
                   <label>
                     <strong>Old Password</strong>
                     <input
@@ -403,7 +419,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
-                </div>
+                </div> */}
                 <Button
                   type="submit"
                   className="w-full bg-purple-600 hover:bg-purple-700"
@@ -533,7 +549,7 @@ export default function AdvertiserProfile({ advertiser }) {
 
           <TabsContent value="company">
             {(formData?.CompanyProfile && isProfileEditMode) ||
-              (!formData?.CompanyProfile && isProfileCreateMode) ? (
+            (!formData?.CompanyProfile && isProfileCreateMode) ? (
               <form onSubmit={handleProfileSubmit}>
                 <div>
                   <label>
@@ -564,9 +580,9 @@ export default function AdvertiserProfile({ advertiser }) {
                       value={
                         profileformData.FoundedDate
                           ? format(
-                            new Date(profileformData.FoundedDate),
-                            "yyyy-MM-dd"
-                          )
+                              new Date(profileformData.FoundedDate),
+                              "yyyy-MM-dd"
+                            )
                           : ""
                       }
                       onChange={handleProfileInputChange}

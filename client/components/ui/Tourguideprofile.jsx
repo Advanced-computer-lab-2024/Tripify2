@@ -1,13 +1,26 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { Edit, User, Mail, FileText, Loader2, CloudUpload, UploadIcon } from "lucide-react";
+import {
+  Edit,
+  User,
+  Mail,
+  FileText,
+  Loader2,
+  CloudUpload,
+  UploadIcon,
+} from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useUploadThing } from "@/lib/uploadthing-hook";
 import { fetcher } from "@/lib/fetch-client";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +31,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
 
   // State Management
   const [image, setImage] = useState(tourguide?.Image ?? null);
-  const { startUpload } = useUploadThing('imageUploader');
+  const { startUpload } = useUploadThing("imageUploader");
   const [requestOpen, setRequestOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [documentsBool, setDocumentsBool] = useState(false);
@@ -46,7 +59,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
 
   // Document handling
   const documentlist = tourguide.Documents.map((doc, index) => (
-    <iframe key={index} className='w-full h-[720px]' src={doc} />
+    <iframe key={index} className="w-full h-[720px]" src={doc} />
   ));
 
   // Fetch itineraries
@@ -66,7 +79,10 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
   let itinerarylist = <li>loading...</li>;
   if (allitineraries.length !== 0) {
     itinerarylist = tourguide.Itineraries.map((itinerary, index) => (
-      <li key={index} className="p-2 border rounded-lg shadow border-slate-500 w-fit">
+      <li
+        key={index}
+        className="p-2 border rounded-lg shadow border-slate-500 w-fit"
+      >
         <h3>{itinerary.Name}</h3>
       </li>
     ));
@@ -76,13 +92,16 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
     e.preventDefault();
     try {
       if (oldPassword !== "" && newPassword !== "") {
-        const changePasswordRes = await fetcher(`/users/change-password/${session?.data?.user?.userId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ oldPassword, newPassword }),
-        });
+        const changePasswordRes = await fetcher(
+          `/users/change-password/${session?.data?.user?.userId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ oldPassword, newPassword }),
+          }
+        );
 
         if (!changePasswordRes.ok) {
           alert("Failed to change password");
@@ -92,7 +111,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
         alert("Password changed successfully");
       }
 
-      let Image = '';
+      let Image = "";
 
       if (image) {
         const imageUploadResult = await startUpload([image]);
@@ -121,10 +140,15 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
     }
   };
 
-  const imgSrcForNow = "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg";
+  const imgSrcForNow =
+    "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg";
 
   if (!tourguide.Accepted) {
-    return <h1 className="mt-8 text-xl text-center">You are NOT accepted by the system</h1>;
+    return (
+      <h1 className="mt-8 text-xl text-center">
+        You are NOT accepted by the system
+      </h1>
+    );
   }
 
   return (
@@ -133,13 +157,17 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
         <div className="flex flex-col w-2/3 gap-4">
           <div className="flex items-center justify-center w-full mb-4">
             <img
-              src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+              src={
+                typeof image === "string" ? image : URL.createObjectURL(image)
+              }
               alt="User Avatar"
               className="object-cover w-24 h-24 mr-4 rounded-full"
             />
             <div className="flex flex-col p-4 justify-left items-left">
               <div className="flex items-center gap-1">
-                <h1 className="text-2xl font-bold text-purple-600">{tourguide.UserId.UserName}</h1>
+                <h1 className="text-2xl font-bold text-purple-600">
+                  {tourguide.UserId.UserName}
+                </h1>
               </div>
             </div>
           </div>
@@ -191,7 +219,9 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
 
               <div>
                 <strong className="block mb-2">Itineraries:</strong>
-                <ul className="flex flex-row flex-wrap gap-2">{itinerarylist}</ul>
+                <ul className="flex flex-row flex-wrap gap-2">
+                  {itinerarylist}
+                </ul>
               </div>
 
               <div className="flex flex-col gap-4">
@@ -201,7 +231,9 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                 >
                   {!documentsBool ? "Show Documents" : "Hide Documents"}
                 </Button>
-                {documentsBool && <div className="space-y-4">{documentlist}</div>}
+                {documentsBool && (
+                  <div className="space-y-4">{documentlist}</div>
+                )}
               </div>
 
               <div className="flex gap-2">
@@ -235,8 +267,20 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                   <strong>Profile Image:</strong>
                 </label>
                 {image ? (
-                  <div className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer' onClick={() => inputRef.current.click()}>
-                    <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
+                  <div
+                    className="relative w-16 h-16 overflow-hidden rounded-full cursor-pointer"
+                    onClick={() => inputRef.current.click()}
+                  >
+                    <Image
+                      width={64}
+                      height={64}
+                      src={
+                        typeof image === "string"
+                          ? image
+                          : URL.createObjectURL(image)
+                      }
+                      alt="tourguide image"
+                    />
                     <input
                       type="file"
                       accept="image/*"
@@ -246,7 +290,10 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                     />
                   </div>
                 ) : (
-                  <div className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer' onClick={() => inputRef.current.click()}>
+                  <div
+                    className="relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer"
+                    onClick={() => inputRef.current.click()}
+                  >
                     <UploadIcon size={24} />
                     <input
                       type="file"
@@ -262,9 +309,12 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
               <div className="space-y-4">
                 {Object.entries({
                   "Mobile Number": { name: "MobileNumber", type: "number" },
-                  "Years of Experience": { name: "YearsOfExperience", type: "number" },
+                  "Years of Experience": {
+                    name: "YearsOfExperience",
+                    type: "number",
+                  },
                   "Previous Work": { name: "PreviousWork", type: "text" },
-                  "Email": { name: "Email", type: "email" }
+                  Email: { name: "Email", type: "email" },
                 }).map(([label, { name, type }]) => (
                   <div key={name}>
                     <label className="block mb-1">
@@ -276,13 +326,15 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                       value={formData[name]}
                       onChange={handleInputChange}
                       className="w-full p-2 border border-gray-300 rounded-md"
-                      placeholder={`Current: ${tourguide[name] || tourguide.UserId[name]}`}
+                      placeholder={`Current: ${
+                        tourguide[name] || tourguide.UserId[name]
+                      }`}
                       required={name !== "PreviousWork"}
                     />
                   </div>
                 ))}
 
-                <div>
+                {/* <div>
                   <label className="block mb-1">
                     <strong>Old Password:</strong>
                   </label>
@@ -293,7 +345,6 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
-
                 <div>
                   <label className="block mb-1">
                     <strong>New Password:</strong>
@@ -304,7 +355,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
-                </div>
+                </div> */}
 
                 {role === "Admin" && (
                   <div>
@@ -329,7 +380,11 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                   className="bg-purple-600 hover:bg-purple-700"
                   disabled={loading}
                 >
-                  {loading ? <Loader2 className="animate-spin" /> : "Save Changes"}
+                  {loading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    "Save Changes"
+                  )}
                 </Button>
                 <Button
                   type="button"
@@ -346,7 +401,9 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
 
       <Dialog open={requestOpen} onOpenChange={setRequestOpen}>
         <DialogContent>
-          <DialogHeader>Are you sure you want to request deletion of your account?</DialogHeader>
+          <DialogHeader>
+            Are you sure you want to request deletion of your account?
+          </DialogHeader>
           <DialogFooter>
             <Button disabled={loading} onClick={() => setRequestOpen(false)}>
               Cancel
@@ -356,14 +413,21 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
               variant="destructive"
               onClick={async () => {
                 setLoading(true);
-                await fetcher(`/users/request-deletion/${session?.data?.user?.userId}`, {
-                  method: 'POST'
-                });
-                await signOut({ redirect: true, callbackUrl: '/' });
+                await fetcher(
+                  `/users/request-deletion/${session?.data?.user?.userId}`,
+                  {
+                    method: "POST",
+                  }
+                );
+                await signOut({ redirect: true, callbackUrl: "/" });
                 setLoading(false);
               }}
             >
-              {loading ? <Loader2 className="animate-spin" /> : "Request Deletion"}
+              {loading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Request Deletion"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

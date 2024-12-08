@@ -762,7 +762,7 @@ All steps are after the set up mentioned above
 
 - **Tutorials**
   - [Next.js Tutorials](https://www.youtube.com/@javascriptmastery)
-  - [Node.js / Express.js Tutorials](https://www.youtube.com/@freecodecamp)
+  - [Node.js / Express.js Tutorials](https://www.youtube.com/@DaveGrayTeachesCode)
   - [React.js Tutorials](https://www.youtube.com/@freecodecamp)
 
 - **JavaScript and Logic**

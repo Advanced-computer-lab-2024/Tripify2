@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useCurrencyStore } from '@/providers/CurrencyProvider'
 import { fetcher } from '@/lib/fetch-client'
 import { Loader2, Tag } from 'lucide-react'
+import { convertPrice } from '@/lib/utils'
 
 export default function BookingForm({ flightId, flightPrice }) {
   const { currency } = useCurrencyStore()
@@ -154,10 +155,10 @@ export default function BookingForm({ flightId, flightPrice }) {
         {discountedPrice && (
           <div className="mt-2">
             <p className="text-sm text-gray-500 line-through">
-              Original Price: {currency} {flightPrice * seats}
+              Original Price: {currency} {convertPrice(flightPrice * seats, currency)}
             </p>
             <p className="text-sm font-medium text-blue-600">
-              Discounted Price: {currency} {discountedPrice}
+              Discounted Price: {currency} {convertPrice(discountedPrice, currency)}
             </p>
           </div>
         )}

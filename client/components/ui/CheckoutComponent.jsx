@@ -365,10 +365,10 @@ const CheckoutComponent = ({ params }) => {
         {discountedPrice && (
           <div className="mt-2">
             <p className="text-sm text-gray-500 line-through">
-              Original Price: {currency} {totalPrice}
+              Original Price: {currency} {convertPrice(totalPrice, currency)}
             </p>
             <p className="text-sm font-medium text-blue-600">
-              Discounted Price: {currency} {discountedPrice}
+              Discounted Price: {currency} {convertPrice(discountedPrice, currency)}
             </p>
           </div>
         )}

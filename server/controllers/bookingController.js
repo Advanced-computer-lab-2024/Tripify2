@@ -345,7 +345,7 @@ const cancelItineraryBooking = async (req, res) => {
     );
     const newWalletBalance = parseFloat(tourist.Wallet) + addedBalance;
 
-    tourist.Wallet = newWalletBalance.toFixed(2);
+    tourist.Wallet = newWalletBalance /*.toFixed(2)*/;
     await tourist.save();
 
     if (booking.UserId.toString() !== req._id.toString()) {

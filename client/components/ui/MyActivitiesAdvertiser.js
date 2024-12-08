@@ -9,6 +9,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Image from "next/image";
 import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { RiDeleteBin5Line, RiEdit2Line } from "@remixicon/react";
@@ -55,69 +64,113 @@ export default function AdvertiserProfile({ Activities }) {
     router.push(`/my-activities/${id}`);
   }
 
-  const cards = AllActivities.map((activity) => (
-    <>
-      <hr />
-      <button
-        className="w-full hover:bg-slate-50"
-        onClick={() => redirectActivity(activity._id)}
-        key={activity._id}
-      >
-        <ul className="grid grid-cols-[100px_300px_100px_300px_300px_100px] justify-items-start p-2 items-center">
-          <li className="w-16 h-16">
-            <img
-              src={
-                activity?.Image.startsWith("http") ||
-                activity?.Image.startsWith("https") ||
-                activity?.Image.startsWith("www") ||
-                activity?.Image.startsWith("i.") ||
-                activity?.Image.startsWith("m.")
-                  ? activity?.Image
-                  : `/images/placeholder.jpg`
-              }
-              className= "w-16 h-16"
-            />
-          </li>
-          <li>{activity?.Name}</li>
-          <li>
-            {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
-            {convertPrice(activity?.Price, currency)}
-          </li>
-          <li>{new Date(activity.Date).toLocaleDateString()}</li>
-          <li className="justify-self-center">
-            {activity?.Inappropriate ? "✔️" : "✖️"}
-          </li>
-          <RiDeleteBin5Line
-            size={18}
-            className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer justify-self-end"
-            onClick={(e) => handleDeleteClick(e, activity._id)}
-          />
-        </ul>
-      </button>
-    </>
-  ));
+  // const cards = AllActivities.map((activity) => (
+  //   <>
+  //     <hr />
+  //     <button
+  //       className="w-full hover:bg-slate-50"
+  //       onClick={() => redirectActivity(activity._id)}
+  //       key={activity._id}
+  //     >
+  //       <ul className="grid grid-cols-[100px_300px_100px_300px_300px_100px] justify-items-start p-2 items-center">
+  //         <li className="w-16 h-16">
+  //           <img
+  //             src={
+  //               activity?.Image.startsWith("http") ||
+  //               activity?.Image.startsWith("https") ||
+  //               activity?.Image.startsWith("www") ||
+  //               activity?.Image.startsWith("i.") ||
+  //               activity?.Image.startsWith("m.")
+  //                 ? activity?.Image
+  //                 : `/images/placeholder.jpg`
+  //             }
+  //             className="w-16 h-16"
+  //           />
+  //         </li>
+  //         <li>{activity?.Name}</li>
+  //         <li>
+  //           {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+  //           {convertPrice(activity?.Price, currency)}
+  //         </li>
+  //         <li>{new Date(activity.Date).toLocaleDateString()}</li>
+  //         <li className="justify-self-center">
+  //           {activity?.Inappropriate ? "✔️" : "✖️"}
+  //         </li>
+  //         <RiDeleteBin5Line
+  //           size={18}
+  //           className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer justify-self-end"
+  //           onClick={(e) => handleDeleteClick(e, activity._id)}
+  //         />
+  //       </ul>
+  //     </button>
+  //   </>
+  // ));
 
   return (
-    <div className="p-6">
-      <div className="px-6 py-4 border-2 border-slate-200 rounded-md">
-        <h1 className="text-2xl">
-          <strong>My Activities</strong>
-        </h1>
-        <span className="text-slate-400">View your activities</span>
-        <div className="mt-4">
-          <ul className="grid grid-cols-[100px_300px_100px_300px_300px_100px] justify-items-start p-2 items-center">
-            <li className="text-slate-600">Image</li>
-            <li className="text-slate-600">Name</li>
-            <li className="text-slate-600">Price</li>
-            <li className="text-slate-600">Date</li>
-            <li className="justify-self-center text-slate-600">
-              Inappropriate
-            </li>
-          </ul>
-          {cards}
-        </div>
-      </div>
-    </div>
+    <Card x-chunk="dashboard-06-chunk-0">
+      <CardHeader>
+        <CardTitle>Activities</CardTitle>
+        <CardDescription>
+          View all your activities currently on the platform.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Image</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Inappropriate</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {AllActivities.map((activity) => (
+              <TableRow key={activity?._id} onClick={()=>{router.push(`/my-activities/${activity._id}`)}}>
+                <TableCell className="hidden sm:table-cell">
+                  <img
+                    src={
+                      activity?.Image.startsWith("http://") ||
+                      activity?.Image.startsWith("https://") ||
+                      activity?.Image.startsWith("www") ||
+                      activity?.Image.startsWith("i.") ||
+                      activity?.Image.startsWith("m.")
+                        ? activity?.Image
+                        : `/images/${activity?.Image}`
+                    }
+                    width={50}
+                    height={50}
+                    alt={activity?.Name}
+                  />
+                </TableCell>
+                <TableCell className="hidden sm:table-cell">
+                  {activity?.Name}
+                </TableCell>
+
+                <TableCell className="font-medium">
+                  {currency === "USD" ? "$" : currency === "EUR" ? "€" : "EGP"}{" "}
+                  {convertPrice(activity?.Price, currency)}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {new Date(activity.Date).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="hidden md:table-cell justify-self-center">
+                  {activity?.Inappropriate ? "✔️" : "✖️"}
+                </TableCell>
+                <TableCell className="font-medium">
+                  <RiDeleteBin5Line
+                    size={18}
+                    className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer justify-self-end"
+                    onClick={(e) => handleDeleteClick(e, activity._id)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 
   // return (

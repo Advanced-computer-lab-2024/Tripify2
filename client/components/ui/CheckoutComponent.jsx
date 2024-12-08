@@ -286,7 +286,7 @@ const CheckoutComponent = ({ params }) => {
             </button>
 
             {isDropdownOpen && (
-              <ul className="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+              <ul className="absolute w-full mt-1 bg-white border border-gray-300 z-[10] rounded-md shadow-lg">
                 {addresses.length > 0 ? (
                   addresses.map((address) => (
                     <li
@@ -375,7 +375,7 @@ const CheckoutComponent = ({ params }) => {
       </div>
 
       {isPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black z-[8] bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
             <h2 className="mb-4 text-xl font-bold">Add Address</h2>
             {errorMessage && (
@@ -480,7 +480,7 @@ const CheckoutComponent = ({ params }) => {
       <button
         onClick={handleBuy}
         disabled={!paymentMethod || !willBeUsedAddress || isLoading}
-        className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 mt-8 ${!paymentMethod || !willBeUsedAddress || isLoading
+        className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 z-[5] mt-8 ${!paymentMethod || !willBeUsedAddress || isLoading
           ? "opacity-50 cursor-not-allowed"
           : ""
           }`}

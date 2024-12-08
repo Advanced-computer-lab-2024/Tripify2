@@ -8,6 +8,21 @@ import { fetcher } from "@/lib/fetch-client";
 import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { RiDeleteBin5Line } from "@remixicon/react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const MyPlaces = ({ myPlaces }) => {
   //console.log(`myPlaces: ${myPlaces}`);
@@ -91,24 +106,99 @@ const MyPlaces = ({ myPlaces }) => {
     <p className="text-gray-600 text-center">No places created</p>
   );
 
+  // return (
+  //   <div className="p-6">
+  //     <div className="px-6 py-4 border-2 border-slate-200 rounded-md">
+  //       <h1 className="text-2xl">
+  //         <strong>My Places</strong>
+  //       </h1>
+  //       <span className="text-slate-400">View your places</span>
+  //       <div className="mt-4">
+  //         <ul className="grid grid-cols-[100px_300px_100px_300px_300px_100px] justify-items-start p-2 items-center">
+  //           <li className="text-slate-600">Image</li>
+  //           <li className="text-slate-600">Name</li>
+  //           <li className="text-slate-600">Prices</li>
+  //           <li className="text-slate-600 ml-4">Type</li>
+  //         </ul>
+  //         {cards}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+
   return (
-    <div className="p-6">
-      <div className="px-6 py-4 border-2 border-slate-200 rounded-md">
-        <h1 className="text-2xl">
-          <strong>My Places</strong>
-        </h1>
-        <span className="text-slate-400">View your places</span>
-        <div className="mt-4">
-          <ul className="grid grid-cols-[100px_300px_100px_300px_300px_100px] justify-items-start p-2 items-center">
-            <li className="text-slate-600">Image</li>
-            <li className="text-slate-600">Name</li>
-            <li className="text-slate-600">Prices</li>
-            <li className="text-slate-600 ml-4">Type</li>
-          </ul>
-          {cards}
-        </div>
-      </div>
-    </div>
+    <Card x-chunk="dashboard-06-chunk-0">
+      <CardHeader>
+        <CardTitle>Places</CardTitle>
+        <CardDescription>
+          View all your places currently on the platform.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Image</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Prices</TableHead>
+              <TableHead>Type</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {myPlaces.map((place) => {
+              let lowestPrice = Math.min(
+                ...Object.values(place?.TicketPrices || [])
+              );
+
+              return (
+                <TableRow
+                  key={place?._id}
+                  onClick={() => redirectPlace(place._id)}
+                >
+                  <TableCell className="hidden sm:table-cell">
+                    <img
+                      src={
+                        place?.Pictures[0].startsWith("http://") ||
+                        place?.Pictures[0].startsWith("https://") ||
+                        place?.Pictures[0].startsWith("www") ||
+                        place?.Pictures[0].startsWith("i.") ||
+                        place?.Pictures[0].startsWith("m.")
+                          ? place?.Pictures[0]
+                          : `/images/${place?.Pictures[0]}`
+                      }
+                      width={50}
+                      height={50}
+                      alt={place?.Name}
+                    />
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    {place?.Name}
+                  </TableCell>
+
+                  <TableCell className="font-medium">
+                    From:{" "}
+                    {currency === "USD"
+                      ? "$"
+                      : currency === "EUR"
+                      ? "€"
+                      : "EGP"}
+                    {convertPrice(lowestPrice, currency)}
+                  </TableCell>
+                  <TableCell className="font-medium">{place?.Type}</TableCell>
+                  <TableCell className="font-medium">
+                    <RiDeleteBin5Line
+                      size={18}
+                      className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer justify-self-end"
+                      onClick={(e) => handleDeleteClick(e, place._id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 };
 

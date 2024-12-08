@@ -6,6 +6,7 @@ import { Plane } from "lucide-react";
 import Link from "next/link";
 import LogoutBtn from "@/components/ui/LogoutBtn";
 import Notifications from "@/components/shared/Notifications";
+import AccountTourist from "@/components/ui/AccountTourist";
 
 import localFont from "next/font/local";
 
@@ -282,7 +283,7 @@ export default function Dashboard({ params }) {
                   </div>
                 );
               })}
-              <LogoutBtn />
+              {role === "Tourist" ? <AccountTourist /> : ""}
             </nav>
           </div>
         )}

@@ -402,7 +402,7 @@ export default function AdvertiserProfile({ advertiser }) {
                     />
                   </label>
                 </div>
-                <div>
+                {/* <div>
                   <label>
                     <strong>Old Password</strong>
                     <input
@@ -423,7 +423,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
-                </div>
+                </div> */}
                 <Button
                   type="submit"
                   className="w-full bg-purple-600 hover:bg-purple-700"

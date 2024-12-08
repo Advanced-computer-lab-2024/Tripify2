@@ -269,8 +269,7 @@ export default function UserProfile() {
               />
             </div>
 
-            {/* Old Password */}
-            <div className="block w-full">
+            {/* <div className="block w-full">
               <span className="block font-medium text-gray-700">Old Password</span>
               <Input
                 type="password"
@@ -281,7 +280,6 @@ export default function UserProfile() {
               />
             </div>
 
-            {/* New Password */}
             <div className="block w-full">
               <span className="block font-medium text-gray-700">New Password</span>
               <Input
@@ -291,7 +289,7 @@ export default function UserProfile() {
                 disabled={loading}
                 className="mt-1"
               />
-            </div>
+            </div> */}
 
             {error && (
               <div className="text-center text-red-500">

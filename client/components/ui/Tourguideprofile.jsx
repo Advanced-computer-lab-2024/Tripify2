@@ -284,7 +284,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                   </div>
                 ))}
 
-                <div>
+                {/* <div>
                   <label className="block mb-1">
                     <strong>Old Password:</strong>
                   </label>
@@ -306,7 +306,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
-                </div>
+                </div> */}
 
                 {role === "Admin" && (
                   <div>

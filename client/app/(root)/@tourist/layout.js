@@ -24,7 +24,7 @@ export default async function TouristLayout({ children }) {
         />
       </header>
       <main>{children}</main>
-      {/* <Footer /> */}
+      <Footer />
     </body>
   );
 }

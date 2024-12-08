@@ -17,24 +17,24 @@ const ItineraryCard = ({ itinerary }) => (
   <Card className="w-full">
     <CardHeader className="relative p-0">
       <img
-        src={itinerary.ItineraryId.Image}
-        alt={itinerary.ItineraryId.Name}
+        src={itinerary?.ItineraryId?.Image}
+        alt={itinerary?.ItineraryId?.Name}
         className="object-cover w-full h-32 rounded-t-lg"
       />
       <Badge
         className="absolute top-2 right-2"
-        variant={itinerary.status === "completed" ? "secondary" : "default"}
+        variant={itinerary?.status === "completed" ? "secondary" : "default"}
       >
-        {itinerary.status === "completed"
+        {itinerary?.status === "completed"
           ? "Completed"
-          : itinerary.status === "upcoming"
-          ? "Upcoming"
-          : "Running"}
+          : itinerary?.status === "upcoming"
+            ? "Upcoming"
+            : "Running"}
       </Badge>
     </CardHeader>
     <CardContent className="pt-4">
       <CardTitle className="mb-2 text-lg">
-        {itinerary.ItineraryId.Name}
+        {itinerary?.ItineraryId?.Name}
       </CardTitle>
       {/* <CardDescription className="flex items-center mb-1">
         <MapPinIcon className="w-4 h-4 mr-1" />
@@ -42,17 +42,17 @@ const ItineraryCard = ({ itinerary }) => (
       </CardDescription> */}
       <CardDescription className="flex items-center mb-1">
         <CalendarIcon className="w-4 h-4 mr-1" />
-        {new Date(itinerary.ItineraryStartDate).toLocaleDateString()} -{" "}
-        {new Date(itinerary.ItineraryEndDate).toLocaleDateString()}
+        {new Date(itinerary?.ItineraryStartDate).toLocaleDateString()} -{" "}
+        {new Date(itinerary?.ItineraryEndDate).toLocaleDateString()}
       </CardDescription>
       <CardDescription className="flex items-center">
         <Users2Icon className="w-4 h-4 mr-1" />
-        {itinerary.Participants} participant(s)
+        {itinerary?.Participants} participant(s)
       </CardDescription>
     </CardContent>
     <CardFooter>
       <Link
-        href={`/itinerary/my-itineraries/${itinerary._id}`}
+        href={`/itinerary/my-itineraries/${itinerary?._id}`}
         className="w-full"
       >
         <Button variant="outline" className="w-full">
@@ -73,8 +73,8 @@ export default function ItinerariesOverview({ itineraries }) {
   const runningItineraries = itineraries
     .filter(
       (i) =>
-        new Date(i.ItineraryStartDate) <= new Date() &&
-        new Date(i.ItineraryEndDate) >= new Date()
+        new Date(i?.ItineraryStartDate) <= new Date() &&
+        new Date(i?.ItineraryEndDate) >= new Date()
     )
     .map((i) => ({ ...i, status: "running" }));
   const allItineraries = [
@@ -107,7 +107,7 @@ export default function ItinerariesOverview({ itineraries }) {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {upcomingItineraries.map((itinerary) => (
               <ItineraryCard
-                key={itinerary.ItineraryId._id}
+                key={itinerary?.ItineraryId?._id}
                 itinerary={itinerary}
               />
             ))}
@@ -117,7 +117,7 @@ export default function ItinerariesOverview({ itineraries }) {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {runningItineraries.map((itinerary) => (
               <ItineraryCard
-                key={itinerary.ItineraryId._id}
+                key={itinerary?.ItineraryId?._id}
                 itinerary={itinerary}
               />
             ))}
@@ -127,7 +127,7 @@ export default function ItinerariesOverview({ itineraries }) {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {completedItineraries.map((itinerary) => (
               <ItineraryCard
-                key={itinerary.ItineraryId._id}
+                key={itinerary?.ItineraryId?._id}
                 itinerary={itinerary}
               />
             ))}

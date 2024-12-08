@@ -97,7 +97,7 @@ export default function ItineraryDetails({ itinerary, bookmarked }) {
 
   const handleCopyLink = () => {
     const dummyLink = session?.data?.user
-      ? `http://localhost:3000/itineraries/${itinerary._id}`
+      ? `http://localhost:3000/itinerary/${itinerary._id}`
       : `http://localhost:3000/itineraries-guest/${itinerary._id}`;
     navigator.clipboard.writeText(dummyLink);
   };
@@ -186,7 +186,7 @@ export default function ItineraryDetails({ itinerary, bookmarked }) {
             <Badge
               key={index}
               variant="neutral"
-              className="text-black bg-white mr-2"
+              className="mr-2 text-black bg-white"
             >
               {tag.Tag}
             </Badge>

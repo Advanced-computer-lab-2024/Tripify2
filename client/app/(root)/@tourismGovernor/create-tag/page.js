@@ -40,7 +40,7 @@ const Page = () => {
 
       setTags([...tags, data]);
       setNewTag("");
-      router.push("/my-places");
+      router.push("/my-tags");
     } catch (err) {
       setError(err.message);
     } finally {

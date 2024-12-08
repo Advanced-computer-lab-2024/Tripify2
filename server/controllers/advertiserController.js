@@ -140,6 +140,7 @@ const updateAdvertiser = async (req, res) => {
 
   try {
     const advertiser = await advertiserModel.findById(id).populate("UserId");
+    console.log("Advertiser: ", advertiser);
 
     const duplicatedUserEmail = await userModel.findOne({ Email });
     const duplicatedUserName = await userModel.findOne({ UserName });
@@ -164,6 +165,7 @@ const updateAdvertiser = async (req, res) => {
       { UserName, Email }, // Update UserName and Email
       { new: true }
     );
+
 
     //console.log("Image: ", Image);
 

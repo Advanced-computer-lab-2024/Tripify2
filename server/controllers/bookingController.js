@@ -775,8 +775,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -875,8 +875,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -973,8 +973,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1041,8 +1041,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1111,8 +1111,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1191,8 +1191,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1307,8 +1307,8 @@ const acceptBooking = async (req, res) => {
         newTotalLoayltyPoints >= 500000
           ? "Gold"
           : newTotalLoayltyPoints >= 100000
-          ? "Silver"
-          : "Bronze";
+            ? "Silver"
+            : "Bronze";
 
       await TouristModel.findByIdAndUpdate(tourist._id, {
         $set: {
@@ -1470,8 +1470,15 @@ const cancelOrderProductBooking = async (req, res) => {
       //console.log(`tourist: ${tourist}`);
       //console.log(`tourist.Wallet: ${tourist.Wallet}`);
       //console.log(`order.TotalPaid: ${order.TotalPaid}`);
-      if (order.Status === "Confirmed")
-        tourist.Wallet = parseFloat(tourist.Wallet) + order.TotalPaid / 100;
+      if (order.Status === "Confirmed") {
+        const bookingPrice = order.TotalPaid;
+        const bookingCurrency = order.Currency;
+        const addedBalance = convertPrice(
+          (bookingPrice || 0) / 100,
+          bookingCurrency
+        );
+        tourist.Wallet = parseFloat(tourist.Wallet) + addedBalance
+      }
       await tourist.save();
     }
 

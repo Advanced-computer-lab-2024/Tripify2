@@ -96,11 +96,9 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
 
       if (image) {
         const imageUploadResult = await startUpload([image]);
-        if (!imageUploadResult.length) {
-          alert("Failed to upload image");
-          return;
-        }
-        Image = imageUploadResult[0].url;
+        if (imageUploadResult?.length) {
+          Image = imageUploadResult[0].url;
+        } else Image = image;
       }
 
       const response = await fetcher(`/tourguides/${tourguideid}`, {
@@ -284,7 +282,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                   </div>
                 ))}
 
-                {/* <div>
+                <div>
                   <label className="block mb-1">
                     <strong>Old Password:</strong>
                   </label>
@@ -306,7 +304,7 @@ function Tourguideprofile({ tourguide, tourguideid, role }) {
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
-                </div> */}
+                </div>
 
                 {role === "Admin" && (
                   <div>

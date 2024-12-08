@@ -40,7 +40,7 @@ function HotelBookingCard({ booking }) {
           </span>
         </div>
         <div className="text-lg font-bold text-green-600">
-          {(booking.TotalPaid / 100).toFixed(2)} {booking.Currency}
+          {booking.Currency}{(booking.TotalPaid / 100).toFixed(2)}
         </div>
       </div>
       <p className="mt-2 text-sm text-gray-500">
@@ -57,7 +57,7 @@ export default function BookedHotelsPage({ hotelsData }) {
   const filterBookings = (filterType) => {
     setFilter(filterType)
     const currentDate = new Date()
-    
+
     if (filterType === 'upcoming') {
       setBookings(hotelsData.filter(booking => {
         const offer = booking.HotelId.offers.find(o => o.id === booking.OfferId)

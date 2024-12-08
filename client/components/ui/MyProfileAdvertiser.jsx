@@ -39,7 +39,7 @@ export default function AdvertiserProfile({ advertiser }) {
   const [originalImage, setOriginalImage] = useState(
     advertiser.advertiser?.Image ?? null
   );
-  console.log(`advertiser: ${JSON.stringify(advertiser)}`);
+  // console.log(`advertiser: ${JSON.stringify(advertiser)}`);
   const { startUpload } = useUploadThing("imageUploader");
   const inputRef = useRef(null);
   const [requestOpen, setRequestOpen] = useState(false);
@@ -107,42 +107,32 @@ export default function AdvertiserProfile({ advertiser }) {
     e.preventDefault();
 
     try {
-      //console.log(session?.data?.user?.id);
+      console.log(session?.data?.user?.id);
       if (oldPassword !== "" && newPassword !== "") {
-        const changePasswordRes = await fetcher(
-          `/users/change-password/${session?.data?.user?.userId}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ oldPassword, newPassword }),
-          }
-        );
+        const changePasswordRes = await fetcher(`/users/change-password/${session?.data?.user?.userId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ oldPassword, newPassword }),
+        })
 
         if (!changePasswordRes.ok) {
-          alert("Failed to change password");
-          return;
+          alert("Failed to change password")
+          return
         }
       }
 
-      // let Image = "";
+      let Image = ''
 
-      // //console.log(`image: ${image}`)
-      // if (image) {
-      //   const imageUploadResult = await startUpload([image]);
-      //   //console.log(`imageUploadResult: ${imageUploadResult}`)
-      //   if (!imageUploadResult?.length) {
-      //    alert("Failed to upload image");
-      //    return;
-      //   }
-      //   Image = imageUploadResult[0].url;
-      // }
+      if (image) {
+        const imageUploadResult = await startUpload([image])
+        if (imageUploadResult?.length) {
+          Image = imageUploadResult[0].url;
+        } else Image = image;
+      }
+      console.log("Image: ", Image)
 
-      //Image= "https://utfs.io/f/kltUTFpXt5coWbhJnjIbDafoFlMTe8NZKgvpCz36WwXikmsV";
-
-      //console.log(`image: ${JSON.stringify(image)}`);
-      //console.log(`session: ${JSON.stringify(session)}`);
       const response = await fetcher(
         `/advertisers/${session?.data?.user?.id}`,
         {
@@ -150,17 +140,13 @@ export default function AdvertiserProfile({ advertiser }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            Image:
-              "https://utfs.io/f/kltUTFpXt5coWbhJnjIbDafoFlMTe8NZKgvpCz36WwXikmsV",
-          }),
+          body: JSON.stringify({ ...formData, Image }),
         }
       );
 
       if (response.ok) {
         const result = await response.json();
-        //console.log("Advertiser updated successfully:", result);
+        console.log("Advertiser updated successfully:", result);
         setIsEditMode(false);
         router.refresh();
       } else {
@@ -307,38 +293,25 @@ export default function AdvertiserProfile({ advertiser }) {
     <div className="flex flex-col items-center p-4 my-10">
       <div className="flex flex-col items-center mb-8">
         {image ? (
-          <div className="relative w-16 h-16 overflow-hidden rounded-full cursor-pointer">
-            <Image
-              width={64}
-              height={64}
-              src={
-                typeof image === "string" ? image : URL.createObjectURL(image)
-              }
-              alt="tourguide image"
-            />
+          <div className='relative w-16 h-16 overflow-hidden rounded-full cursor-pointer' onClick={() => inputRef.current.click()}>
+            <Image width={64} height={64} src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt="tourguide image" />
             <input
               type="file"
               accept="image/*"
               ref={inputRef}
-              name="Image"
-              onChange={(e) => {
-                setImage(e.target.files[0]);
-              }}
-              className="hidden w-full h-full"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="hidden"
             />
           </div>
         ) : (
-          <div className="relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer">
+          <div className='relative flex items-center justify-center w-16 h-16 overflow-hidden bg-gray-300 rounded-full cursor-pointer' onClick={() => inputRef.current.click()}>
             <UploadIcon size={24} />
             <input
               type="file"
               accept="image/*"
               ref={inputRef}
-              name="Image"
-              onChange={(e) => {
-                setImage(e.target.files[0]);
-              }}
-              className="hidden w-full h-full"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="hidden"
             />
           </div>
         )}
@@ -409,7 +382,7 @@ export default function AdvertiserProfile({ advertiser }) {
                     />
                   </label>
                 </div>
-                {/* <div>
+                <div>
                   <label>
                     <strong>Old Password</strong>
                     <input
@@ -430,7 +403,7 @@ export default function AdvertiserProfile({ advertiser }) {
                       className="w-full p-2 mb-4 border rounded-lg border-slate-300"
                     />
                   </label>
-                </div> */}
+                </div>
                 <Button
                   type="submit"
                   className="w-full bg-purple-600 hover:bg-purple-700"
@@ -560,7 +533,7 @@ export default function AdvertiserProfile({ advertiser }) {
 
           <TabsContent value="company">
             {(formData?.CompanyProfile && isProfileEditMode) ||
-            (!formData?.CompanyProfile && isProfileCreateMode) ? (
+              (!formData?.CompanyProfile && isProfileCreateMode) ? (
               <form onSubmit={handleProfileSubmit}>
                 <div>
                   <label>
@@ -591,9 +564,9 @@ export default function AdvertiserProfile({ advertiser }) {
                       value={
                         profileformData.FoundedDate
                           ? format(
-                              new Date(profileformData.FoundedDate),
-                              "yyyy-MM-dd"
-                            )
+                            new Date(profileformData.FoundedDate),
+                            "yyyy-MM-dd"
+                          )
                           : ""
                       }
                       onChange={handleProfileInputChange}

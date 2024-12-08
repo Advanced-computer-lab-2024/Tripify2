@@ -98,7 +98,7 @@ export default function AdvertiserProfile({ Activities }) {
   //         </li>
   //         <RiDeleteBin5Line
   //           size={18}
-  //           className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer justify-self-end"
+  //           className="text-red-500 transition duration-200 cursor-pointer hover:text-red-600 justify-self-end"
   //           onClick={(e) => handleDeleteClick(e, activity._id)}
   //         />
   //       </ul>
@@ -127,15 +127,15 @@ export default function AdvertiserProfile({ Activities }) {
           </TableHeader>
           <TableBody>
             {AllActivities.map((activity) => (
-              <TableRow key={activity?._id} onClick={()=>{router.push(`/my-activities/${activity._id}`)}}>
+              <TableRow key={activity?._id} onClick={() => { router.push(`/my-activities/${activity._id}`) }}>
                 <TableCell className="hidden sm:table-cell">
                   <img
                     src={
                       activity?.Image.startsWith("http://") ||
-                      activity?.Image.startsWith("https://") ||
-                      activity?.Image.startsWith("www") ||
-                      activity?.Image.startsWith("i.") ||
-                      activity?.Image.startsWith("m.")
+                        activity?.Image.startsWith("https://") ||
+                        activity?.Image.startsWith("www") ||
+                        activity?.Image.startsWith("i.") ||
+                        activity?.Image.startsWith("m.")
                         ? activity?.Image
                         : `/images/${activity?.Image}`
                     }
@@ -161,8 +161,11 @@ export default function AdvertiserProfile({ Activities }) {
                 <TableCell className="font-medium">
                   <RiDeleteBin5Line
                     size={18}
-                    className="text-red-500 hover:text-red-600 transition duration-200 cursor-pointer justify-self-end"
-                    onClick={(e) => handleDeleteClick(e, activity._id)}
+                    className="text-red-500 transition duration-200 cursor-pointer hover:text-red-600 justify-self-end"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(e, activity._id);
+                    }}
                   />
                 </TableCell>
               </TableRow>
@@ -174,14 +177,14 @@ export default function AdvertiserProfile({ Activities }) {
   );
 
   // return (
-  //   <div className="p-6 max-w-7xl mx-auto">
-  //     <div className="flex justify-between items-center mb-4">
+  //   <div className="p-6 mx-auto max-w-7xl">
+  //     <div className="flex items-center justify-between mb-4">
   //       <h1 className="text-2xl font-bold">
   //         Activities ({AllActivities.length})
   //       </h1>
   //       <button
   //         onClick={handleCreateClick}
-  //         className="bg-blue-500 text-white py-2 px-4 rounded"
+  //         className="px-4 py-2 text-white bg-blue-500 rounded"
   //       >
   //         Create
   //       </button>
@@ -192,7 +195,7 @@ export default function AdvertiserProfile({ Activities }) {
   //         {AllActivities.map((activity) => (
   //           <Card
   //             key={activity._id}
-  //             className="relative group transition-all duration-300 ease-in-out transform hover:scale-101 hover:shadow-xl hover:bg-gray-100"
+  //             className="relative transition-all duration-300 ease-in-out transform group hover:scale-101 hover:shadow-xl hover:bg-gray-100"
   //           >
   //             <CardHeader>
   //               <img
@@ -224,14 +227,14 @@ export default function AdvertiserProfile({ Activities }) {
   //                 <div className="flex justify-between w-full py-4 space-x-4">
   //                   <button
   //                     onClick={() => handleEditClick(activity._id)}
-  //                     className="flex items-center justify-center bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600 transition duration-200 w-1/3"
+  //                     className="flex items-center justify-center w-1/3 px-4 py-2 text-white transition duration-200 bg-green-500 rounded-md shadow-md hover:bg-green-600"
   //                   >
   //                     <RiEdit2Line size={18} className="mr-2" />
   //                     Edit
   //                   </button>
   //                   <button
   //                     onClick={() => handleDeleteClick(activity._id)}
-  //                     className="flex items-center justify-center bg-red-500 text-white py-2 px-1 rounded-md shadow-md hover:bg-red-600 transition duration-200 w-2/3"
+  //                     className="flex items-center justify-center w-2/3 px-1 py-2 text-white transition duration-200 bg-red-500 rounded-md shadow-md hover:bg-red-600"
   //                   >
   //                     <RiDeleteBin5Line size={18} className="mr-2" />
   //                     Delete

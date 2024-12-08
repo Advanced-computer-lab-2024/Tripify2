@@ -1,4 +1,6 @@
 'use client'
+import { convertPrice } from '@/lib/utils'
+import { useCurrencyStore } from '@/providers/CurrencyProvider'
 import { useState } from 'react'
 
 function FlightCard({ flight }) {
@@ -18,7 +20,7 @@ function FlightCard({ flight }) {
             {isPastFlight ? 'Past' : 'Upcoming'}
           </span>
         </div>
-        <div className="text-lg font-bold text-green-600">${flight.FlightId?.price?.total}</div>
+        <div className="text-lg font-bold text-green-600">{flight.Currency}{parseFloat(flight.TotalPaid) / 100}</div>
       </div>
     </div>
   )

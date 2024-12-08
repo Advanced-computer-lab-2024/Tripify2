@@ -28,7 +28,7 @@ function TransportationCard({ booking }) {
                 </div>
                 <div className="text-lg font-bold text-green-600">
                     {booking.Currency === 'USD' ? '$' : booking.Currency === 'EUR' ? '€' : 'EGP'}
-                    {booking.TotalPaid}
+                    {parseFloat(booking.TotalPaid / 100).toFixed(2)}
                 </div>
             </div>
         </div>

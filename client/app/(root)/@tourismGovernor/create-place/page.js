@@ -39,6 +39,9 @@ export default function MyPlaces() {
   const [buttonClicked, setButtonClicked] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
 
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
   const disableButton =
     !newPlace?.Name.trim() ||
     !newPlace?.Description.trim() ||
@@ -84,6 +87,36 @@ export default function MyPlaces() {
 
     fetchTagsAndCategories();
   }, []);
+
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategories((prevSelected) => {
+      if (prevSelected.includes(categoryId))
+        return prevSelected.filter((id) => id !== categoryId);
+      else return [...prevSelected, categoryId];
+    });
+
+    setNewPlace((prevData) => ({
+      ...prevData,
+      Categories: selectedCategories.includes(categoryId)
+        ? selectedCategories.filter((id) => id !== categoryId)
+        : [...selectedCategories, categoryId],
+    }));
+  };
+
+  const handleTagChange = (tagId) => {
+    setSelectedTags((prevSelected) => {
+      if (prevSelected.includes(tagId))
+        return prevSelected.filter((id) => id !== tagId);
+      else return [...prevSelected, tagId];
+    });
+
+    setNewPlace((prevData) => ({
+      ...prevData,
+      Tags: selectedTags.includes(tagId)
+        ? selectedTags.filter((id) => id !== tagId)
+        : [...selectedTags, tagId],
+    }));
+  };
 
   const handleAddPair = () => {
     if (key.trim() !== "") {
@@ -343,7 +376,7 @@ export default function MyPlaces() {
         <LocationPicker onLocationSelect={handleLocationSelect} />
       </div>
 
-      <div>
+      {/* <div>
         <h3 className="text-lg font-bold">Select Category</h3>
         <div className="flex flex-wrap gap-4 mt-2">
           {categoriesButton.map((category) => (
@@ -402,6 +435,56 @@ export default function MyPlaces() {
                 className="focus:ring-2 focus:ring-blue-500"
               />
               <span className="text-gray-600">{tag.Tag}</span>
+            </label>
+          ))}
+        </div>
+      </div> */}
+
+      <div className="block mb-4">
+        <span className="block mb-2">Categories:</span>
+        <div className="flex flex-wrap gap-2">
+          {categoriesButton.map((category) => (
+            <label
+              key={category._id}
+              className={`cursor-pointer p-2 border rounded ${
+                selectedCategories.includes(category._id)
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              <input
+                type="checkbox"
+                value={category._id}
+                onChange={() => handleCategoryChange(category._id)}
+                checked={selectedCategories.includes(category._id)}
+                className="hidden"
+              />
+              {category.Category}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="block mb-4">
+        <span className="block mb-2">Tags:</span>
+        <div className="flex flex-wrap gap-2">
+          {tagsButton.map((tag) => (
+            <label
+              key={tag._id}
+              className={`cursor-pointer p-2 border rounded ${
+                selectedTags.includes(tag._id)
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              <input
+                type="checkbox"
+                value={tag._id}
+                onChange={() => handleTagChange(tag._id)}
+                checked={selectedTags.includes(tag._id)}
+                className="hidden"
+              />
+              {tag.Tag}
             </label>
           ))}
         </div>

@@ -5,7 +5,13 @@ import { convertPrice } from "@/lib/utils";
 import { useCurrencyStore } from "@/providers/CurrencyProvider";
 import { useRouter } from "next/navigation";
 import { fetcher } from "@/lib/fetch-client";
-import { CreditCardIcon, WalletIcon, DollarSignIcon, Loader2, Tag } from "lucide-react";
+import {
+  CreditCardIcon,
+  WalletIcon,
+  DollarSignIcon,
+  Loader2,
+  Tag,
+} from "lucide-react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import LocationPicker from "@/components/shared/LocationPicker";
 import LocationViewer from "@/components/shared/LoactionViewer";
@@ -181,7 +187,10 @@ const CheckoutComponent = ({ params }) => {
   const handleBuy = async () => {
     try {
       setIsLoading(true);
-      if (paymentMethod === "wallet" && parseFloat(wallet) < (discountedPrice || totalPrice)) {
+      if (
+        paymentMethod === "wallet" &&
+        parseFloat(wallet) < (discountedPrice || totalPrice)
+      ) {
         setMessageAboveButton("Insufficient balance in wallet");
         setTimeout(() => {
           setMessageAboveButton("");
@@ -200,7 +209,7 @@ const CheckoutComponent = ({ params }) => {
           products: simplifiedProducts,
           currency: currency,
           paymentMethod: paymentMethod,
-          promoCode: promoCode || undefined
+          promoCode: promoCode || undefined,
         }),
       });
 
@@ -281,12 +290,12 @@ const CheckoutComponent = ({ params }) => {
               {willBeUsedAddress
                 ? willBeUsedAddress.name
                 : addresses.length > 0
-                  ? addresses[0].name
-                  : "No Saved Addresses"}
+                ? addresses[0].name
+                : "No Saved Addresses"}
             </button>
 
             {isDropdownOpen && (
-              <ul className="absolute w-full mt-1 bg-white border border-gray-300 z-[10] rounded-md shadow-lg">
+              <ul className="absolute w-full mt-1 bg-white border border-gray-300 z-[8] rounded-md shadow-lg">
                 {addresses.length > 0 ? (
                   addresses.map((address) => (
                     <li
@@ -295,10 +304,11 @@ const CheckoutComponent = ({ params }) => {
                       onClick={() => handleAddressSelect(address)}
                     >
                       <span
-                        className={`${willBeUsedAddress?.name === address.name
-                          ? "font-bold text-blue-500"
-                          : ""
-                          }`}
+                        className={`${
+                          willBeUsedAddress?.name === address.name
+                            ? "font-bold text-blue-500"
+                            : ""
+                        }`}
                       >
                         {address.name}
                       </span>
@@ -330,7 +340,10 @@ const CheckoutComponent = ({ params }) => {
       </div>
 
       <div className="mb-6">
-        <label htmlFor="promoCode" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="promoCode"
+          className="block text-sm font-medium text-gray-700"
+        >
           Promo Code
         </label>
         <div className="flex mt-1 space-x-2">
@@ -368,14 +381,15 @@ const CheckoutComponent = ({ params }) => {
               Original Price: {currency} {convertPrice(totalPrice, currency)}
             </p>
             <p className="text-sm font-medium text-blue-600">
-              Discounted Price: {currency} {convertPrice(discountedPrice, currency)}
+              Discounted Price: {currency}{" "}
+              {convertPrice(discountedPrice, currency)}
             </p>
           </div>
         )}
       </div>
 
       {isPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black z-[8] bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black z-[10] bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[90vh] overflow-y-auto">
             <h2 className="mb-4 text-xl font-bold">Add Address</h2>
             {errorMessage && (
@@ -445,10 +459,11 @@ const CheckoutComponent = ({ params }) => {
       <div className="flex justify-center mt-6 space-x-4 payment-methods">
         <button
           onClick={() => setPaymentMethod("cash-on-delivery")}
-          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${paymentMethod === "cash-on-delivery"
-            ? "bg-blue-500 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${
+            paymentMethod === "cash-on-delivery"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
         >
           <DollarSignIcon className="w-6 h-6" />
           <span>Cash</span>
@@ -456,10 +471,11 @@ const CheckoutComponent = ({ params }) => {
 
         <button
           onClick={() => setPaymentMethod("wallet")}
-          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${paymentMethod === "wallet"
-            ? "bg-blue-500 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${
+            paymentMethod === "wallet"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
         >
           <WalletIcon className="w-6 h-6" />
           <span>Wallet</span>
@@ -467,10 +483,11 @@ const CheckoutComponent = ({ params }) => {
 
         <button
           onClick={() => setPaymentMethod("credit-card")}
-          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${paymentMethod === "credit-card"
-            ? "bg-blue-500 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+          className={`p-4 rounded-lg w-40 flex items-center justify-center space-x-2 text-lg font-medium transition ${
+            paymentMethod === "credit-card"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
         >
           <CreditCardIcon className="w-6 h-6" />
           <span>Card</span>
@@ -480,10 +497,11 @@ const CheckoutComponent = ({ params }) => {
       <button
         onClick={handleBuy}
         disabled={!paymentMethod || !willBeUsedAddress || isLoading}
-        className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 z-[5] mt-8 ${!paymentMethod || !willBeUsedAddress || isLoading
-          ? "opacity-50 cursor-not-allowed"
-          : ""
-          }`}
+        className={`w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-medium transition hover:bg-blue-600 z-[5] mt-8 ${
+          !paymentMethod || !willBeUsedAddress || isLoading
+            ? "opacity-50 cursor-not-allowed"
+            : ""
+        }`}
       >
         {isLoading ? (
           <>
@@ -491,7 +509,7 @@ const CheckoutComponent = ({ params }) => {
             Processing...
           </>
         ) : (
-          'Buy'
+          "Buy"
         )}
       </button>
       {messageAboveButton && (

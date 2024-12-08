@@ -382,7 +382,6 @@ const ItineraryComponent = ({ params }) => {
                       {new Date(itinerary.StartDate).toLocaleDateString()}
                     </p>
                     <p>
-                      Tags:{" "}
                       {itinerary.Tag.map((tag) => (
                         <Badge
                           key={tag._id}
@@ -395,12 +394,11 @@ const ItineraryComponent = ({ params }) => {
                     </p>
 
                     <p>
-                      Categories:{" "}
                       {itinerary.Category.map((category) => (
                         <Badge
                           key={category._id}
                           variant="neutral"
-                          className="text-white bg-blue-500 mr-2"
+                          className="text-white bg-blue-600 mr-2"
                         >
                           {category.Category}
                         </Badge>

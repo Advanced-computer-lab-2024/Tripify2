@@ -188,6 +188,8 @@ const PlacesPage = () => {
                         </Badge>
                       ) : null;
                     })}
+                  </p>
+                  <p>
                     {place.Categories.map((categoryId) => {
                       const foundCategory = categories.find(
                         (actualCategory) => actualCategory._id === categoryId

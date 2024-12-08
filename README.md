@@ -645,50 +645,50 @@ EMAIL_PASSWORD= your-password
   - NEXT_PUBLIC_API_SERVER_ENDPOINT = https://your-backend.com 
 
 **URL for authentication callback (used by NextAuth.js)**
-  - NEXTAUTH_URL=https://your-frontend.com 
+  - NEXTAUTH_URL = https://your-frontend.com 
 
 **Secret key used by NextAuth.js for token encryption (keep it secure)**
-  - NEXTAUTH_SECRET=your-next.js-secret-auth-key 
+  - NEXTAUTH_SECRET = your-next.js-secret-auth-key 
 
 **Google API key for accessing Google Maps or other Google services**
-  - NEXT_PUBLIC_GOOGLE_API_KEY=your-google-maps-api-key 
+  - NEXT_PUBLIC_GOOGLE_API_KEY = your-google-maps-api-key 
 
 **API key for UploadThing (file upload service)**
-  - UPLOADTHING_TOKEN=your-uploadthing-api-key 
+  - UPLOADTHING_TOKEN = your-uploadthing-api-key 
 
 **API key for Frigade service (used for specific integrations, e.g., payments or other services)**
-  - NEXT_PUBLIC_FRIGADE_API_KEY=your-frigade-api-key 
+  - NEXT_PUBLIC_FRIGADE_API_KEY = your-frigade-api-key 
 
 **MongoDB URI for connecting to your database**
-  - MONGODB_URI=your-mongodb-api-key 
+  - MONGODB_URI = your-mongodb-api-key 
 
 **Secret used for signing access tokens (keep this safe and secret)**
-  - ACCESS_TOKEN_SECRET=your-access-token-key 
+  - ACCESS_TOKEN_SECRET = your-access-token-key 
 
 **Secret used for refreshing access tokens (keep this safe and secret)**
-  - REFRESH_TOKEN_SECRET=your-refresh-token-key 
+  - REFRESH_TOKEN_SECRET = your-refresh-token-key 
 
 **Secret key for Stripe payments integration**
-  - STRIPE_SECRET_KEY=your-stripe-api-key 
+  - STRIPE_SECRET_KEY = your-stripe-api-key 
 
 **Client URL, used for redirecting users to the frontend after authentication or actions**
-  - CLIENT_URL=https://your-frontend.com 
+  - CLIENT_URL = https://your-frontend.com 
 
 **Stripe endpoint secret used for verifying webhook events from Stripe**
-  - STRIPE_ENDPOINT_SECRET=your-stripe-api-key 
+  - STRIPE_ENDPOINT_SECRET = your-stripe-api-key 
 
 **API key for accessing hotel-related data (hotel booking service)**
-  - HOTEL_API_KEY=your-hotels-api-key 
+  - HOTEL_API_KEY = your-hotels-api-key 
 
 **Secret key for the hotel API (used in some cases for authentication with hotel services)**
-  - HOTEL_API_SECRET=your-hotels-api-key 
+  - HOTEL_API_SECRET = your-hotels-api-key 
 
 **Frontend URL for various purposes, such as redirects or linking in emails**
-  - FRONTEND_URL=https://your-frontend.com 
+  - FRONTEND_URL = https://your-frontend.com 
 
 **Email credentials for sending emails from your backend (e.g., for notifications, password resets)**
-  - EMAIL_USER=your-email 
-  - EMAIL_PASSWORD=your-password
+  - EMAIL_USER = your-email 
+  - EMAIL_PASSWORD = your-password
 
 ## API Refrences
 

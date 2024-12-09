@@ -87,6 +87,7 @@ By combining personalized itineraries, budgeting tools, collaborative planning, 
 
 
 ## Screenshots
+[Tests and Screenshots](https://drive.google.com/drive/folders/1f0NyHhLAwt00rs-qYnzicYOppYfXbk4K)
 
 ## Tech/Frameworks Used
 
@@ -1003,6 +1004,7 @@ EMAIL_PASSWORD= your-password
 | `/users/get-all/delete-requests`    | `GET`   | Retrieves all deletion requests (requires admin privileges).  |
 
 ## Tests
+[Tests and Screenshots](https://drive.google.com/drive/folders/1f0NyHhLAwt00rs-qYnzicYOppYfXbk4K)
 
 ## How to use
 All steps are after the set up mentioned above

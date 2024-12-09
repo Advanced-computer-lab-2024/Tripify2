@@ -291,7 +291,7 @@ export default function Dashboard({ params }) {
             </nav>
           </div>
         )}
-        <Notifications />
+       { role==="Guest"?"":<Notifications />}
       </div>
 
       {sidebarVisible && (

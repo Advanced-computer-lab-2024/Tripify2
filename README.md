@@ -903,8 +903,6 @@ EMAIL_PASSWORD= your-password
 
 ### Review Routes
 
-#### Itinerary Reviews
-
 | Endpoint                        | Method  | Description                                                   |
 |----------------------------------|---------|---------------------------------------------------------------|
 | `/reviews/itineraries/:id`       | `POST`  | Adds a review for a specific itinerary (accessible by tourists).

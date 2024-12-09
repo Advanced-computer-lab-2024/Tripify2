@@ -690,9 +690,6 @@ EMAIL_PASSWORD= your-password
   - EMAIL_USER = your-email 
   - EMAIL_PASSWORD = your-password
 
-## API Refrences
-
-
 ## API Reference
 
 ```http

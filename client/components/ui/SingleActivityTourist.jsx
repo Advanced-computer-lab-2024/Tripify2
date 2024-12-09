@@ -477,7 +477,7 @@ export default function ActivityDetails({ activity, bookmarked }) {
           </div>
           <button
             onClick={handleBook}
-            disabled={activity.RemainingBookings === 0}
+            disabled={activity.RemainingBookings === 0 || !session?.data?.user}
             className="px-6 py-3 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg disabled:opacity-65 disabled:hover:scale-100 disabled:hover:bg-gray-500 disabled:bg-gray-500 hover:bg-blue-600 hover:scale-105"
           >
             Book Now

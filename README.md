@@ -901,8 +901,6 @@ EMAIL_PASSWORD= your-password
   Review Routes
 ```
 
-Here’s the updated documentation for the review-related routes with the `/reviews` path for itineraries, tour guides, activities, and products:
-
 ### Review Routes
 
 #### Itinerary Reviews

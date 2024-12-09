@@ -31,7 +31,12 @@ async function getProducts(req, res) {
 
     console.log(query);
 
-    const products = await Product.find(query).populate("Seller");
+    const products = await Product.find(query).populate(["Seller", {
+      path: "Reviews",
+      populate: {
+        path: "UserId",
+      },
+    }]);
     // .populate("Reviews");
     res.status(200).json(products);
   } catch (e) {
